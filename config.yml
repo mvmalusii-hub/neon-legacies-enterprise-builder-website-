@@ -1,0 +1,78 @@
+# ==========================================
+# SITE SETTINGS
+# ==========================================
+title: Neon Legacies Enterprise Builder
+description: Professional business compliance and document solutions for South African companies
+url: "https://neonlegacies.co.za"
+baseurl: ""
+
+# ==========================================
+# GITHUB METADATA (Enables site.github variables)
+# ==========================================
+github: [metadata]
+
+# ==========================================
+# PLUGINS
+# ==========================================
+plugins:
+  - jekyll-redirect-from
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  # - github-pages  # Automatically included on GitHub Pages
+
+# ==========================================
+# MARKDOWN & SYNTAX
+# ==========================================
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# ==========================================
+# PERMALINKS
+# ==========================================
+permalink: /:year/:month/:day/:title/
+
+# ==========================================
+# EXCLUDE FROM BUILD
+# ==========================================
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - .sass-cache
+  - .jekyll-cache
+  - vendor
+  - README.md
+  - LICENSE
+  - .gitignore
+  - package.json
+  - package-lock.json
+
+# ==========================================
+# DEFAULTS
+# ==========================================
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "page"
+
+# ==========================================
+# TIMEZONE
+# ==========================================
+timezone: Africa/Johannesburg
+
+# ==========================================
+# BUILD SETTINGS
+# ==========================================
+future: false
+show_drafts: false
+limit_posts: 0

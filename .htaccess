@@ -1,0 +1,4 @@
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^legacylaunchpad.co.za$ [OR]
+RewriteCond %{HTTP_HOST} ^www.legacylaunchpad.co.za$
+RewriteRule (.*)$ https://www.neonlegacies.co.za/$1 [R=301,L]

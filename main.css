@@ -1,0 +1,2295 @@
+/* ============================================================ */
+/*  1. RESET & BASE                                             */
+/* ============================================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+    line-height: 1.5;
+}
+.hidden {
+    display: none !important;
+}
+
+/* ============================================================ */
+/*  2. TOP HEADER & NAVIGATION                                  */
+/* ============================================================ */
+.top-header {
+    background: #0f172a;
+    color: white;
+    padding: 15px 30px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.logo-icon {
+    background: #fbbf24;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0f172a;
+}
+.logo-text h1 {
+    font-size: 1.4rem;
+    letter-spacing: -0.5px;
+}
+.logo-text p {
+    font-size: 0.7rem;
+    color: #94a3b8;
+}
+.top-nav {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.top-nav a {
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.top-nav a:hover,
+.top-nav a.active {
+    color: #fbbf24;
+}
+
+/* Dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+.dropbtn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+}
+.dropbtn i {
+    font-size: 0.7rem;
+    margin-left: 5px;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    z-index: 1000;
+    top: 30px;
+    left: 0;
+}
+.dropdown-content a {
+    color: #0f172a;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid #e2e8f0;
+}
+.dropdown-content a:last-child {
+    border-bottom: none;
+}
+.dropdown-content a:hover {
+    background: #fefce8;
+    color: #fbbf24;
+}
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+.dropdown:hover .dropbtn {
+    color: #fbbf24;
+}
+.menu-toggle {
+    display: none;
+    background: #0f172a;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+/* ============================================================ */
+/*  3. SIDEBAR & LAYOUT                                         */
+/* ============================================================ */
+.app-container {
+    display: flex;
+    min-height: calc(100vh - 80px);
+}
+.sidebar {
+    width: 280px;
+    background: #0f172a;
+    color: #e2e8f0;
+    position: fixed;
+    top: 80px;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+    z-index: 100;
+    padding: 20px 0;
+}
+.sidebar-header {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid #334155;
+    margin-bottom: 20px;
+}
+.sidebar-header h3 {
+    color: #fbbf24;
+    font-size: 1.2rem;
+}
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+}
+.sidebar-menu li {
+    margin-bottom: 4px;
+}
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: 0.2s;
+    font-size: 0.9rem;
+}
+.sidebar-menu a:hover {
+    background: #1e293b;
+    color: #fbbf24;
+}
+.sidebar-menu i {
+    width: 24px;
+    text-align: center;
+}
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 30px;
+}
+
+/* ============================================================ */
+/*  4. COMMON COMPONENTS                                        */
+/* ============================================================ */
+.section-title {
+    font-size: 1.8rem;
+    margin: 40px 0 20px;
+    border-left: 5px solid #fbbf24;
+    padding-left: 15px;
+}
+.btn {
+    display: inline-block;
+    background: #fbbf24;
+    color: #0f172a;
+    padding: 12px 30px;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn:hover {
+    background: #f59e0b;
+    transform: translateY(-2px);
+}
+.btn-sm {
+    width: auto;
+    padding: 8px 20px;
+    font-size: 0.85rem;
+}
+.btn-outline {
+    background: transparent;
+    color: #0f172a;
+    border: 2px solid #0f172a;
+}
+.btn-outline:hover {
+    background: #0f172a;
+    color: white;
+}
+.btn-small {
+    background: #0f172a;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: 0.2s;
+    display: inline-block;
+    margin-top: 10px;
+}
+.btn-small:hover {
+    background: #fbbf24;
+    color: #0f172a;
+}
+.form-card {
+    background: white;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-family: inherit;
+}
+.file-hint {
+    font-size: 0.75rem;
+    color: #475569;
+    margin-top: 5px;
+}
+.message {
+    margin-top: 15px;
+    text-align: center;
+}
+.login-warning {
+    background: #fef9c3;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.login-warning a {
+    font-weight: bold;
+    color: inherit;
+}
+.footer-contact {
+    background: #0f172a;
+    color: #94a3b8;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    margin-top: 50px;
+}
+.footer-contact a {
+    color: #fbbf24;
+    text-decoration: none;
+}
+
+/* ============================================================ */
+/*  5. PAGE-SPECIFIC OVERRIDES (via body classes)              */
+/* ============================================================ */
+
+/* --- International Theme (deep blue) --- */
+.theme-international {
+    background: #f0f7ff;
+    color: #0a2540;
+}
+.theme-international .top-header,
+.theme-international .sidebar,
+.theme-international .footer-contact {
+    background: #0a2540;
+}
+.theme-international .sidebar-header {
+    border-bottom-color: #2c4c6e;
+}
+.theme-international .sidebar-menu a:hover {
+    background: #1e4a6e;
+    color: #fbbf24;
+}
+.theme-international .section-title {
+    color: #0a2540;
+}
+.theme-international .menu-toggle {
+    background: #0a2540;
+}
+
+/* --- Growth Theme (green/teal) --- */
+.theme-growth {
+    background: #f5fbf7;
+    color: #1a3b2f;
+}
+.theme-growth .top-header,
+.theme-growth .sidebar,
+.theme-growth .footer-contact {
+    background: #1a3b2f;
+}
+.theme-growth .sidebar-header {
+    border-bottom-color: #2d5a47;
+}
+.theme-growth .sidebar-menu a:hover {
+    background: #2d5a47;
+    color: #fbbf24;
+}
+.theme-growth .section-title {
+    color: #1a3b2f;
+}
+.theme-growth .menu-toggle {
+    background: #1a3b2f;
+}
+
+/* --- Hub Theme (purple) --- */
+.theme-hub {
+    background: #f8fafc;
+    color: #1e293b;
+}
+.theme-hub .top-header,
+.theme-hub .sidebar,
+.theme-hub .footer-contact {
+    background: #2d2b5e;
+}
+.theme-hub .sidebar-header {
+    border-bottom-color: #4c4794;
+}
+.theme-hub .sidebar-menu a:hover {
+    background: #4c4794;
+    color: #fbbf24;
+}
+.theme-hub .section-title {
+    color: #2d2b5e;
+}
+.theme-hub .menu-toggle {
+    background: #2d2b5e;
+}
+.theme-hub .logo-text p {
+    color: #a5b4fc;
+}
+
+/* ============================================================ */
+/*  6. COMPONENT-SPECIFIC STYLES (shared across pages)         */
+/* ============================================================ */
+
+/* ---- Hero variants ---- */
+.hero-premium,
+.hero-admin,
+.hero-referral,
+.hero-market,
+.hero-hub,
+.hero-partner,
+.hero-growth,
+.global-badge {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: white;
+    padding: 30px;
+    border-radius: 24px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+.hero-premium i,
+.hero-admin i,
+.hero-referral i,
+.hero-market i,
+.hero-hub i,
+.hero-partner i,
+.hero-growth i,
+.global-badge i {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #fbbf24;
+}
+.hero-premium h2,
+.hero-admin h2,
+.hero-referral h2,
+.hero-market h2,
+.hero-hub h2,
+.hero-partner h2,
+.hero-growth h2,
+.global-badge h2 {
+    margin: 10px 0;
+}
+/* specific hero overrides */
+.global-badge {
+    background: linear-gradient(135deg, #0a2540, #1e4a6e);
+}
+
+/* ---- Grids ---- */
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin: 30px 0;
+}
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: 0.2s;
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+.card i {
+    font-size: 2rem;
+    color: #fbbf24;
+    margin-bottom: 15px;
+}
+.premium-card {
+    border: 1px solid rgba(0,0,0,0.04);
+}
+.premium-card:hover {
+    border-color: #fbbf24;
+}
+
+/* ---- Partner Grid ---- */
+.partner-grid,
+.company-grid,
+.industry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+.partner-card,
+.company-card,
+.industry-card {
+    background: white;
+    border-radius: 16px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: 0.2s;
+}
+.partner-card:hover,
+.company-card:hover,
+.industry-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.partner-card img,
+.company-card img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+.company-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 15px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #fbbf24;
+}
+.industry-card i {
+    font-size: 2rem;
+    color: #fbbf24;
+    margin-bottom: 10px;
+}
+.industry-card h4 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+.industry-card p {
+    font-size: 0.8rem;
+    color: #475569;
+    margin-bottom: 12px;
+}
+
+/* ---- Stats (referral) ---- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 20px 0 30px;
+}
+.stat-card {
+    background: #f1f5f9;
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+}
+.stat-card h3 {
+    font-size: 2rem;
+    color: #fbbf24;
+    margin-bottom: 5px;
+}
+.stat-card p {
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+/* ---- Referral link box ---- */
+.referral-link-box {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+.referral-link-box code {
+    background: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    word-break: break-all;
+    flex: 1;
+    font-family: 'Courier New', monospace;
+}
+.referral-note {
+    margin-top: 15px;
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+/* ---- Checkbox & Radio groups ---- */
+.checkbox-group,
+.radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 15px 0 25px;
+}
+.checkbox-group label,
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: normal;
+    cursor: pointer;
+}
+.checkbox-group input[type="checkbox"],
+.radio-group input[type="radio"] {
+    width: auto;
+    margin: 0;
+}
+
+/* ---- Video & Comments (Hub) ---- */
+.video-container {
+    background: #000;
+    border-radius: 24px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    aspect-ratio: 16 / 9;
+    position: relative;
+}
+.video-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #1e1b4b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+}
+.video-placeholder i {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    color: #fbbf24;
+}
+.comment-section {
+    background: white;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+.comment-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 15px;
+    background: #f8fafc;
+}
+.comment-item {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+.comment-item:last-child {
+    border-bottom: none;
+}
+.comment-author {
+    font-weight: bold;
+    color: #2d2b5e;
+}
+.comment-date {
+    font-size: 0.7rem;
+    color: #475569;
+    margin-left: 10px;
+}
+.comment-text {
+    margin-top: 5px;
+}
+
+/* ---- Simulation row (referral) ---- */
+.simulate-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.simulate-row input {
+    flex: 1;
+    min-width: 150px;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+}
+
+/* ---- Why us (index) ---- */
+.why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin: 25px 0 40px;
+}
+.why-card {
+    background: white;
+    padding: 30px 20px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    transition: 0.3s;
+    border-bottom: 3px solid transparent;
+}
+.why-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    border-bottom-color: #fbbf24;
+}
+.why-card i {
+    font-size: 2.2rem;
+    color: #fbbf24;
+    margin-bottom: 15px;
+}
+.why-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+.why-card p {
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+/* ---- Testimonials ---- */
+.testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    margin: 25px 0 40px;
+}
+.testimonial-card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+.testimonial-card .stars {
+    color: #fbbf24;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+.testimonial-card p {
+    font-style: italic;
+    margin-bottom: 12px;
+    color: #1e293b;
+}
+.testimonial-card .author {
+    font-size: 0.85rem;
+    color: #475569;
+    font-weight: 600;
+}
+
+/* ---- CTA (index) ---- */
+.cta-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 24px;
+    padding: 50px 30px;
+    margin: 40px 0 50px;
+    text-align: center;
+    color: white;
+}
+.cta-content h2 {
+    font-size: 2rem;
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 15px;
+}
+.cta-content p {
+    font-size: 1.05rem;
+    opacity: 0.85;
+    max-width: 550px;
+    margin: 0 auto 25px;
+}
+.cta-note {
+    margin-top: 15px;
+    font-size: 0.9rem !important;
+    opacity: 0.6 !important;
+}
+.roadmap-highlight {
+    border-left: 5px solid #fbbf24;
+    background: #fefce8;
+}
+
+/* ---- Hero stats (index) ---- */
+.hero-premium {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+}
+.hero-premium::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+}
+.hero-badge {
+    display: inline-block;
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    padding: 6px 18px;
+    border-radius: 40px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+.hero-premium h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 15px;
+    font-family: 'Playfair Display', serif;
+}
+.hero-subtitle {
+    font-size: 1.15rem;
+    max-width: 650px;
+    margin: 0 auto 30px;
+    opacity: 0.85;
+    line-height: 1.6;
+}
+.hero-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 35px;
+}
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.hero-stats span {
+    font-size: 0.95rem;
+    opacity: 0.8;
+}
+.hero-stats strong {
+    font-weight: 700;
+    color: #fbbf24;
+    font-size: 1.1rem;
+}
+
+/* ============================================================ */
+/*  7. MOBILE RESPONSIVE                                        */
+/* ============================================================ */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        top: 70px;
+        width: 260px;
+        z-index: 150;
+    }
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    .main-content {
+        margin-left: 0;
+        padding: 15px;
+    }
+    .top-nav {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background: #0f172a;
+        padding: 15px;
+        border-radius: 12px;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        z-index: 200;
+    }
+    .top-nav.show {
+        display: flex;
+    }
+    .dropdown-content {
+        position: static;
+        background: #1e293b;
+        box-shadow: none;
+        width: 100%;
+    }
+    .dropdown-content a {
+        color: white;
+        border-bottom-color: #334155;
+    }
+    .dropdown-content a:hover {
+        background: #fbbf24;
+        color: #0f172a;
+    }
+    .menu-toggle {
+        display: block;
+    }
+    .hero-premium {
+        padding: 40px 20px;
+    }
+    .hero-premium h1 {
+        font-size: 1.8rem;
+    }
+    .hero-stats {
+        gap: 20px;
+    }
+    .why-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .cta-content h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .why-grid,
+    .industry-grid,
+    .testimonial-grid,
+    .partner-grid,
+    .company-grid {
+        grid-template-columns: 1fr;
+    }
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================ */
+/*  FLOOR PLANS ONE‑PAGER (flyer)                               */
+/* ============================================================ */
+.page-flyer {
+    background: #e2e8f0; /* matches original flyer background */
+}
+
+.flyer-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px 0;
+}
+
+.flyer-card {
+    max-width: 900px;
+    width: 100%;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 35px -10px rgba(0,0,0,0.2);
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.flyer-hero {
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    padding: 30px 20px;
+}
+.flyer-hero h1 {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+    font-family: inherit;
+}
+.flyer-hero p {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+.flyer-tag {
+    background: #fbbf24;
+    color: #0f172a;
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 40px;
+    font-weight: bold;
+    margin-top: 15px;
+    font-size: 0.8rem;
+}
+
+.flyer-body {
+    padding: 30px 35px;
+}
+
+.flyer-two-col {
+    display: flex;
+    gap: 30px;
+    margin: 20px 0 30px;
+    flex-wrap: wrap;
+}
+.flyer-col {
+    flex: 1;
+    min-width: 200px;
+}
+
+.flyer-section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-left: 5px solid #fbbf24;
+    padding-left: 12px;
+    margin-bottom: 15px;
+}
+
+.flyer-feature-list {
+    list-style: none;
+    padding: 0;
+}
+.flyer-feature-list li {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.flyer-feature-list i {
+    color: #fbbf24;
+    width: 20px;
+    font-size: 1rem;
+}
+
+.flyer-price-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #f8fafc;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+.flyer-price-table th,
+.flyer-price-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+.flyer-price-table th {
+    background: #0f172a;
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+.flyer-price-table .price {
+    font-weight: bold;
+    color: #0f172a;
+}
+
+.flyer-small-note {
+    font-size: 0.75rem;
+    margin: 5px 0 15px;
+    color: #475569;
+}
+
+.flyer-contact {
+    background: #f1f5f9;
+    text-align: center;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 12px;
+}
+.flyer-contact p {
+    margin: 5px 0;
+}
+
+.flyer-btn {
+    display: inline-block;
+    background: #fbbf24;
+    color: #0f172a;
+    text-decoration: none;
+    padding: 12px 28px;
+    border-radius: 40px;
+    font-weight: bold;
+    margin: 10px 0;
+    transition: 0.2s;
+}
+.flyer-btn:hover {
+    background: #f59e0b;
+    transform: scale(1.02);
+}
+
+.flyer-footer-note {
+    font-size: 0.7rem;
+    color: #475569;
+    text-align: center;
+    margin-top: 20px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 15px;
+}
+
+/* ---- Print styles (preserve flyer appearance) ---- */
+@media print {
+    .page-flyer {
+        background: white;
+    }
+    .flyer-card {
+        max-width: 100%;
+        box-shadow: none;
+        border-radius: 0;
+    }
+    .flyer-btn {
+        background: #0f172a;
+        color: white;
+        border: 1px solid #ccc;
+    }
+    .top-header, .sidebar, .footer-contact, .menu-toggle {
+        display: none !important;
+    }
+    .main-content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
+    .flyer-wrapper {
+        padding: 0;
+    }
+}
+
+/* ---- Responsive tweaks ---- */
+@media (max-width: 700px) {
+    .flyer-body {
+        padding: 20px;
+    }
+    .flyer-two-col {
+        flex-direction: column;
+    }
+    .flyer-hero h1 {
+        font-size: 1.6rem;
+    }
+}
+
+/* ============================================================ */
+/*  PERSONAL SERVICES PAGE                                       */
+/* ============================================================ */
+
+/* Hero */
+.hero-personal {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    padding: 50px 30px;
+    border-radius: 24px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+.hero-personal h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    font-weight: 800;
+}
+.hero-personal p {
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto 25px;
+    opacity: 0.9;
+}
+
+/* Personal services grid (3 columns) */
+.personal-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Pricing table */
+.pricing-wrapper {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin: 20px 0 30px;
+}
+.pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.pricing-table th,
+.pricing-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+.pricing-table th {
+    background: #0f172a;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.pricing-table .price {
+    font-weight: bold;
+    color: #0f172a;
+}
+.pricing-table tr:last-child td {
+    border-bottom: none;
+}
+.pricing-note {
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 15px 0 10px;
+    color: #475569;
+}
+
+/* Combo cards */
+.combo-card {
+    text-align: center;
+    border: 2px solid transparent;
+    transition: 0.3s;
+}
+.combo-card:hover {
+    border-color: #fbbf24;
+}
+.combo-card i {
+    font-size: 2.5rem;
+}
+.combo-card strong {
+    color: #fbbf24;
+    font-size: 1.1rem;
+}
+
+/* CTA buttons */
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 40px 0 30px;
+    flex-wrap: wrap;
+}
+.cta-buttons .btn {
+    min-width: 180px;
+    text-align: center;
+}
+.cta-buttons .btn-secondary {
+    background: #0f172a;
+    color: white;
+}
+.cta-buttons .btn-secondary:hover {
+    background: #fbbf24;
+    color: #0f172a;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .hero-personal h1 {
+        font-size: 1.8rem;
+    }
+    .hero-personal p {
+        font-size: 1rem;
+    }
+    .pricing-table th,
+    .pricing-table td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+    .pricing-table {
+        font-size: 0.8rem;
+    }
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .cta-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pricing-table th,
+    .pricing-table td {
+        padding: 6px 8px;
+        font-size: 0.7rem;
+    }
+    .pricing-table td:last-child {
+        display: none; /* hide notes on very small screens */
+    }
+}
+
+/* ============================================================ */
+/*  BUSINESS SUPPORT PAGE                                        */
+/* ============================================================ */
+
+/* Hero */
+.hero-business {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    padding: 50px 30px;
+    border-radius: 24px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+.hero-business h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    font-weight: 800;
+}
+.hero-business p {
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto 25px;
+    opacity: 0.9;
+}
+
+/* Business services grid (3 columns) */
+.business-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Pricing table (reuse from personal-services) */
+.pricing-wrapper {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin: 20px 0 30px;
+}
+.pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.pricing-table th,
+.pricing-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+.pricing-table th {
+    background: #0f172a;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.pricing-table .price {
+    font-weight: bold;
+    color: #0f172a;
+}
+.pricing-table tr:last-child td {
+    border-bottom: none;
+}
+.pricing-note {
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 15px 0 10px;
+    color: #475569;
+}
+
+/* Combo cards (reuse from personal-services) */
+.combo-card {
+    text-align: center;
+    border: 2px solid transparent;
+    transition: 0.3s;
+}
+.combo-card:hover {
+    border-color: #fbbf24;
+}
+.combo-card i {
+    font-size: 2.5rem;
+}
+.combo-card strong {
+    color: #fbbf24;
+    font-size: 1.1rem;
+}
+
+/* CTA buttons (reuse from personal-services) */
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 40px 0 30px;
+    flex-wrap: wrap;
+}
+.cta-buttons .btn {
+    min-width: 180px;
+    text-align: center;
+}
+.cta-buttons .btn-secondary {
+    background: #0f172a;
+    color: white;
+}
+.cta-buttons .btn-secondary:hover {
+    background: #fbbf24;
+    color: #0f172a;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .hero-business h1 {
+        font-size: 1.8rem;
+    }
+    .hero-business p {
+        font-size: 1rem;
+    }
+    .pricing-table th,
+    .pricing-table td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+    .pricing-table {
+        font-size: 0.8rem;
+    }
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .cta-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pricing-table th,
+    .pricing-table td {
+        padding: 6px 8px;
+        font-size: 0.7rem;
+    }
+    .pricing-table td:last-child {
+        display: none; /* hide notes on very small screens */
+    }
+}
+
+/* ============================================================ */
+/*  MARKETING SERVICES PAGE                                      */
+/* ============================================================ */
+
+/* Hero */
+.hero-marketing {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    padding: 50px 30px;
+    border-radius: 24px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+.hero-marketing h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    font-weight: 800;
+}
+.hero-marketing p {
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto 25px;
+    opacity: 0.9;
+}
+
+/* Marketing services grid */
+.marketing-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Pricing table (reuse from personal-services) */
+.pricing-wrapper {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin: 20px 0 30px;
+}
+.pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.pricing-table th,
+.pricing-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+.pricing-table th {
+    background: #0f172a;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.pricing-table .price {
+    font-weight: bold;
+    color: #0f172a;
+}
+.pricing-table tr:last-child td {
+    border-bottom: none;
+}
+.pricing-note {
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 15px 0 10px;
+    color: #475569;
+}
+
+/* Combo cards (reuse from personal-services) */
+.combo-card {
+    text-align: center;
+    border: 2px solid transparent;
+    transition: 0.3s;
+}
+.combo-card:hover {
+    border-color: #fbbf24;
+}
+.combo-card i {
+    font-size: 2.5rem;
+}
+.combo-card strong {
+    color: #fbbf24;
+    font-size: 1.1rem;
+}
+
+/* CTA buttons (reuse from personal-services) */
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 40px 0 30px;
+    flex-wrap: wrap;
+}
+.cta-buttons .btn {
+    min-width: 180px;
+    text-align: center;
+}
+.cta-buttons .btn-secondary {
+    background: #0f172a;
+    color: white;
+}
+.cta-buttons .btn-secondary:hover {
+    background: #fbbf24;
+    color: #0f172a;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .hero-marketing h1 {
+        font-size: 1.8rem;
+    }
+    .hero-marketing p {
+        font-size: 1rem;
+    }
+    .pricing-table th,
+    .pricing-table td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+    .pricing-table {
+        font-size: 0.8rem;
+    }
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .cta-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pricing-table th,
+    .pricing-table td {
+        padding: 6px 8px;
+        font-size: 0.7rem;
+    }
+    .pricing-table td:last-child {
+        display: none; /* hide deliverables on very small screens */
+    }
+}
+
+/* ============================================================ */
+/*  ORDER & QUOTE PAGE                                          */
+/* ============================================================ */
+.order-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    padding: 30px 20px;
+    border-radius: 24px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+.order-header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+.order-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.order-form-card {
+    background: white;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+@media (max-width: 700px) {
+    .form-row-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 30px 0 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #fbbf24;
+}
+
+.checkbox-label,
+.personal-grid label,
+.bundle-grid label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: normal;
+    cursor: pointer;
+    padding: 6px 0;
+}
+.bundle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+@media (max-width: 600px) {
+    .bundle-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.personal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 20px;
+}
+@media (max-width: 700px) {
+    .personal-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.category-accordion {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+.category-header {
+    background: #f1f5f9;
+    padding: 14px 18px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+}
+.category-header:hover {
+    background: #e2e8f0;
+}
+.category-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: white;
+}
+.category-content.open {
+    max-height: 600px;
+    overflow-y: auto;
+}
+.doc-list {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+}
+.doc-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.doc-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    flex-shrink: 0;
+}
+.doc-item span {
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+.summary-bar {
+    background: #fefce8;
+    border: 1px solid #fbbf24;
+    padding: 20px;
+    border-radius: 16px;
+    margin: 25px 0;
+    text-align: center;
+}
+.summary-bar strong {
+    font-size: 1.2rem;
+}
+
+.loading {
+    display: none;
+    text-align: center;
+    margin: 20px;
+    font-weight: 600;
+}
+
+/* Override button in form */
+.btn-primary {
+    width: 100%;
+}
+
+/* ============================================================ */
+/*  INDUSTRY PAGE (IT Document Roadmap)                         */
+/* ============================================================ */
+.page-industry {
+    background: #f8fafc;
+}
+
+/* Hero */
+.hero-industry {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    padding: 50px 30px;
+    border-radius: 24px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+.hero-industry h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+.hero-industry p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+/* Document Tables */
+.doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    margin: 15px 0 25px;
+}
+.doc-table thead {
+    background: #0f172a;
+    color: white;
+}
+.doc-table th,
+.doc-table td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+}
+.doc-table th:first-child,
+.doc-table td:first-child {
+    width: 40px;
+    text-align: center;
+}
+.doc-table tbody tr:hover {
+    background: #fefce8;
+}
+.doc-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.doc-table input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #fbbf24;
+}
+
+/* Section headings (Phase 1, Phase 2, etc.) */
+.doc-section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 30px 0 15px;
+    padding: 8px 15px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    border-left: 4px solid #fbbf24;
+}
+
+/* File Directory Structure */
+.repo-structure {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 25px 30px;
+    border-radius: 16px;
+    overflow-x: auto;
+    margin: 20px 0 30px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.8;
+}
+.repo-structure pre {
+    color: #e2e8f0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Industry Buttons */
+.industry-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+.industry-buttons .btn {
+    min-width: 200px;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-industry h1 {
+        font-size: 1.8rem;
+    }
+    .hero-industry p {
+        font-size: 1rem;
+    }
+    .doc-table th,
+    .doc-table td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+    .doc-table th:first-child,
+    .doc-table td:first-child {
+        width: 30px;
+    }
+    .repo-structure {
+        padding: 15px;
+        font-size: 0.7rem;
+    }
+    .industry-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .industry-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+/* ============================================================ */
+/*  INDUSTRY PAGE (Document Roadmap)                            */
+/* ============================================================ */
+.page-industry {
+    background: #f8fafc;
+}
+
+/* Hero */
+.hero-industry {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    padding: 50px 30px;
+    border-radius: 24px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+.hero-industry h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+.hero-industry p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+/* Document Tables */
+.doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    margin: 15px 0 25px;
+}
+.doc-table thead {
+    background: #0f172a;
+    color: white;
+}
+.doc-table th,
+.doc-table td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+}
+.doc-table th:first-child,
+.doc-table td:first-child {
+    width: 40px;
+    text-align: center;
+}
+.doc-table tbody tr:hover {
+    background: #fefce8;
+}
+.doc-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.doc-table input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #fbbf24;
+}
+
+/* Section headings (Phase 1, Phase 2, etc.) */
+h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 30px 0 15px;
+    padding: 8px 15px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    border-left: 4px solid #fbbf24;
+}
+
+/* File Directory Structure */
+.repo-structure {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 25px 30px;
+    border-radius: 16px;
+    overflow-x: auto;
+    margin: 20px 0 30px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.8;
+}
+.repo-structure pre {
+    color: #e2e8f0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Industry Buttons */
+.industry-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+.industry-buttons .btn {
+    min-width: 200px;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-industry h1 {
+        font-size: 1.8rem;
+    }
+    .hero-industry p {
+        font-size: 1rem;
+    }
+    .doc-table th,
+    .doc-table td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+    .doc-table th:first-child,
+    .doc-table td:first-child {
+        width: 30px;
+    }
+    .repo-structure {
+        padding: 15px;
+        font-size: 0.7rem;
+    }
+    .industry-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .industry-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+/* ============================================================ */
+/*  HERO PREMIUM (Home page)                                    */
+/* ============================================================ */
+.hero-premium {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    padding: 60px 40px;
+    border-radius: 24px;
+    margin-bottom: 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.hero-premium::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+}
+.hero-badge {
+    display: inline-block;
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    padding: 6px 18px;
+    border-radius: 40px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+.hero-premium h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 15px;
+    font-family: 'Playfair Display', serif;
+}
+.hero-subtitle {
+    font-size: 1.15rem;
+    max-width: 650px;
+    margin: 0 auto 30px;
+    opacity: 0.85;
+    line-height: 1.6;
+}
+.hero-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 35px;
+}
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.hero-stats span {
+    font-size: 0.95rem;
+    opacity: 0.8;
+}
+.hero-stats strong {
+    font-weight: 700;
+    color: #fbbf24;
+    font-size: 1.1rem;
+}
+
+/* ============================================================ */
+/*  TRUST STRIP                                                 */
+/* ============================================================ */
+.trust-strip {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+    padding: 30px 20px;
+    margin: -10px 0 30px;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+.trust-item {
+    text-align: center;
+}
+.trust-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fbbf24;
+    letter-spacing: -0.5px;
+}
+.trust-label {
+    font-size: 0.85rem;
+    color: #475569;
+    font-weight: 500;
+}
+
+/* ============================================================ */
+/*  WHY US                                                      */
+/* ============================================================ */
+.why-us {
+    margin-bottom: 50px;
+}
+.why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+}
+.why-card {
+    background: white;
+    padding: 30px 20px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    transition: 0.3s;
+    border-bottom: 3px solid transparent;
+}
+.why-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    border-bottom-color: #fbbf24;
+}
+.why-card i {
+    font-size: 2.2rem;
+    color: #fbbf24;
+    margin-bottom: 15px;
+}
+.why-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+.why-card p {
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+/* ============================================================ */
+/*  ABC CARDS                                                   */
+/* ============================================================ */
+.abc-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.abc-card {
+    position: relative;
+    padding-top: 50px;
+    border-top: 3px solid transparent;
+    transition: border-color 0.3s, transform 0.3s;
+}
+.abc-card:hover {
+    border-top-color: #fbbf24;
+    transform: translateY(-6px);
+}
+.abc-badge {
+    position: absolute;
+    top: -12px;
+    left: 25px;
+    background: #fbbf24;
+    color: #0f172a;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(251, 191, 36, 0.3);
+}
+.abc-card:hover .abc-badge {
+    transform: scale(1.1);
+    transition: 0.2s;
+}
+
+/* ============================================================ */
+/*  INDUSTRY GRID (used on index and industries page)           */
+/* ============================================================ */
+.industry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+    margin: 25px 0 40px;
+}
+.industry-card {
+    background: white;
+    padding: 25px 20px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    transition: 0.3s;
+}
+.industry-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+.industry-card i {
+    font-size: 2rem;
+    color: #fbbf24;
+    margin-bottom: 10px;
+}
+.industry-card h4 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+.industry-card p {
+    font-size: 0.8rem;
+    color: #475569;
+    margin-bottom: 12px;
+}
+
+/* ============================================================ */
+/*  TESTIMONIALS                                                */
+/* ============================================================ */
+.testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    margin: 25px 0 40px;
+}
+.testimonial-card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+.testimonial-card .stars {
+    color: #fbbf24;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+.testimonial-card p {
+    font-style: italic;
+    margin-bottom: 12px;
+    color: #1e293b;
+}
+.testimonial-card .author {
+    font-size: 0.85rem;
+    color: #475569;
+    font-weight: 600;
+}
+
+/* ============================================================ */
+/*  CTA SECTION                                                 */
+/* ============================================================ */
+.cta-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 24px;
+    padding: 50px 30px;
+    margin: 40px 0 50px;
+    text-align: center;
+    color: white;
+}
+.cta-content h2 {
+    font-size: 2rem;
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 15px;
+}
+.cta-content p {
+    font-size: 1.05rem;
+    opacity: 0.85;
+    max-width: 550px;
+    margin: 0 auto 25px;
+}
+.cta-note {
+    margin-top: 15px;
+    font-size: 0.9rem !important;
+    opacity: 0.6 !important;
+}
+.roadmap-highlight {
+    border-left: 5px solid #fbbf24;
+    background: #fefce8;
+}
+
+/* ============================================================ */
+/*  RESPONSIVE OVERRIDES (for home page components)             */
+/* ============================================================ */
+@media (max-width: 768px) {
+    .hero-premium {
+        padding: 40px 20px;
+    }
+    .hero-premium h1 {
+        font-size: 1.8rem;
+    }
+    .hero-stats {
+        gap: 20px;
+    }
+    .why-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .cta-content h2 {
+        font-size: 1.5rem;
+    }
+    .trust-strip {
+        gap: 30px;
+        padding: 20px 10px;
+    }
+    .trust-number {
+        font-size: 1.5rem;
+    }
+    .abc-grid {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 480px) {
+    .why-grid {
+        grid-template-columns: 1fr;
+    }
+    .industry-grid,
+    .testimonial-grid {
+        grid-template-columns: 1fr;
+    }
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+

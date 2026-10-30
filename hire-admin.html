@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Hire Our Admin – Virtual Admin Support |Neon Legacies Enterprise Builder</title>
+    <meta name="description" content="Hire virtual administrative assistants for your business. Fixed pricing, flexible contracts, and dedicated support.">
+
+    <!-- External Styles -->
+    <link rel="stylesheet" href="main.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- ============================================================ -->
+    <!-- 1. TOP HEADER                                                -->
+    <!-- ============================================================ -->
+    <header class="top-header">
+        <div class="logo-area">
+            <div class="logo-icon">LP</div>
+            <div class="logo-text">
+                <h1>Neon Legacies Enterprise Builder</h1>
+                <p>Building what lasts.</p>
+            </div>
+        </div>
+
+        <nav class="top-nav" id="topNav">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="industries.html">Industries</a>
+            <a href="policies.html">Policies</a>
+            <a href="#contact">Contact</a>
+        </nav>
+
+        <button class="menu-toggle" id="menuToggleTop" aria-label="Toggle navigation">☰</button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar">☰</button>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- 2. MAIN APP CONTAINER                                        -->
+    <!-- ============================================================ -->
+    <div class="app-container">
+
+        <!-- SIDEBAR (Shared) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Enterprise Menu</h3>
+                <p>Advanced features</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="profile.html"><i class="fas fa-user-plus"></i> 01 Profile / Create Profile</a></li>
+                <li><a href="partners.html"><i class="fas fa-handshake"></i> 02 Our Partners</a></li>
+                <li><a href="international.html"><i class="fas fa-globe"></i> 03 International Partners</a></li>
+                <li><a href="strategic-growth.html"><i class="fas fa-chart-line"></i> 04 Strategic Growth</a></li>
+                <li><a href="business-partners.html"><i class="fas fa-building"></i> 05 Business Partners</a></li>
+                <li><a href="market-leads.html"><i class="fas fa-chart-simple"></i> 06 Real Time Market Leads</a></li>
+                <li><a href="business-hub.html"><i class="fas fa-users"></i> 07 Business Hub</a></li>
+                <li><a href="hire-admin.html"><i class="fas fa-user-tie"></i> 08 Hire Our Admin</a></li>
+                <li><a href="#"><i class="fas fa-gift"></i> 09 Referral Program</a></li>
+                <li><a href="#"><i class="fas fa-sign-out-alt"></i> 10 Profile Log Out</a></li>
+            </ul>
+        </aside>
+
+        <!-- MAIN CONTENT (Page‑specific) -->
+        <main class="main-content">
+
+            <!-- Hero -->
+            <div class="hero-admin">
+                <i class="fas fa-user-tie"></i>
+                <h2>Hire Our Administrative Team</h2>
+                <p>Scale your operations without the overhead. Our professional administrators work remotely or on‑site, seamlessly integrating with your existing team.</p>
+            </div>
+
+            <!-- Form -->
+            <div class="form-card">
+                <div id="loginWarning" class="login-warning hidden">
+                    ⚠️ You are not logged in. <a href="profile.html">Please log in or create a profile</a> to request admin services.
+                </div>
+
+                <form id="hireAdminForm">
+                    <!-- Basic Info -->
+                    <div class="form-group">
+                        <label for="companyName">Your name / Company name</label>
+                        <input type="text" id="companyName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone number</label>
+                        <input type="tel" id="phone">
+                    </div>
+
+                    <!-- Contract Type -->
+                    <h3>📄 Contract Type</h3>
+                    <div class="radio-group">
+                        <label><input type="radio" name="contractLength" value="1 year" required> 1 Year Contract</label>
+                        <label><input type="radio" name="contractLength" value="2 years"> 2 Years Contract</label>
+                        <label><input type="radio" name="contractLength" value="3 years"> 3 Years Contract</label>
+                    </div>
+
+                    <!-- Team Requirements -->
+                    <h3>👥 Team Requirements</h3>
+                    <div class="form-group">
+                        <label for="staffCount">Number of admin staff required</label>
+                        <input type="number" id="staffCount" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workArrangement">Work arrangement</label>
+                        <select id="workArrangement">
+                            <option value="remote">Fully remote (our team works from our office)</option>
+                            <option value="onsite">On‑site at your premises</option>
+                            <option value="hybrid">Hybrid (remote + on‑site as needed)</option>
+                        </select>
+                    </div>
+
+                    <!-- Services Required -->
+                    <h3>📋 Services Required</h3>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" value="Document Management"> Document Management (filing, digitising, organisation)</label>
+                        <label><input type="checkbox" value="Compliance Filing"> Compliance Filing (CIPC, SARS, DSD, etc.)</label>
+                        <label><input type="checkbox" value="Client Communication"> Client Communication (email, phone, scheduling)</label>
+                        <label><input type="checkbox" value="Bookkeeping"> Bookkeeping / Invoice Processing</label>
+                        <label><input type="checkbox" value="HR Administration"> HR Administration (contracts, payroll support)</label>
+                        <label><input type="checkbox" value="Data Entry"> Data Entry / Database Management</label>
+                        <label><input type="checkbox" value="Report Generation"> Report Generation (monthly, quarterly)</label>
+                        <label><input type="checkbox" value="Other"> Other (specify in notes)</label>
+                    </div>
+
+                    <!-- Existing Team -->
+                    <div class="form-group">
+                        <label for="hasTeam">Do you currently have an internal admin team?</label>
+                        <select id="hasTeam">
+                            <option value="yes">Yes, we have a team</option>
+                            <option value="no">No, we have no admin staff</option>
+                            <option value="partial">Partial / we need augmentation</option>
+                        </select>
+                    </div>
+
+                    <!-- Start Date -->
+                    <div class="form-group">
+                        <label for="startDate">When do you need the service to start?</label>
+                        <input type="date" id="startDate">
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="form-group">
+                        <label for="notes">Additional notes / special requirements</label>
+                        <textarea id="notes" rows="3" placeholder="Tell us more about your current systems, challenges, or specific needs."></textarea>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="form-group">
+                        <label for="uploadFile">Upload existing filing structure or policies (optional)</label>
+                        <input type="file" id="uploadFile" accept=".pdf,.docx,.xlsx">
+                        <div class="file-hint">Helps us understand your current setup.</div>
+                    </div>
+
+                    <button type="submit" class="btn">Request Admin Team →</button>
+                    <div id="submitMessage" class="message"></div>
+                </form>
+            </div>
+
+            <!-- Footer / Contact (Shared) -->
+            <div class="footer-contact" id="contact">
+                <p><strong>Msimelelo Victor Malusi</strong> – Founder</p>
+                <p>
+                    <i class="fas fa-phone"></i> +27 72 152 3293 &nbsp;|&nbsp;
+                    <i class="fab fa-whatsapp"></i> 067 794 9236 &nbsp;|&nbsp;
+                    <i class="fas fa-envelope"></i> info@neonlegacies.co.za
+                </p>
+                <p>© 2025 Neon Legacies Enterprise Builder(Pty) Ltd – Building what lasts.</p>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 3. EXTERNAL JAVASCRIPT                                       -->
+    <!-- ============================================================ -->
+    <script src="app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<head>
+  <!-- ========================================== -->
+  <!-- CHARACTER SET & VIEWPORT                   -->
+  <!-- ========================================== -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <!-- ========================================== -->
+  <!-- PRIMARY TITLE & DESCRIPTION               -->
+  <!-- ========================================== -->
+  <title>
+    {% if page.title %}
+      {{ page.title }} | Neon Legacies
+    {% else %}
+      Neon Legacies | Business Compliance & Document Solutions for South African Companies
+    {% endif %}
+  </title>
+  
+  <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}Professional business compliance, CIPC, SARS, B-BBEE, and document solutions for South African companies. Fixed pricing, 26+ industries supported.{% endif %}">
+  
+  <!-- ========================================== -->
+  <!-- CANONICAL URL (prevents duplicate content) -->
+  <!-- ========================================== -->
+  <link rel="canonical" href="https://neonlegacies.co.za{{ page.url | remove: 'index.html' }}">
+  
+  <!-- ========================================== -->
+  <!-- KEYWORDS (optional but still used)        -->
+  <!-- ========================================== -->
+  <meta name="keywords" content="business compliance, CIPC, SARS, B-BBEE, COIDA, document solutions, South Africa, business registration, corporate governance, compliance software">
+  
+  <!-- ========================================== -->
+  <!-- OPEN GRAPH (Social Media Previews)         -->
+  <!-- ========================================== -->
+  <meta property="og:title" content="{% if page.title %}{{ page.title }} | Neon Legacies{% else %}Neon Legacies | Business Compliance & Document Solutions{% endif %}">
+  <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}Professional business compliance and document solutions for South African companies. CIPC, SARS, B-BBEE, COIDA support.{% endif %}">
+  <meta property="og:url" content="https://neonlegacies.co.za{{ page.url }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Neon Legacies">
+  <meta property="og:image" content="https://neonlegacies.co.za/assets/images/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  
+  <!-- ========================================== -->
+  <!-- TWITTER CARDS                             -->
+  <!-- ========================================== -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% if page.title %}{{ page.title }} | Neon Legacies{% else %}Neon Legacies{% endif %}">
+  <meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% else %}Business compliance and document solutions for South African companies.{% endif %}">
+  <meta name="twitter:image" content="https://neonlegacies.co.za/assets/images/og-image.jpg">
+  <meta name="twitter:site" content="@NeonLegacies">
+  
+  <!-- ========================================== -->
+  <!-- LOCAL BUSINESS (South Africa specific)    -->
+  <!-- ========================================== -->
+  <meta name="geo.region" content="ZA">
+  <meta name="geo.placename" content="Johannesburg">
+  <meta name="geo.position" content="-26.2041;28.0473">
+  <meta name="ICBM" content="-26.2041, 28.0473">
+  
+  <!-- ========================================== -->
+  <!-- ROBOTS (Control search engine behavior)   -->
+  <!-- ========================================== -->
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  
+  <!-- ========================================== -->
+  <!-- STRUCTURED DATA (JSON-LD for Rich Snippets)-->
+  <!-- ========================================== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Neon Legacies Enterprise Builder",
+    "description": "Professional business compliance and document solutions for South African companies.",
+    "url": "https://neonlegacies.co.za",
+    "logo": "https://neonlegacies.co.za/assets/images/logo.png",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "ZA",
+      "addressLocality": "Johannesburg"
+    },
+    "areaServed": "South Africa",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "Sales",
+      "telephone": "+27-11-555-0123",
+      "availableLanguage": ["English", "Zulu"]
+    },
+    "sameAs": [
+      "https://www.facebook.com/neonlegacies",
+      "https://www.linkedin.com/company/neonlegacies"
+    ]
+  }
+  </script>
+  
+  <!-- ========================================== -->
+  <!-- FAVICON                                   -->
+  <!-- ========================================== -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+  
+  <!-- ========================================== -->
+  <!-- FONTS & CSS                               -->
+  <!-- ========================================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+  
+  <!-- ========================================== -->
+  <!-- PRELOAD CRITICAL RESOURCES (Faster load)  -->
+  <!-- ========================================== -->
+  <link rel="preload" href="/assets/images/hero-bg.webp" as="image" type="image/webp">
+  
+  <!-- ========================================== -->
+  <!-- SITEMAP & RSS                             -->
+  <!-- ========================================== -->
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
+  <link rel="alternate" type="application/atom+xml" title="Neon Legacies" href="/feed.xml">
+  
+  <!-- ========================================== -->
+  <!-- NO NEED: HSTS/Redirect meta tags removed  -->
+  <!-- GitHub "Enforce HTTPS" handles redirects  -->
+  <!-- ========================================== -->
+  </head>

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Unified EPK Studio |Neon Legacies Enterprise Builder + LLP Service</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        /* TOP HEADER BAR (sticky) */
+        .top-header {
+            background: #0f172a;
+            color: white;
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            background: #fbbf24;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0f172a;
+        }
+        .logo-text h1 {
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+        .logo-text p {
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+        .top-nav {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .top-nav a {
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .top-nav a:hover {
+            color: #fbbf24;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropbtn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: inherit;
+            padding: 0;
+        }
+        .dropbtn i {
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            z-index: 1000;
+            top: 30px;
+            left: 0;
+        }
+        .dropdown-content a {
+            color: #0f172a;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-content a:hover {
+            background: #fefce8;
+            color: #fbbf24;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown:hover .dropbtn {
+            color: #fbbf24;
+        }
+
+        /* LAYOUT: SIDEBAR + MAIN */
+        .app-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+        .sidebar {
+            width: 280px;
+            background: #0f172a;
+            color: #e2e8f0;
+            position: fixed;
+            top: 80px;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 100;
+            padding: 20px 0;
+        }
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #334155;
+            margin-bottom: 20px;
+        }
+        .sidebar-header h3 {
+            color: #fbbf24;
+            font-size: 1.2rem;
+        }
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar-menu li {
+            margin-bottom: 4px;
+        }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .sidebar-menu a:hover {
+            background: #1e293b;
+            color: #fbbf24;
+        }
+        .sidebar-menu i {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* MAIN CONTENT – Unified EPK Studio */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 0;
+            background: #0b1120;
+        }
+        .epk-studio {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #101624;
+            border-radius: 0 0 2rem 2rem;
+            overflow: hidden;
+            border: 1px solid #1e2a3a;
+            border-top: none;
+        }
+        .hero {
+            background: linear-gradient(135deg, #0f172a, #0a0f1c);
+            padding: 2.5rem 2rem 1.8rem;
+            text-align: center;
+            border-bottom: 1px solid #1e2a3a;
+        }
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6ee7b7, #3b82f6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .hero p {
+            max-width: 800px;
+            margin: 0 auto;
+            color: #9ca3af;
+            font-size: 1rem;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            transition: 0.2s;
+        }
+        .cta-button:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+
+        /* MAIN TWO-TAB SWITCHER (Creative vs LLP) */
+        .main-mode-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            background: #0f172a;
+            padding: 1rem 1rem 0 1rem;
+            border-bottom: 1px solid #1e2a3a;
+        }
+        .mode-btn {
+            background: transparent;
+            border: none;
+            padding: 0.7rem 2rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 60px;
+            cursor: pointer;
+            color: #9ca3af;
+            transition: all 0.2s;
+        }
+        .mode-btn.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+        }
+        .mode-btn:hover:not(.active) {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        /* Category tabs (inner, per mode) */
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 1rem 0 1rem;
+            background: #0f172a;
+            border-bottom: 1px solid #1e2a3a;
+        }
+        .cat-btn {
+            background: transparent;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border-radius: 60px;
+            cursor: pointer;
+            color: #9ca3af;
+            transition: all 0.2s;
+        }
+        .cat-btn.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+        }
+        .cat-btn:hover:not(.active) {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .content-pane {
+            padding: 2rem;
+        }
+        .category-page {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+        .category-page.active-category {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .section-subtitle {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            color: #f0f4ff;
+        }
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .client-card {
+            background: #131c2c;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            border: 1px solid #1e2f44;
+            transition: 0.2s;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+        .client-card:hover {
+            transform: translateY(-4px);
+            border-color: #3b82f6;
+        }
+        .card-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: #1e2f44;
+            display: block;
+        }
+        .card-content {
+            padding: 1rem;
+        }
+        .card-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title i {
+            color: #3b82f6;
+            width: 24px;
+        }
+        .card-desc {
+            font-size: 0.75rem;
+            color: #a0afc0;
+            margin-top: 4px;
+        }
+        .badge-sample {
+            display: inline-block;
+            background: #1e2f44;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            color: #8ca3c0;
+            margin-top: 8px;
+        }
+        .footer-note {
+            background: #0f172a;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.7rem;
+            color: #6c7b96;
+            border-top: 1px solid #1e2a3a;
+        }
+        .llp-footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #1e2a3a;
+        }
+        .llp-footer a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+        .global-note {
+            background: #1e2f44;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem 0 0;
+            font-size: 0.85rem;
+        }
+
+        /* Mode visibility */
+        .mode-workspace {
+            display: none;
+        }
+        .mode-workspace.active-mode {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                top: 70px;
+                width: 260px;
+                z-index: 150;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .top-nav {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background: #0f172a;
+                padding: 15px;
+                border-radius: 12px;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                z-index: 200;
+            }
+            .top-nav.show {
+                display: flex;
+            }
+            .dropdown-content {
+                position: static;
+                background: #1e293b;
+                box-shadow: none;
+                width: 100%;
+            }
+            .dropdown-content a {
+                color: white;
+                border-bottom-color: #334155;
+            }
+            .dropdown-content a:hover {
+                background: #fbbf24;
+                color: #0f172a;
+            }
+            .menu-toggle, .sidebar-toggle-btn {
+                display: block;
+                background: #0f172a;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 30px;
+                cursor: pointer;
+                font-size: 1.2rem;
+            }
+            .hero h1 { font-size: 1.8rem; }
+            .category-tabs { gap: 0.3rem; }
+            .cat-btn { padding: 0.4rem 0.8rem; font-size: 0.7rem; }
+            .content-pane { padding: 1rem; }
+            .mode-btn { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        }
+        .menu-toggle, .sidebar-toggle-btn {
+            display: none;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .sidebar-toggle-btn {
+            background: #1e293b;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <div class="logo-area">
+            <div class="logo-icon">LP</div>
+            <div class="logo-text">
+                <h1>Legacy Launchpad</h1>
+                <p>Building what lasts.</p>
+            </div>
+        </div>
+        <div class="top-nav" id="topNav">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="industries.html">Industries</a>
+            <div class="dropdown">
+                <button class="dropbtn">Services <i class="fas fa-chevron-down"></i></button>
+                <div class="dropdown-content">
+                    <a href="3d-floor-plans.html">🏗️ 3D Floor Plans</a>
+                    <a href="personal-services.html">🧑 Personal Services</a>
+                    <a href="business-support.html">📊 Business Support</a>
+                    <a href="marketing-services.html">🎨 Marketing Services</a>
+                    <a href="order-documents.html">📋 Order Documents</a>
+                </div>
+            </div>
+            <a href="policies.html">Policies</a>
+            <a href="#contact">Contact</a>
+        </div>
+        <div class="header-actions">
+            <button class="sidebar-toggle-btn" id="sidebarToggleBtn">☰ Menu</button>
+            <button class="menu-toggle" id="menuToggle">☰ Nav</button>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Enterprise Menu</h3>
+                <p>Advanced features</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="profile.html"><i class="fas fa-user-plus"></i> 01 Profile / Create Profile</a></li>
+                <li><a href="partners.html"><i class="fas fa-handshake"></i> 02 Our Partners</a></li>
+                <li><a href="international.html"><i class="fas fa-globe"></i> 03 International Partners</a></li>
+                <li><a href="strategic-growth.html"><i class="fas fa-chart-line"></i> 04 Strategic Growth</a></li>
+                <li><a href="business-partners.html"><i class="fas fa-building"></i> 05 Business Partners</a></li>
+                <li><a href="market-leads.html"><i class="fas fa-chart-simple"></i> 06 Real Time Market Leads</a></li>
+                <li><a href="business-hub.html"><i class="fas fa-users"></i> 07 Business Hub</a></li>
+                <li><a href="hire-admin.html"><i class="fas fa-user-tie"></i> 08 Hire Our Admin</a></li>
+                <li><a href="referral.html"><i class="fas fa-gift"></i> 09 Referral Program</a></li>
+                <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i> 10 Profile Log Out</a></li>
+                <li><a href="epk-studio.html"><i class="fas fa-star"></i> 11 EPK Studio (Unified)</a></li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="epk-studio">
+                <div class="hero">
+                    <h1>🎬 EPK Studio · Master Portfolio</h1>
+                    <p>Professional Electronic Press Kits for both Creative Arts Professionals and LLP / Professional Firms.<br>Select your industry below.</p>
+                    <a href="#" class="cta-button" id="mainCta">📩 Get Your Custom EPK →</a>
+                </div>
+
+                <!-- MAIN MODE TOGGLES: Creative vs LLP -->
+                <div class="main-mode-tabs">
+                    <button class="mode-btn active" data-mode="creative">🎨 Creative Arts Pros</button>
+                    <button class="mode-btn" data-mode="llp">🏛️ LLP & Professional Firms</button>
+                </div>
+
+                <!-- CREATIVE WORKSPACE (original EPK Studio) -->
+                <div id="workspace-creative" class="mode-workspace active-mode">
+                    <div class="category-tabs">
+                        <button class="cat-btn active" data-cat="entertainment">🎭 Entertainment & Acting</button>
+                        <button class="cat-btn" data-cat="visualarts">🎨 Visual Arts & Craft</button>
+                        <button class="cat-btn" data-cat="sports">🏆 Sports & Wellness</button>
+                        <button class="cat-btn" data-cat="music">🎵 Music & Audio</button>
+                        <button class="cat-btn" data-cat="media">📢 Media & Influencers</button>
+                        <button class="cat-btn" data-cat="events">🎪 Events & Education</button>
+                        <button class="cat-btn" data-cat="business">💼 Business & Creative</button>
+                    </div>
+                    <div class="content-pane">
+                        <!-- Entertainment -->
+                        <div id="cat-entertainment" class="category-page active-category">
+                            <div class="section-subtitle">🎭 Film · TV · Commercial Talent</div>
+                            <div class="market-grid">
+                                <a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EHeadshot%3C/text%3E%3C/svg%3E" alt="actor"><div class="card-content"><div class="card-title"><i class="fas fa-user"></i> Actor / Commercial Talent</div><div class="card-desc">TV series, film, national commercials. Showreel, headshots, agent contacts.</div><span class="badge-sample">📄 Sample EPK: 4 pages</span></div></a>
+                                <a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EMic%20shot%3C/text%3E%3C/svg%3E" alt="voice"><div class="card-content"><div class="card-title"><i class="fas fa-microphone-alt"></i> Voice-over Artist</div><div class="card-desc">Animation, radio, corporate narration. Demo reel, client logos.</div><span class="badge-sample">🎙️ Demo & rate card</span></div></a>
+                                <a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EDance%20still%3C/text%3E%3C/svg%3E" alt="dancer"><div class="card-content"><div class="card-title"><i class="fas fa-music"></i> Dancer / Choreographer</div><div class="card-desc">Performance reels, workshop schedule, company affiliations.</div><span class="badge-sample">💃 Movement portfolio</span></div></a>
+                                <a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EComedy%20shot%3C/text%3E%3C/svg%3E" alt="comedian"><div class="card-content"><div class="card-title"><i class="fas fa-laugh-squint"></i> Comedian</div><div class="card-desc">Tour dates, press quotes, video clips, club bookers.</div><span class="badge-sample">🎤 Tour EPK</span></div></a>
+                                <a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EFilm%20still%3C/text%3E%3C/svg%3E" alt="director"><div class="card-content"><div class="card-title"><i class="fas fa-video"></i> Film Director / Filmmaker</div><div class="card-desc">Showreel, festival selections, crew testimonials.</div><span class="badge-sample">🎬 Director's EPK</span></div></a>
+                            </div>
+                        </div>
+                        <!-- Visual Arts -->
+                        <div id="cat-visualarts" class="category-page">
+                            <div class="section-subtitle">🎨 Fine Art · Sculpture · Illustration</div>
+                            <div class="market-grid">
+                                <a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EPainting%3C/text%3E%3C/svg%3E" alt="painter"><div class="card-content"><div class="card-title"><i class="fas fa-palette"></i> Painter / Fine Artist</div><div class="card-desc">Artwork gallery, exhibition history, collector testimonials.</div><span class="badge-sample">🎨 Artist portfolio</span></div></a>
+                                <a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3ESculpture%3C/text%3E%3C/svg%3E" alt="sculptor"><div class="card-content"><div class="card-title"><i class="fas fa-cube"></i> Sculptor</div><div class="card-desc">Stone, bronze, wood works. Public commissions.</div><span class="badge-sample">🗿 Sculptor EPK</span></div></a>
+                                <a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EIllustration%3C/text%3E%3C/svg%3E" alt="illustrator"><div class="card-content"><div class="card-title"><i class="fas fa-pencil-ruler"></i> Illustrator / Concept Artist</div><div class="card-desc">Commission work, brand collaborations, online store.</div><span class="badge-sample">✏️ Portfolio</span></div></a>
+                                <a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3ECamera%3C/text%3E%3C/svg%3E" alt="photographer"><div class="card-content"><div class="card-title"><i class="fas fa-camera-retro"></i> Photographer</div><div class="card-desc">Fashion, documentary, commercial. Galleries & client lists.</div><span class="badge-sample">📸 Photography EPK</span></div></a>
+                                <a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3ETattoo%20flash%3C/text%3E%3C/svg%3E" alt="tattoo"><div class="card-content"><div class="card-title"><i class="fas fa-dragon"></i> Tattoo Artist</div><div class="card-desc">Flash designs, studio policies, booking info, healed work.</div><span class="badge-sample">🖤 Tattoo EPK</span></div></a>
+                            </div>
+                        </div>
+                        <!-- Sports & Wellness (abbreviated but full from original) -->
+                        <div id="cat-sports" class="category-page"><div class="section-subtitle">🏅 Athletes · Coaches · Health Pros</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EAthlete%3C/text%3E%3C/svg%3E" alt="athlete"><div class="card-content"><div class="card-title"><i class="fas fa-futbol"></i> Professional Athlete</div><div class="card-desc">Stats, sponsors, press mentions, highlight reels.</div><span class="badge-sample">⚽ Athlete EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3ESport%20science%3C/text%3E%3C/svg%3E" alt="sport scientist"><div class="card-content"><div class="card-title"><i class="fas fa-heartbeat"></i> Sports Scientist</div><div class="card-desc">Rehab protocols, performance testing, workshops.</div><span class="badge-sample">🧬 Science portfolio</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EPersonal%20trainer%3C/text%3E%3C/svg%3E" alt="trainer"><div class="card-content"><div class="card-title"><i class="fas fa-dumbbell"></i> Personal Trainer</div><div class="card-desc">Before/after, certifications, online coaching.</div><span class="badge-sample">💪 Trainer EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EYoga%3C/text%3E%3C/svg%3E" alt="yoga"><div class="card-content"><div class="card-title"><i class="fas fa-spa"></i> Yoga / Pilates Instructor</div><div class="card-desc">Class schedule, retreats, testimonials.</div><span class="badge-sample">🧘 EPK</span></div></a></div></div>
+                        <div id="cat-music" class="category-page"><div class="section-subtitle">🎶 Musicians · DJs · Audio Pros</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EMusician%3C/text%3E%3C/svg%3E" alt="musician"><div class="card-content"><div class="card-title"><i class="fas fa-guitar"></i> Musician / Band</div><div class="card-desc">Releases, tour dates, press kit.</div><span class="badge-sample">🎸 Band EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EDJ%20decks%3C/text%3E%3C/svg%3E" alt="dj"><div class="card-content"><div class="card-title"><i class="fas fa-headphones"></i> DJ / Producer</div><div class="card-desc">Mixes, release links, club booking.</div><span class="badge-sample">🎧 DJ EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EPodcast%3C/text%3E%3C/svg%3E" alt="podcaster"><div class="card-content"><div class="card-title"><i class="fas fa-podcast"></i> Podcaster</div><div class="card-desc">Episode list, sponsors, media kit.</div><span class="badge-sample">🎙️ Media kit</span></div></a></div></div>
+                        <div id="cat-media" class="category-page"><div class="section-subtitle">📱 Content Creators · Speakers · Writers</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EContent%20creator%3C/text%3E%3C/svg%3E" alt="influencer"><div class="card-content"><div class="card-title"><i class="fab fa-instagram"></i> Content Creator / Influencer</div><div class="card-desc">Brand collab history, analytics, rates.</div><span class="badge-sample">📈 Influencer kit</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3ESpeaker%3C/text%3E%3C/svg%3E" alt="speaker"><div class="card-content"><div class="card-title"><i class="fas fa-microphone-alt"></i> Public Speaker</div><div class="card-desc">Speaking topics, past stages, testimonials.</div><span class="badge-sample">🎤 Speaker EPK</span></div></a></div></div>
+                        <div id="cat-events" class="category-page"><div class="section-subtitle">🎪 Hosts · Planners · Chefs · Educators</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EMC%20host%3C/text%3E%3C/svg%3E" alt="host"><div class="card-content"><div class="card-title"><i class="fas fa-chalkboard-user"></i> Event Host / MC</div><div class="card-desc">Crowd photos, client feedback, video snippets.</div><span class="badge-sample">🎤 Host EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EChef%20plating%3C/text%3E%3C/svg%3E" alt="chef"><div class="card-content"><div class="card-title"><i class="fas fa-utensils"></i> Chef / Culinary Artist</div><div class="card-desc">Signature dishes, press features, brand partnerships.</div><span class="badge-sample">🍽️ Chef EPK</span></div></a></div></div>
+                        <div id="cat-business" class="category-page"><div class="section-subtitle">💼 Design · Architecture · Beauty · Freelance</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EGraphic%20design%3C/text%3E%3C/svg%3E" alt="designer"><div class="card-content"><div class="card-title"><i class="fas fa-paint-brush"></i> Graphic Designer</div><div class="card-desc">Portfolio, client list, brand work.</div><span class="badge-sample">🎨 Design EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EArchitecture%3C/text%3E%3C/svg%3E" alt="architect"><div class="card-content"><div class="card-title"><i class="fas fa-building"></i> Architect / Interior Designer</div><div class="card-desc">Project galleries, publications, awards.</div><span class="badge-sample">🏛️ Design portfolio</span></div></a></div></div>
+                        <div class="global-note"><i class="fas fa-plus-circle"></i> Plus many more: florists, brand strategists, etc. — any creative professional needs an EPK.</div>
+                    </div>
+                </div>
+
+                <!-- LLP WORKSPACE (original LLP Service) -->
+                <div id="workspace-llp" class="mode-workspace">
+                    <div class="category-tabs">
+                        <button class="cat-btn active" data-cat="legal">⚖️ Legal & Partnerships</button>
+                        <button class="cat-btn" data-cat="financial">💰 Financial Services</button>
+                        <button class="cat-btn" data-cat="consulting">📊 Consulting & Advisory</button>
+                        <button class="cat-btn" data-cat="realestate">🏢 Real Estate & Infrastructure</button>
+                        <button class="cat-btn" data-cat="corporate">📑 Corporate & Compliance</button>
+                        <button class="cat-btn" data-cat="tech">💻 Tech & Digital Firms</button>
+                        <button class="cat-btn" data-cat="health">🏥 Health & Wellness Orgs</button>
+                    </div>
+                    <div class="content-pane">
+                        <div id="cat-legal" class="category-page active-category"><div class="section-subtitle">⚖️ Law Firms · LLP Members · Barristers</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3ELaw%20firm%20profile%3C/text%3E%3C/svg%3E" alt="law"><div class="card-content"><div class="card-title"><i class="fas fa-gavel"></i> Law Firm Partner / LLP Member</div><div class="card-desc">Practice areas, landmark cases, partner credentials.</div><span class="badge-sample">📜 Partnership EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3ECorporate%20counsel%3C/text%3E%3C/svg%3E" alt="counsel"><div class="card-content"><div class="card-title"><i class="fas fa-briefcase"></i> In-House Counsel / Legal Director</div><div class="card-desc">Corporate governance, compliance highlights.</div><span class="badge-sample">🏛️ Legal EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EArbitration%3C/text%3E%3C/svg%3E" alt="mediator"><div class="card-content"><div class="card-title"><i class="fas fa-scale-balanced"></i> Mediator / Arbitrator</div><div class="card-desc">Dispute resolution track record, case studies.</div><span class="badge-sample">⚖️ Neutral EPK</span></div></a></div></div>
+                        <div id="cat-financial" class="category-page"><div class="section-subtitle">💰 Accounting · Wealth · Audit & Advisory</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3ECPA%20firm%3C/text%3E%3C/svg%3E" alt="cpa"><div class="card-content"><div class="card-title"><i class="fas fa-calculator"></i> CPA / Accounting Partner</div><div class="card-desc">Audit specialties, client portfolio, recognitions.</div><span class="badge-sample">📊 Financial EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EWealth%20management%3C/text%3E%3C/svg%3E" alt="wealth"><div class="card-content"><div class="card-title"><i class="fas fa-chart-line"></i> Wealth Manager / Family Office</div><div class="card-desc">Investment philosophy, AUM, client success.</div><span class="badge-sample">💼 Wealth EPK</span></div></a></div></div>
+                        <div id="cat-consulting" class="category-page"><div class="section-subtitle">📊 Management Consultants · Strategy Advisors</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EStrategy%20consultant%3C/text%3E%3C/svg%3E" alt="strategy"><div class="card-content"><div class="card-title"><i class="fas fa-chalkboard-user"></i> Strategy Consultant</div><div class="card-desc">Case studies, frameworks, transformation results.</div><span class="badge-sample">🧠 Strategy EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EHR%20consultant%3C/text%3E%3C/svg%3E" alt="hr"><div class="card-content"><div class="card-title"><i class="fas fa-users"></i> HR / Talent Advisor</div><div class="card-desc">Leadership coaching, organizational design.</div><span class="badge-sample">👥 HR EPK</span></div></a></div></div>
+                        <div id="cat-realestate" class="category-page"><div class="section-subtitle">🏢 Property Development · Architecture · RE Partnerships</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EReal%20estate%20partner%3C/text%3E%3C/svg%3E" alt="re"><div class="card-content"><div class="card-title"><i class="fas fa-building"></i> Real Estate Partner / Developer</div><div class="card-desc">Project portfolio, capital partners, impact.</div><span class="badge-sample">🏗️ Development EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EArchitect%20firm%3C/text%3E%3C/svg%3E" alt="arch"><div class="card-content"><div class="card-title"><i class="fas fa-draw-polygon"></i> Architecture Firm / Principal</div><div class="card-desc">Design awards, built works, certifications.</div><span class="badge-sample">🏛️ Architectural EPK</span></div></a></div></div>
+                        <div id="cat-corporate" class="category-page"><div class="section-subtitle">📑 Company Secretaries · Compliance Officers · ESG</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3ECorporate%20secretary%3C/text%3E%3C/svg%3E" alt="secretary"><div class="card-content"><div class="card-title"><i class="fas fa-file-signature"></i> Company Secretary / Governance Lead</div><div class="card-desc">Board compliance, annual filings, governance.</div><span class="badge-sample">📋 Governance EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3ECompliance%20officer%3C/text%3E%3C/svg%3E" alt="compliance"><div class="card-content"><div class="card-title"><i class="fas fa-clipboard-list"></i> Compliance & Ethics Officer</div><div class="card-desc">Regulatory certifications, audit outcomes.</div><span class="badge-sample">🔒 Compliance EPK</span></div></a></div></div>
+                        <div id="cat-tech" class="category-page"><div class="section-subtitle">💻 SaaS · IT Consultancies · Digital Agencies</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3ETech%20startup%3C/text%3E%3C/svg%3E" alt="tech"><div class="card-content"><div class="card-title"><i class="fas fa-laptop-code"></i> Tech Founder / CTO</div><div class="card-desc">Product roadmap, funding rounds, deployments.</div><span class="badge-sample">🚀 Startup EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EIT%20consultancy%3C/text%3E%3C/svg%3E" alt="it"><div class="card-content"><div class="card-title"><i class="fas fa-cloud-upload-alt"></i> IT / Digital Transformation Firm</div><div class="card-desc">Case studies, certifications, client ROI.</div><span class="badge-sample">☁️ Digital EPK</span></div></a></div></div>
+                        <div id="cat-health" class="category-page"><div class="section-subtitle">🏥 Medical Practices · Wellness LLPs · HealthTech</div><div class="market-grid"><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EMedical%20clinic%3C/text%3E%3C/svg%3E" alt="clinic"><div class="card-content"><div class="card-title"><i class="fas fa-hospital-user"></i> Medical Practice / Clinic LLP</div><div class="card-desc">Specialties, physician profiles, patient outcomes.</div><span class="badge-sample">🩺 Medical EPK</span></div></a><a href="#" class="client-card"><img class="card-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160'%3E%3Crect width='400' height='160' fill='%231e2f44'/%3E%3Ctext x='200' y='90' text-anchor='middle' fill='%236ee7b7'%3EHealth%20coach%3C/text%3E%3C/svg%3E" alt="wellness"><div class="card-content"><div class="card-title"><i class="fas fa-heartbeat"></i> Health & Wellness Coach</div><div class="card-desc">Certifications, client transformations, speaking events.</div><span class="badge-sample">🧘 Wellness EPK</span></div></a></div></div>
+                        <div class="global-note"><i class="fas fa-briefcase"></i> Plus many more: financial planners, legal mediators, ESG directors, family offices — any professional firm needs a powerful EPK.</div>
+                    </div>
+                </div>
+
+                <div class="footer-note">
+                    🚀 <strong>Unified EPK Studio</strong> — Two dedicated workspaces: Creative Arts Pros & LLP Professional Firms. Each with their own category tabs and 20+ sample markets.<br>
+                    📸 Replace placeholder images with actual headshots, firm logos, or project imagery when building final EPK.
+                </div>
+                <div class="llp-footer">
+                    <p><strong>Msimelelo Victor Malusi</strong> – Founder</p>
+                    <p><i class="fas fa-phone"></i> +27 72 152 3293 &nbsp;|&nbsp; <i class="fab fa-whatsapp"></i> 067 794 9236 &nbsp;|&nbsp; <i class="fas fa-envelope"></i> mv.malusi@legacylaunchpad.co.za</p>
+                    <p>© 2025 Neon Legacies Enterprise Builder(Pty) Ltd – Building what lasts. | LLP Service Integration</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mode switching (Creative / LLP)
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const creativeWorkspace = document.getElementById('workspace-creative');
+        const llpWorkspace = document.getElementById('workspace-llp');
+
+        function setActiveMode(mode) {
+            if (mode === 'creative') {
+                creativeWorkspace.classList.add('active-mode');
+                llpWorkspace.classList.remove('active-mode');
+                modeBtns.forEach(btn => {
+                    if (btn.getAttribute('data-mode') === 'creative') btn.classList.add('active');
+                    else btn.classList.remove('active');
+                });
+                // Reset creative category tabs to first active
+                const creativeCatBtns = creativeWorkspace.querySelectorAll('.cat-btn');
+                const creativePages = creativeWorkspace.querySelectorAll('.category-page');
+                if (creativeCatBtns.length && creativePages.length) {
+                    creativePages.forEach(p => p.classList.remove('active-category'));
+                    creativePages[0].classList.add('active-category');
+                    creativeCatBtns.forEach(btn => btn.classList.remove('active'));
+                    creativeCatBtns[0].classList.add('active');
+                }
+            } else {
+                llpWorkspace.classList.add('active-mode');
+                creativeWorkspace.classList.remove('active-mode');
+                modeBtns.forEach(btn => {
+                    if (btn.getAttribute('data-mode') === 'llp') btn.classList.add('active');
+                    else btn.classList.remove('active');
+                });
+                // Reset LLP category tabs to first active
+                const llpCatBtns = llpWorkspace.querySelectorAll('.cat-btn');
+                const llpPages = llpWorkspace.querySelectorAll('.category-page');
+                if (llpCatBtns.length && llpPages.length) {
+                    llpPages.forEach(p => p.classList.remove('active-category'));
+                    llpPages[0].classList.add('active-category');
+                    llpCatBtns.forEach(btn => btn.classList.remove('active'));
+                    llpCatBtns[0].classList.add('active');
+                }
+            }
+        }
+
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.getAttribute('data-mode');
+                if (mode) setActiveMode(mode);
+            });
+        });
+
+        // Category switching inside each workspace (delegation)
+        document.querySelectorAll('.mode-workspace').forEach(workspace => {
+            workspace.addEventListener('click', (e) => {
+                const catBtn = e.target.closest('.cat-btn');
+                if (!catBtn) return;
+                const container = catBtn.closest('.mode-workspace');
+                if (!container) return;
+                const catId = catBtn.getAttribute('data-cat');
+                const targetPage = container.querySelector(`#cat-${catId}`);
+                if (targetPage) {
+                    // Deactivate all pages and buttons in this workspace
+                    container.querySelectorAll('.category-page').forEach(p => p.classList.remove('active-category'));
+                    container.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+                    targetPage.classList.add('active-category');
+                    catBtn.classList.add('active');
+                }
+            });
+        });
+
+        // Global CTA
+        document.getElementById('mainCta').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert("📧 Request your custom EPK: epk@neonlegacies.co.za or call 072 152 3293. We serve both creatives & professional firms!");
+        });
+
+        // Card click handler for all client cards
+        document.querySelectorAll('.client-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const titleElem = card.querySelector('.card-title');
+                let profession = titleElem ? titleElem.innerText.trim() : "this professional";
+                alert(`✨ EPK Request for: ${profession}\nContact us at info@neonlegacies.co.za to build your custom 4-page Electronic Press Kit.`);
+            });
+        });
+
+        // Mobile toggles
+        const menuBtn = document.getElementById('menuToggle');
+        const topNav = document.getElementById('topNav');
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                topNav.classList.toggle('show');
+            });
+        }
+        const sidebarToggle = document.getElementById('sidebarToggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+        }
+    </script>
+</body>
+</html>
