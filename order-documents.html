@@ -2403,8 +2403,12 @@
             // ---- Lead intake (Google Apps Script) ----------------------
             // Paste the deployed /exec URL + the shared token from
             // apps-script/Code.gs. Until then the order is queued locally.
-            const LEAD_ENDPOINT = 'AKfycbzM082roGPD0iDJy8XgmSdFATcPS8Ma5b2Y7XtAAEiO';
-            const LEAD_TOKEN = 'REPLACE_WITH_A_LONG_RANDOM_STRING';
+            // Accepts the bare deployment ID or the full .../exec URL.
+            const LEAD_ID = 'AKfycbzM082roGPD0iDJy8XgmSdFATcPS8Ma5b2Y7XtAAEiO';
+            const LEAD_ENDPOINT = LEAD_ID.indexOf('https://script.google.com/') === 0
+                ? LEAD_ID
+                : (LEAD_ID ? 'https://script.google.com/macros/s/' + LEAD_ID + '/exec' : '');
+            const LEAD_TOKEN = '32bb90901d4b2c3323c1bb87cb08940f341040813634abc0';
             payload.formType = 'Order';
             payload.token = LEAD_TOKEN;
             payload.id = 'order-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
@@ -2412,7 +2416,7 @@
             const honeypot = document.querySelector('#orderForm input[name="_hp"]');
             if (honeypot) { payload._hp = honeypot.value; }
             try {
-                if (LEAD_ENDPOINT.indexOf('https://script.google.com/') === 0) {
+                if (LEAD_ENDPOINT) {
                     await fetch(LEAD_ENDPOINT, {
                         method: 'POST',
                         mode: 'no-cors',                       // Apps Script sends no CORS headers

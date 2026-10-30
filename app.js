@@ -12,12 +12,21 @@
 //  Until then submissions are queued in localStorage so nothing is lost.
 // ============================================================
 window.NEON_LEADS = {
-    endpoint: 'AKfycbzM082roGPD0iDJy8XgmSdFATcPS8Ma5b2Y7XtAAEiO',   // e.g. https://script.google.com/macros/s/AKfy…/exec
-    token: 'REPLACE_WITH_A_LONG_RANDOM_STRING', // must match Code.gs CONFIG.SHARED_TOKEN
+    // Accepts the bare deployment ID or the full .../exec URL.
+    endpoint: 'AKfycbzM082roGPD0iDJy8XgmSdFATcPS8Ma5b2Y7XtAAEiO',
+    token: '32bb90901d4b2c3323c1bb87cb08940f341040813634abc0', // must match Code.gs CONFIG.SHARED_TOKEN
     queueKey: 'neonLeadQueue',
 
+    /** Builds the /exec URL from a full URL or a bare deployment ID. */
+    url: function () {
+        const e = String(this.endpoint || '').trim();
+        if (e.indexOf('https://script.google.com/') === 0) { return e; }
+        if (/^[A-Za-z0-9_-]{20,}$/.test(e)) { return 'https://script.google.com/macros/s/' + e + '/exec'; }
+        return '';
+    },
+
     isConfigured: function () {
-        return this.endpoint.indexOf('https://script.google.com/') === 0;
+        return this.url().length > 0 && this.token.indexOf('REPLACE_WITH') !== 0;
     },
 
     /** Human-readable form names, keyed by <form id>. */
@@ -79,12 +88,23 @@ window.NEON_LEADS = {
     /** Sends one payload. Returns a promise that always resolves. */
     send: function (payload) {
         if (!this.isConfigured()) { this.queue(payload); return Promise.resolve({ queued: true }); }
-        return fetch(this.endpoint, {
+        return fetch(this.url(), {
             method: 'POST',
             mode: 'no-cors',                      // Apps Script sends no CORS headers
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
         }).catch(function () { return null; });
+    },
+
+    /** Retries anything queued while the endpoint was still unconfigured. */
+    flushQueue: function () {
+        if (!this.isConfigured()) { return; }
+        let q = [];
+        try { q = JSON.parse(localStorage.getItem(this.queueKey) || '[]'); } catch (e) { return; }
+        if (!q.length) { return; }
+        const self = this;
+        q.forEach(function (payload) { self.send(payload); });
+        try { localStorage.removeItem(self.queueKey); } catch (e) { /* ignore */ }
     },
 
     /** Collect + submit a form. */
@@ -114,6 +134,8 @@ document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('form'), function (form) {
         window.NEON_LEADS.addHoneypot(form);
     });
+    // Send anything queued before the endpoint was configured.
+    window.NEON_LEADS.flushQueue();
 });
 
 // ============================================================

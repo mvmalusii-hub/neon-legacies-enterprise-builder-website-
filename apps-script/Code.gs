@@ -13,7 +13,7 @@
 
 var CONFIG = {
   NOTIFY_EMAILS: 'mv.malusii@gmail.com',   // comma-separate for several people
-  SHARED_TOKEN: 'REPLACE_WITH_A_LONG_RANDOM_STRING', // must match app.js
+  SHARED_TOKEN: '32bb90901d4b2c3323c1bb87cb08940f341040813634abc0', // must match window.NEON_LEADS.token in app.js
   SPREADSHEET_ID: '',                      // blank = sheet this script is bound to
   SHEET_TAB: 'Leads',
   AUTO_REPLY: true,
@@ -41,7 +41,10 @@ function doPost(e) {
     if (data._hp) { return out({ ok: true }); }
 
     // 2. Shared token – blocks drive-by spam against the public URL.
-    if (String(data.token || '') !== String(CONFIG.SHARED_TOKEN)) {
+    //    If it was never configured we accept the post (honeypot and throttle
+    //    still apply) instead of silently dropping real leads.
+    var tokenConfigured = CONFIG.SHARED_TOKEN && CONFIG.SHARED_TOKEN.indexOf('REPLACE_WITH') !== 0;
+    if (tokenConfigured && String(data.token || '') !== String(CONFIG.SHARED_TOKEN)) {
       return out({ ok: false, error: 'unauthorised' });
     }
 

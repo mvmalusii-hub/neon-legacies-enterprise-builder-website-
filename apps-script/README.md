@@ -22,11 +22,12 @@ Spaza compliance | `spaza-compliance.html` | `Spaza Compliance`
    *Neon Legacies – Website Leads*. The `Leads` tab and its headers are
    created automatically on the first submission.
 2. In that sheet: **Extensions ▸ Apps Script**.
-3. Delete the placeholder `myFunction`, paste the whole of `Code.gs`, and fill in:
-   - `SHARED_TOKEN` – any long random string (e.g. run
-     `openssl rand -hex 24`). Same value goes into the site.
-   - `NOTIFY_EMAILS` – where new-lead alerts should land.
-   - `AUTO_REPLY` – `true` to send customers a receipt with a reference number.
+3. Delete the placeholder `myFunction` and paste the whole of `Code.gs`.
+   `SHARED_TOKEN` is already set to the value the site sends, so **do not edit it**
+   unless you also change `window.NEON_LEADS.token` in `app.js` and `LEAD_TOKEN`
+   in `order-documents.html`. Adjust if needed:
+   - `NOTIFY_EMAILS` – where new-lead alerts land (default `mv.malusii@gmail.com`).
+   - `AUTO_REPLY` – `true` sends the customer a receipt with a reference number.
 4. **Deploy ▸ New deployment ▸ Web app**
    - Description: `Website leads v1`
    - **Execute as: Me**
@@ -34,10 +35,17 @@ Spaza compliance | `spaza-compliance.html` | `Spaza Compliance`
    - **Deploy**, then authorise the script (Google will warn that the app is
      unverified – choose *Advanced ▸ Go to … (unsafe)*: it is your own script).
 5. Copy the **Web app URL** (ends in `/exec`).
-6. Paste it into the site in two places, together with the same token:
-   - `app.js` → `window.NEON_LEADS.endpoint` and `window.NEON_LEADS.token`
-   - `order-documents.html` → `LEAD_ENDPOINT` and `LEAD_TOKEN`
+6. The site already carries deployment ID
+   `AKfycbzM082roGPD0iDJy8XgmSdFATcPS8Ma5b2Y7XtAAEiO`. If your new deployment ID
+   differs, paste it in exactly two places (bare ID **or** full `/exec` URL both work):
+   - `app.js` → `window.NEON_LEADS.endpoint`
+   - `order-documents.html` → `LEAD_ID`
 7. Commit + push. Pages redeploys in about a minute.
+
+> **Why the token is in a public repo:** both the endpoint URL and the token are
+> visible in the source, so the token only stops naive bots. Real protection is
+> the honeypot, the per-email throttle and server-side validation. Rotate the
+> token if you start seeing junk rows.
 
 ## Verify
 
