@@ -67,7 +67,7 @@ Neon Legacies Enterprise Builder-website/
 3. Go to **Settings → Pages**.
 4. Under **Branch**, select `main` (or `master`) and `/ (root)` folder.
 5. Click **Save**.
-6. Your site will be live at `https://your-username.github.io/legacy-launchpad-website/` within 2 minutes.
+6. Your site will be live at `https://www.neonlegacies.co.za/` within 2 minutes.
 
 ---
 

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signed Out | Neon Legacies Enterprise Builder</title>
+    <meta name="description" content="You have been signed out of the Neon Legacies Enterprise Builder Business Hub.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+        .top-header { background: #0f172a; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .logo-area { display: flex; align-items: center; gap: 12px; text-decoration: none; color: white; }
+        .logo-icon { background: #fbbf24; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: #0f172a; }
+        .logo-text h1 { font-size: 1.4rem; letter-spacing: -0.5px; }
+        .logo-text p { font-size: 0.7rem; color: #94a3b8; }
+        .top-nav a { color: white; text-decoration: none; margin-left: 22px; }
+        .top-nav a:hover { color: #fbbf24; }
+        main { max-width: 640px; margin: 60px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 10px 30px rgba(15,23,42,0.08); text-align: center; }
+        .card i { font-size: 2.4rem; color: #fbbf24; margin-bottom: 18px; }
+        .card h2 { font-size: 1.6rem; color: #0f172a; margin-bottom: 10px; }
+        .card p { color: #475569; margin-bottom: 24px; }
+        .btn { display: inline-block; background: #0f172a; color: white; padding: 12px 26px; border-radius: 999px; text-decoration: none; font-weight: 600; }
+        .btn:hover { background: #fbbf24; color: #0f172a; }
+        .fine { font-size: 0.75rem; color: #94a3b8; margin-top: 22px; }
+    </style>
+</head>
+<body>
+    <header class="top-header">
+        <a class="logo-area" href="index.html">
+            <div class="logo-icon">NL</div>
+            <div class="logo-text">
+                <h1>Neon Legacies Enterprise Builder</h1>
+                <p>Building what lasts.</p>
+            </div>
+        </a>
+        <nav class="top-nav">
+            <a href="index.html">Home</a>
+            <a href="industries.html">Industries</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="card">
+            <i class="fas fa-sign-out-alt"></i>
+            <h2>You have been signed out</h2>
+            <p>Your session details have been cleared from this device. You can sign in again from the Business Hub at any time.</p>
+            <a class="btn" href="index.html">Back to Home</a>
+            <p class="fine">Taking you back to the home page in <span id="countdown">5</span> seconds…</p>
+        </div>
+    </main>
+
+    <script>
+        // Clear any locally stored session data for this site.
+        try {
+            ['user', 'userEmail', 'profile', 'session', 'authToken'].forEach(function (key) {
+                localStorage.removeItem(key);
+            });
+            sessionStorage.clear();
+        } catch (e) {
+            // Storage may be unavailable (private mode) – ignore.
+        }
+
+        var remaining = 5;
+        var el = document.getElementById('countdown');
+        var timer = setInterval(function () {
+            remaining -= 1;
+            if (el) { el.textContent = remaining; }
+            if (remaining <= 0) {
+                clearInterval(timer);
+                window.location.replace('index.html');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
