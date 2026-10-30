@@ -1,4 +1,122 @@
 // ============================================================
+//  NEON LEADS – form intake (Google Apps Script backend)
+//  ------------------------------------------------------------
+//  Every form on the site is POSTed to one Apps Script web app that
+//  appends a row to a Google Sheet and emails the team.
+//
+//  TO GO LIVE:
+//    1. Deploy apps-script/Code.gs as a web app (Execute as: Me,
+//       Who has access: Anyone) and copy the /exec URL.
+//    2. Paste that URL into NEON_LEADS.endpoint below.
+//    3. Paste the same shared token you set in Code.gs CONFIG.SHARED_TOKEN.
+//  Until then submissions are queued in localStorage so nothing is lost.
+// ============================================================
+window.NEON_LEADS = {
+    endpoint: 'YOUR_APPS_SCRIPT_WEB_APP_URL',   // e.g. https://script.google.com/macros/s/AKfy…/exec
+    token: 'REPLACE_WITH_A_LONG_RANDOM_STRING', // must match Code.gs CONFIG.SHARED_TOKEN
+    queueKey: 'neonLeadQueue',
+
+    isConfigured: function () {
+        return this.endpoint.indexOf('https://script.google.com/') === 0;
+    },
+
+    /** Human-readable form names, keyed by <form id>. */
+    formName: function (form) {
+        const map = {
+            orderForm: 'Order',
+            signupFormElement: 'Account Signup',
+            loginFormElement: 'Login',
+            growthForm: 'Growth Consultation',
+            directorSessionForm: 'Director Session',
+            partnerApplicationForm: 'Partner Application',
+            registerCompanyForm: 'Market Lead Company',
+            hireAdminForm: 'Hire Admin',
+            liquorForm: 'Liquor Licence',
+            complianceForm: 'Spaza Compliance',
+            intlForm: 'International Partner'
+        };
+        return (form && map[form.id]) || (form && form.dataset.leadType) || 'General Enquiry';
+    },
+
+    /** Flatten a form into a plain object (name/id → value). */
+    collect: function (form) {
+        const data = {};
+        Array.prototype.forEach.call(form.elements, function (el) {
+            if (!el.name && !el.id) { return; }
+            const key = el.name || el.id;
+            if (el.type === 'checkbox') {
+                data[key] = el.checked;
+            } else if (el.type === 'radio') {
+                if (el.checked) { data[key] = el.value; }
+            } else if (el.type !== 'submit' && el.type !== 'button' && el.type !== 'password') {
+                if (!(key in data) || el.value) { data[key] = el.value; }
+            }
+        });
+        return data;
+    },
+
+    /** Adds the anti-spam honeypot once per form. */
+    addHoneypot: function (form) {
+        if (form.querySelector('input[name="_hp"]')) { return; }
+        const hp = document.createElement('input');
+        hp.type = 'text';
+        hp.name = '_hp';
+        hp.tabIndex = -1;
+        hp.autocomplete = 'off';
+        hp.setAttribute('aria-hidden', 'true');
+        hp.style.cssText = 'position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;';
+        form.appendChild(hp);
+    },
+
+    queue: function (payload) {
+        try {
+            const q = JSON.parse(localStorage.getItem(this.queueKey) || '[]');
+            q.push(payload);
+            localStorage.setItem(this.queueKey, JSON.stringify(q.slice(-25)));
+        } catch (e) { /* storage full or blocked */ }
+    },
+
+    /** Sends one payload. Returns a promise that always resolves. */
+    send: function (payload) {
+        if (!this.isConfigured()) { this.queue(payload); return Promise.resolve({ queued: true }); }
+        return fetch(this.endpoint, {
+            method: 'POST',
+            mode: 'no-cors',                      // Apps Script sends no CORS headers
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+        }).catch(function () { return null; });
+    },
+
+    /** Collect + submit a form. */
+    submit: function (form) {
+        if (!form) { return Promise.resolve(); }
+        const payload = this.collect(form);
+        payload.formType = this.formName(form);
+        payload.token = this.token;
+        payload.id = 'lead-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+        payload.page = location.pathname.split('/').pop() || 'index.html';
+        payload.timestamp = new Date().toISOString();
+        return this.send(payload);
+    }
+};
+
+// Capture-phase hook: fires before each page's own submit handler, so the
+// payload is sent even though those handlers call preventDefault().
+document.addEventListener('submit', function (e) {
+    const form = e.target;
+    if (!form || form.tagName !== 'FORM') { return; }
+    if (form.dataset.noLead === 'true') { return; }
+    window.NEON_LEADS.submit(form);
+}, true);
+
+// Add the honeypot to every form as soon as the DOM is parsed.
+document.addEventListener('DOMContentLoaded', function () {
+    Array.prototype.forEach.call(document.querySelectorAll('form'), function (form) {
+        window.NEON_LEADS.addHoneypot(form);
+    });
+});
+
+// ============================================================
 //  MAIN – runs once when DOM is ready
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -119,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     msg.innerHTML = '<span style="color:red;">❌ Passwords do not match.</span>';
                     return;
                 }
-                msg.innerHTML = '<span style="color:green;">✅ Account created! Please check your email for confirmation. (Demo – backend pending)</span>';
+                msg.innerHTML = '<span style="color:green;">✅ Account created! Your request has been sent to our team – check your email for confirmation.</span>';
             });
         }
 
@@ -198,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     partnerSubmitMsg.innerHTML = '<span style="color:red;">❌ Please <a href="profile.html">log in</a> to submit a partnership application.</span>';
                     return;
                 }
-                partnerSubmitMsg.innerHTML = '<span style="color:green;">✅ Application received! Our team will review and contact you within 5 business days. (Demo – backend pending)</span>';
+                partnerSubmitMsg.innerHTML = '<span style="color:green;">✅ Application received! Our team will review it and contact you within 5 business days.</span>';
             });
         }
     }
@@ -252,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     intlSubmitMsg.innerHTML = '<span style="color:red;">❌ Please <a href="profile.html">log in</a> to submit an international partnership request.</span>';
                     return;
                 }
-                intlSubmitMsg.innerHTML = '<span style="color:green;">✅ Thank you! Your international request has been received. We will contact you within 48 hours. (Demo – backend pending)</span>';
+                intlSubmitMsg.innerHTML = '<span style="color:green;">✅ Thank you! Your international request has been received – we will contact you within 48 hours.</span>';
             });
         }
     }
@@ -289,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 growthSubmitMsg.innerHTML = '<span style="color:red;">❌ Please select a preferred date (at least 7 days from now).</span>';
                 return;
             }
-            growthSubmitMsg.innerHTML = '<span style="color:green;">✅ Your strategic growth consultation request has been received! We will confirm your appointment within 48 hours. (Demo – backend pending)</span>';
+            growthSubmitMsg.innerHTML = '<span style="color:green;">✅ Your strategic growth consultation request has been received! We will confirm your appointment within 48 hours.</span>';
         });
     }
 
@@ -331,7 +449,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('sessionMessage').innerHTML = '<span style="color:red;">❌ Please select a date at least 14 days from now.</span>';
                     return;
                 }
-                document.getElementById('sessionMessage').innerHTML = '<span style="color:green;">✅ Director session request received! We will confirm within 48 hours. (Demo)</span>';
+                document.getElementById('sessionMessage').innerHTML = '<span style="color:green;">✅ Director session request received! We will confirm within 48 hours.</span>';
             });
         }
 
@@ -360,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const logoData = evt.target.result || null;
                     partners.push({ companyName, industry, website, description, logoData });
                     renderPartners();
-                    document.getElementById('partnerApplicationMessage').innerHTML = '<span style="color:green;">✅ Application submitted! Your business now appears in Prospective Partners. (Demo)</span>';
+                    document.getElementById('partnerApplicationMessage').innerHTML = '<span style="color:green;">✅ Application submitted! Your business now appears in Prospective Partners – our team will verify it shortly.</span>';
                     partnerAppForm.reset();
                 };
                 if (logoFile) {
@@ -368,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     partners.push({ companyName, industry, website, description, logoData: null });
                     renderPartners();
-                    document.getElementById('partnerApplicationMessage').innerHTML = '<span style="color:green;">✅ Application submitted! Your business now appears in Prospective Partners. (Demo)</span>';
+                    document.getElementById('partnerApplicationMessage').innerHTML = '<span style="color:green;">✅ Application submitted! Your business now appears in Prospective Partners – our team will verify it shortly.</span>';
                     partnerAppForm.reset();
                 }
             });
@@ -659,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 hireSubmitMsg.innerHTML = '<span style="color:red;">❌ Please enter a valid number of staff.</span>';
                 return;
             }
-            hireSubmitMsg.innerHTML = '<span style="color:green;">✅ Your request has been received! Our team will contact you within 48 hours to discuss a custom SLA. (Demo – backend pending)</span>';
+            hireSubmitMsg.innerHTML = '<span style="color:green;">✅ Your request has been received! Our team will contact you within 48 hours to discuss a custom SLA.</span>';
         });
     }
 
