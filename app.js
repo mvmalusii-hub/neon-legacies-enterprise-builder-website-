@@ -12,7 +12,7 @@
 //  Until then submissions are queued in localStorage so nothing is lost.
 // ============================================================
 window.NEON_LEADS = {
-    endpoint: 'YOUR_APPS_SCRIPT_WEB_APP_URL',   // e.g. https://script.google.com/macros/s/AKfy…/exec
+    endpoint: 'AKfycbzM082roGPD0iDJy8XgmSdFATcPS8Ma5b2Y7XtAAEiO',   // e.g. https://script.google.com/macros/s/AKfy…/exec
     token: 'REPLACE_WITH_A_LONG_RANDOM_STRING', // must match Code.gs CONFIG.SHARED_TOKEN
     queueKey: 'neonLeadQueue',
 
