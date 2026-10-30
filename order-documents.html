@@ -1,0 +1,2423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Order Document Roadmaps & Compliance Systems | Legacy Launchpad</title>
+    <meta name="description" content="Order ready-to-use document roadmaps and compliance systems for your industry. Fixed pricing, fast delivery, South African compliance.">
+    <title>Order & Quote | Legacy Launchpad</title>
+
+    <!-- External Styles -->
+    <link rel="stylesheet" href="main.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- ============================================================ -->
+    <!-- 1. TOP HEADER                                                -->
+    <!-- ============================================================ -->
+    <header class="top-header">
+        <div class="logo-area">
+            <div class="logo-icon">LP</div>
+            <div class="logo-text">
+                <h1>Legacy Launchpad</h1>
+                <p>Building what lasts.</p>
+            </div>
+        </div>
+
+        <nav class="top-nav" id="topNav">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="industries.html">Industries</a>
+            <div class="dropdown">
+                <button class="dropbtn">Services <i class="fas fa-chevron-down"></i></button>
+                <div class="dropdown-content">
+                    <a href="3d-floor-plans.html">🏗️ 3D Floor Plans</a>
+                    <a href="personal-services.html">🧑 Personal Services</a>
+                    <a href="business-support.html">📊 Business Support</a>
+                    <a href="marketing-services.html">🎨 Marketing Services</a>
+                    <a href="order-documents.html">📋 Order Documents</a>
+                </div>
+            </div>
+            <a href="policies.html">Policies</a>
+            <a href="#contact">Contact</a>
+        </nav>
+
+        <button class="menu-toggle" id="menuToggleTop" aria-label="Toggle navigation">☰</button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar">☰</button>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- 2. MAIN APP CONTAINER                                        -->
+    <!-- ============================================================ -->
+    <div class="app-container">
+
+        <!-- SIDEBAR (full menu + EPK Studio) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Enterprise Menu</h3>
+                <p>Advanced features</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="profile.html"><i class="fas fa-user-plus"></i> 01 Profile / Create Profile</a></li>
+                <li><a href="partners.html"><i class="fas fa-handshake"></i> 02 Our Partners</a></li>
+                <li><a href="international.html"><i class="fas fa-globe"></i> 03 International Partners</a></li>
+                <li><a href="strategic-growth.html"><i class="fas fa-chart-line"></i> 04 Strategic Growth</a></li>
+                <li><a href="business-partners.html"><i class="fas fa-building"></i> 05 Business Partners</a></li>
+                <li><a href="market-leads.html"><i class="fas fa-chart-simple"></i> 06 Real Time Market Leads</a></li>
+                <li><a href="business-hub.html"><i class="fas fa-users"></i> 07 Business Hub</a></li>
+                <li><a href="hire-admin.html"><i class="fas fa-user-tie"></i> 08 Hire Our Admin</a></li>
+                <li><a href="referral.html"><i class="fas fa-gift"></i> 09 Referral Program</a></li>
+                <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i> 10 Profile Log Out</a></li>
+                <!-- EPK Studio link (opens in new tab) -->
+                <li><a href="https://www.legacylaunchpad.co.za/artist-profile-service.html" target="_blank"><i class="fas fa-star"></i> 11 EPK Studio</a></li>
+            </ul>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- ===== ORDER & QUOTE HEADER ===== -->
+            <div class="order-header">
+                <h1>📋 Order &amp; Quote System</h1>
+                <p>Select your services – company registration, document roadmaps, individual documents, or pre‑packaged bundles.</p>
+            </div>
+
+            <!-- ===== FORM ===== -->
+            <div class="order-form-card">
+                <form id="orderForm">
+
+                    <!-- Client Info -->
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="fullName">Your full name *</label>
+                            <input type="text" id="fullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email address *</label>
+                            <input type="email" id="email" required>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="phone">Phone number</label>
+                            <input type="tel" id="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="company">Company / Organisation</label>
+                            <input type="text" id="company">
+                        </div>
+                    </div>
+
+                    <!-- Company Registration -->
+                    <h3 class="section-subtitle">🏢 Company Registration (optional)</h3>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="companyType">Company type</label>
+                            <select id="companyType">
+                                <option value="">-- Not required --</option>
+                                <option value="Pty Ltd">Private Company (Pty Ltd)</option>
+                                <option value="NPC">Non-Profit Company (NPC)</option>
+                                <option value="NPO/NGO">Non-Profit Organisation (NPO/NGO)</option>
+                                <option value="ECD / Daycare">ECD / Daycare Centre</option>
+                                <option value="Sole Proprietor">Sole Proprietor</option>
+                                <option value="Partnership">Partnership</option>
+                                <option value="Trust">Trust</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="name1">Proposed name 1</label>
+                            <input type="text" id="name1" placeholder="First choice">
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="name2">Proposed name 2</label>
+                            <input type="text" id="name2" placeholder="Second choice">
+                        </div>
+                        <div class="form-group">
+                            <label for="name3">Proposed name 3</label>
+                            <input type="text" id="name3" placeholder="Third choice">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="name4">Proposed name 4</label>
+                        <input type="text" id="name4" placeholder="Fourth choice">
+                    </div>
+
+                    <!-- Document Systems (FDS & Roadmap) -->
+                    <h3 class="section-subtitle">📁 Document Systems (choose any)</h3>
+                    <div class="form-row-2">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="includeFDS"> File Directory Structure (R700 per industry)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="includeRoadmap"> Document Roadmap (R700 per industry)
+                        </label>
+                    </div>
+                    <div class="form-group" id="industrySelectGroup" style="display: none;">
+                        <label for="industryForDocs">Select industry for FDS / Roadmap</label>
+                        <select id="industryForDocs">
+                            <option value="">-- Select industry --</option>
+                            <option value="Construction">Construction</option>
+                            <option value="Cleaning Services">Cleaning Services</option>
+                            <option value="Cash for Scrap">Cash for Scrap</option>
+                            <option value="Property & Real Estate">Property & Real Estate</option>
+                            <option value="Transport & Logistics">Transport & Logistics</option>
+                            <option value="Retail (General)">Retail (General)</option>
+                            <option value="Restaurant & Takeaway">Restaurant & Takeaway</option>
+                            <option value="Security Services">Security Services</option>
+                            <option value="Light Manufacturing">Light Manufacturing</option>
+                            <option value="Automotive Repair & Sales">Automotive Repair & Sales</option>
+                            <option value="Health & Beauty (Salon/Spa)">Health & Beauty (Salon/Spa)</option>
+                            <option value="Information Technology (IT)">Information Technology (IT)</option>
+                            <option value="Event Management & Catering">Event Management & Catering</option>
+                            <option value="Farming & Agriculture">Farming & Agriculture</option>
+                            <option value="Funeral Services">Funeral Services</option>
+                            <option value="ECD (Daycare/Crèche)">ECD (Daycare/Crèche)</option>
+                            <option value="Electrical & Solar">Electrical & Solar</option>
+                            <option value="Plumbing & Sanitation">Plumbing & Sanitation</option>
+                            <option value="Logistics & Warehousing">Logistics & Warehousing</option>
+                            <option value="NGO / Non-Profit">NGO / Non-Profit</option>
+                        </select>
+                    </div>
+
+                    <!-- Pre‑packaged Bundles -->
+                    <h3 class="section-subtitle">📦 Pre‑packaged Bundles</h3>
+                    <div class="bundle-grid">
+                        <label><input type="radio" name="bundle" value="none" checked> None</label>
+                        <label><input type="radio" name="bundle" value="startup"> Startup Launch Package – R1,750</label>
+                        <label><input type="radio" name="bundle" value="compliance"> Compliance Package – R1,050</label>
+                        <label><input type="radio" name="bundle" value="franchise"> Full Franchise Bundle – R6,000</label>
+                        <label><input type="radio" name="bundle" value="industry-combo"> Industry Combo (3 industries) – R1,500</label>
+                    </div>
+
+                    <!-- Personal Services -->
+                    <h3 class="section-subtitle">🧑 Personal Services (tick any)</h3>
+                    <div class="personal-grid">
+                        <label><input type="checkbox" class="personal-service" data-price="350" data-name="UIF Application"> UIF Application – R350</label>
+                        <label><input type="checkbox" class="personal-service" data-price="250" data-name="ID/Passport Assistance"> ID/Passport Assistance – R250</label>
+                        <label><input type="checkbox" class="personal-service" data-price="450" data-name="Artist Profile"> Artist Profile – R450</label>
+                        <label><input type="checkbox" class="personal-service" data-price="800" data-name="Artist EPK"> Artist EPK – R800</label>
+                        <label><input type="checkbox" class="personal-service" data-price="400" data-name="CV + Cover Letter"> CV + Cover Letter – R400</label>
+                        <label><input type="checkbox" class="personal-service" data-price="300" data-name="SASSA Grant Assistance"> SASSA Grant Assistance – R300</label>
+                        <label><input type="checkbox" class="personal-service" data-price="200" data-name="Police Clearance Guidance"> Police Clearance Guidance – R200</label>
+                    </div>
+
+                    <!-- Advanced Document Selection (per category) -->
+                    <h3 class="section-subtitle">📄 Advanced Document Selection (per document – R30 each)</h3>
+                    <div class="form-group">
+                        <label for="advIndustrySelect">Select industry</label>
+                        <select id="advIndustrySelect">
+                            <option value="">-- Select industry to see documents --</option>
+                            <option value="Construction">Construction</option>
+                            <option value="Cleaning Services">Cleaning Services</option>
+                            <option value="Cash for Scrap">Cash for Scrap</option>
+                            <option value="Property & Real Estate">Property & Real Estate</option>
+                            <option value="Transport & Logistics">Transport & Logistics</option>
+                            <option value="Retail (General)">Retail (General)</option>
+                            <option value="Restaurant & Takeaway">Restaurant & Takeaway</option>
+                            <option value="Security Services">Security Services</option>
+                            <option value="Light Manufacturing">Light Manufacturing</option>
+                            <option value="Automotive Repair & Sales">Automotive Repair & Sales</option>
+                            <option value="Health & Beauty (Salon/Spa)">Health & Beauty (Salon/Spa)</option>
+                            <option value="Information Technology (IT)">Information Technology (IT)</option>
+                            <option value="Event Management & Catering">Event Management & Catering</option>
+                            <option value="Farming & Agriculture">Farming & Agriculture</option>
+                            <option value="Funeral Services">Funeral Services</option>
+                            <option value="ECD (Daycare/Crèche)">ECD (Daycare/Crèche)</option>
+                            <option value="Electrical & Solar">Electrical & Solar</option>
+                            <option value="Plumbing & Sanitation">Plumbing & Sanitation</option>
+                            <option value="Logistics & Warehousing">Logistics & Warehousing</option>
+                            <option value="NGO / Non-Profit">NGO / Non-Profit</option>
+                        </select>
+                    </div>
+                    <div id="advCategoriesContainer"></div>
+
+                    <!-- Notes -->
+                    <div class="form-group">
+                        <label for="notes">Additional notes or special requests</label>
+                        <textarea id="notes" rows="4" placeholder="Anything else we should know?"></textarea>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="summary-bar">
+                        <strong>Total amount due: R <span id="totalAmount">0</span></strong>
+                        <p style="font-size:0.85rem; margin-top:8px;">Excludes VAT. Government fees (CIPC, SARS, etc.) are paid separately.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit Order →</button>
+                    <div class="loading" id="loading">Processing...</div>
+                </form>
+            </div>
+
+            <!-- ===== FOOTER ===== -->
+            <div class="footer-contact" id="contact">
+                <p><strong>Msimelelo Victor Malusi</strong> – Founder</p>
+                <p>
+                    <i class="fas fa-phone"></i> 072 152 3293 &nbsp;|&nbsp;
+                    <i class="fab fa-whatsapp"></i> 063 301 7269 &nbsp;|&nbsp;
+                    <i class="fas fa-envelope"></i> mv.malusi@legacylaunchpad.co.za
+                </p>
+                <p>© 2025 Legacy Launchpad (Pty) Ltd – Building what lasts.</p>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 3. PAGE-SPECIFIC JAVASCRIPT (document selection & logic)     -->
+    <!-- ============================================================ -->
+    <script>
+        // ========================
+        // FULL INDUSTRY DOCUMENTS DATA (all 20 industries)
+        // (This is the same massive dataset as before – kept inline for this page)
+        // ========================
+        const industryDocs = {
+          "Construction": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "CIDB Registration Certificate",
+              "NHBRC Registration (if residential)",
+              "CSD Registration",
+              "B-BBEE Certificate",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Construction Permit (if structural)"
+            ],
+            "Contracts & Client Docs": [
+              "Construction Agreement (Master)",
+              "Subcontractor Agreement",
+              "Quotation / Proposal Template",
+              "Non-Disclosure Agreement (NDA)",
+              "Variation Order Form",
+              "Progress Payment Certificate",
+              "Practical Completion Certificate",
+              "Defects Liability Period Agreement",
+              "Site Handover Form",
+              "Final Account Statement",
+              "Client Complaint Form",
+              "Subcontractor Safety Indemnity"
+            ],
+            "Human Resources": [
+              "Employment Contract – General Worker",
+              "Employment Contract – Skilled Artisan",
+              "Employment Contract – Site Supervisor",
+              "Employment Contract – Project Manager",
+              "Independent Contractor Agreement",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Shift Roster Template",
+              "Attendance Register (Daily)",
+              "PPE Issue Register",
+              "Training Record – Health & Safety",
+              "Training Record – Machinery Operation"
+            ],
+            "Operations & Site Management": [
+              "Daily Site Diary",
+              "Site Instruction Register",
+              "Delivery Note Register",
+              "Tool & Equipment Sign-Out Register",
+              "Vehicle Log Sheet (per vehicle)",
+              "Concrete Pour Register",
+              "Material Requisition Form",
+              "Plant / Machinery Daily Checklist",
+              "Scaffold Inspection Log",
+              "Site Diary (Supervisor Copy)",
+              "Photographic Record Log",
+              "Client Site Visit Register",
+              "Waste Manifests (if hazardous)",
+              "As-Built Drawings Register"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Site‑Specific Risk Assessment",
+              "Safe Work Method Statement (SWMS)",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register",
+              "Fire Extinguisher Inspection Log",
+              "Emergency Evacuation Plan (per site)",
+              "Toolbox Talk Register",
+              "Personal Protective Equipment (PPE) Policy",
+              "Hazardous Substance Register"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template",
+              "Supplier Invoice Register",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Material Purchase Order",
+              "Supplier Contract – Materials",
+              "Plant Hire Agreement",
+              "Bank Reconciliation Template",
+              "Client Payment History",
+              "Retention Money Register"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Vehicle Maintenance Log",
+              "Small Tool Register (under R500)",
+              "Equipment Calibration Log",
+              "Generator / Compressor Log",
+              "Scaffolding Register",
+              "Ladder Inspection Log",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Daily Work Report (for client)",
+              "Overtime Authorisation Form",
+              "Leave Application Form",
+              "Subcontractor Induction Form",
+              "Site Induction Checklist (new worker)",
+              "Toolbox Talk Template (blank)",
+              "Snag List Form",
+              "Termination Checklist"
+            ]
+          },
+          "Cleaning Services": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "B-BBEE Certificate",
+              "CSD Registration",
+              "Waste Carrier Licence",
+              "Hazardous Chemical Register"
+            ],
+            "Contracts & Client Docs": [
+              "Cleaning Service Agreement (Master)",
+              "Site‑Specific SLA",
+              "Quotation / Proposal Template",
+              "Non-Disclosure Agreement (NDA)",
+              "Variation Order Form",
+              "Service Sign‑Off Sheet",
+              "Client Complaint Form",
+              "Contract Renewal Letter",
+              "Termination Notice",
+              "Subcontractor Cleaning Agreement",
+              "Preferred Supplier Agreement"
+            ],
+            "Human Resources": [
+              "Employment Contract – General Cleaner",
+              "Employment Contract – Specialised Cleaner",
+              "Employment Contract – Site Supervisor",
+              "Employment Contract – Operations Manager",
+              "Independent Contractor Agreement",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Shift Roster Template",
+              "Attendance Register (Daily)",
+              "Uniform & PPE Issue Register",
+              "Training Record – Chemical Handling"
+            ],
+            "Operations & Site Management": [
+              "Daily Cleaning Checklist (per site)",
+              "Site Inspection Log (Quality Control)",
+              "Equipment Sign‑Out Register",
+              "Chemical Inventory Log",
+              "Material Safety Data Sheets (MSDS) Register",
+              "Waste Removal Log",
+              "Vehicle Log Sheet (if mobile crew)",
+              "Key Register (per site)",
+              "Client Site Visit Register",
+              "Stock Take Report (chemicals, consumables)",
+              "Equipment Maintenance Log",
+              "Lost Property Register"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Site‑Specific Risk Assessment",
+              "Safe Work Method Statement (SWMS)",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register",
+              "Fire Extinguisher Inspection Log",
+              "Chemical Spill Response Plan",
+              "Personal Protective Equipment (PPE) Policy",
+              "Toolbox Talk Register"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template",
+              "Supplier Invoice Register",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Purchase Order (chemicals, consumables)",
+              "Supplier Contracts – Chemicals",
+              "Client Payment History",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Equipment Maintenance Log",
+              "Small Equipment Register (mops, buckets)",
+              "Vehicle Maintenance Log (if any)",
+              "Equipment Loan/Return Form",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Daily Work Report (for client)",
+              "Overtime Authorisation Form",
+              "Leave Application Form",
+              "Site Induction Checklist (new cleaner)",
+              "Client Satisfaction Survey",
+              "Supplier Evaluation Form",
+              "Termination Checklist"
+            ]
+          },
+          "Cash for Scrap": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Scrap Metal Dealers Licence",
+              "Second-Hand Goods Dealer Licence",
+              "Waste Management Licence",
+              "Zoning Certificate (Industrial)",
+              "Fire Clearance Certificate",
+              "Weighbridge Calibration Certificate",
+              "B-BBEE Certificate"
+            ],
+            "Contracts & Client Docs": [
+              "Supplier Agreement (Corporate)",
+              "Cash Purchase Receipt (Standard)",
+              "Non-Cash Payment Authorization",
+              "Quotation Template (for selling scrap)",
+              "Sales Invoice (selling scrap)",
+              "Transport / Collection Agreement",
+              "Non-Disclosure Agreement (NDA)",
+              "Contractor Agreement (transport, sorting)",
+              "Supplier Registration Form",
+              "Indemnity Form (for site access)"
+            ],
+            "Human Resources": [
+              "Employment Contract – General Worker",
+              "Employment Contract – Weighbridge Operator",
+              "Employment Contract – Buyer / Manager",
+              "Employment Contract – Driver",
+              "Independent Contractor Agreement",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Shift Roster Template",
+              "Attendance Register (Daily)"
+            ],
+            "Operations & Site Management": [
+              "Daily Purchase Register (required by law)",
+              "Weighbridge Ticket",
+              "Stock Inventory Log (by metal type)",
+              "Price List (daily rates)",
+              "Vehicle Log Sheet (collection trucks)",
+              "Seller ID Verification Log",
+              "Waiting Period Register",
+              "CCTV Footage Log",
+              "Equipment Sign-Out Register",
+              "Cash Float Register",
+              "Daily Cash Reconciliation",
+              "Supplier Payment Schedule",
+              "Loading / Dispatch Log",
+              "Site Access Register (sellers & trucks)"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Site‑Specific Risk Assessment",
+              "Safe Work Method Statement (SWMS)",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register",
+              "Fire Extinguisher Inspection Log",
+              "Emergency Evacuation Plan",
+              "Personal Protective Equipment (PPE) Policy",
+              "Hazardous Waste Register",
+              "Toolbox Talk Register"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (selling scrap)",
+              "Supplier Invoice Register (expenses)",
+              "Payroll Register",
+              "Cash Purchase Log (for tax)",
+              "Bank Deposit Slip Log",
+              "Supplier Contract – Foundry / Recycler",
+              "Client Payment History",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Weighbridge Calibration Log",
+              "Vehicle Maintenance Log",
+              "Equipment Maintenance Log",
+              "Small Tool Register",
+              "CCTV System Maintenance Log",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Seller Declaration Form (source of scrap)",
+              "Daily Stock Report (by metal type)",
+              "Overtime Authorisation Form",
+              "Leave Application Form",
+              "Site Induction Checklist (new worker)",
+              "Supplier Complaint Form",
+              "Termination Checklist"
+            ]
+          },
+          "Property & Real Estate": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "Property Practitioner Licence (PPRA)",
+              "Fidelity Fund Certificate (FFC)",
+              "COIDA Registration (if employees)",
+              "Public Liability Insurance",
+              "Professional Indemnity Insurance",
+              "B-BBEE Certificate",
+              "CSD Registration"
+            ],
+            "Contracts & Client Docs": [
+              "Exclusive Mandate Agreement (Sale)",
+              "Non‑Exclusive Mandate Agreement (Sale)",
+              "Exclusive Mandate Agreement (Letting)",
+              "Lease Agreement (Residential)",
+              "Lease Agreement (Commercial)",
+              "Offer to Purchase (Residential)",
+              "Offer to Purchase (Commercial)",
+              "Deed of Sale (Vacant Land)",
+              "Tenant Application Form",
+              "Lease Renewal Agreement",
+              "Early Termination Agreement",
+              "Non‑Disclosure Agreement (NDA)",
+              "Property Management Agreement",
+              "Suretyship Agreement (Guarantor)"
+            ],
+            "Human Resources": [
+              "Employment Contract – Property Practitioner (Agent)",
+              "Employment Contract – Property Manager",
+              "Employment Contract – Administrator",
+              "Independent Contractor Agreement (commission‑only)",
+              "Code of Conduct (PPRA aligned)",
+              "Disciplinary Code & Procedure",
+              "Commission Split Agreement (per deal)",
+              "Shift / Viewing Roster",
+              "Training Record – PPRA CPD"
+            ],
+            "Operations & Site Management": [
+              "Property Inspection Report (Ingoing)",
+              "Property Inspection Report (Outgoing)",
+              "Monthly Rent Roll",
+              "Lease Expiry Tracker",
+              "Maintenance Request Log",
+              "Contractor Quote Register",
+              "Key Register (per property)",
+              "Viewing Schedule Log",
+              "Offer Register (for sellers)",
+              "Deposit Register (Rental)",
+              "Eviction Notice Template",
+              "Deed of Trust (deposit handling)"
+            ],
+            "Health & Safety": [
+              "OHS Policy (for managed properties)",
+              "Electrical Certificate of Compliance (ECOC)",
+              "Gas Certificate of Compliance",
+              "Fire Certificate (for commercial)",
+              "Asbestos Report (older buildings)",
+              "Tenant Safety Notice",
+              "Incident Report Form (tenant injury)",
+              "Pest Control Log"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (commission)",
+              "Debit Order Authorization Form",
+              "Landlord Payment Schedule",
+              "Trust Account Register (client money)",
+              "Agent Commission Statement (per deal)",
+              "Supplier Invoice Register (maintenance)",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Bank Reconciliation (including trust account)"
+            ],
+            "Assets & Equipment": [
+              "Asset Register (office)",
+              "Vehicle Log Sheet (agent vehicles)",
+              "Sign Board Register (for sale/to let)",
+              "Photography Equipment Register",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Client Registration Form (seller/landlord)",
+              "Buyer / Tenant Registration Form",
+              "Section 13 Notice (lease renewal)",
+              "Section 4/5 Notice (eviction)",
+              "Rental Increase Notice (annual)",
+              "Credit Check Authorization",
+              "Agent Visit Report (after viewing)",
+              "Referral Fee Agreement",
+              "Office Trust Account Log",
+              "Termination Checklist (staff)"
+            ]
+          },
+          "Transport & Logistics": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "Operating Licence (Public Transport)",
+              "Road Transport Permit (Cross‑border)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Goods‑in‑Transit Insurance",
+              "Comprehensive Vehicle Insurance",
+              "B-BBEE Certificate",
+              "CSD Registration",
+              "Dangerous Goods Permit (if applicable)"
+            ],
+            "Contracts & Client Docs": [
+              "Logistics Services Agreement (Master)",
+              "Consignment Note / Waybill",
+              "Quotation / Proposal Template",
+              "Non‑Disclosure Agreement (NDA)",
+              "Subcontractor Agreement (owner‑driver)",
+              "Delivery Proof / POD Log",
+              "Rate Card (per km, per ton, per trip)",
+              "Client Credit Application",
+              "Fuel Surcharge Agreement",
+              "Indemnity Form (client loading/unloading)"
+            ],
+            "Human Resources": [
+              "Employment Contract – Long‑Distance Driver",
+              "Employment Contract – Local Delivery Driver",
+              "Employment Contract – Fleet Manager",
+              "Employment Contract – Logistics Coordinator",
+              "Employment Contract – General Assistant (Loader)",
+              "Independent Contractor Agreement (Owner‑Driver)",
+              "Code of Conduct (Drivers)",
+              "Disciplinary Code & Procedure",
+              "Shift Roster / Driver Schedule",
+              "Attendance Register (Daily)",
+              "Professional Driving Permit (PrDP) Register",
+              "Driver Training Record (Defensive driving)"
+            ],
+            "Operations & Fleet Management": [
+              "Daily Vehicle Inspection Checklist (Pre‑trip)",
+              "Daily Vehicle Inspection Checklist (Post‑trip)",
+              "Trip Log / Job Card (per load)",
+              "Fuel Consumption Log (per vehicle)",
+              "Toll & Expense Log (per trip)",
+              "Vehicle Service Schedule",
+              "Repair & Maintenance Log (per vehicle)",
+              "Tyre Register (per vehicle)",
+              "Accident / Incident Report Form (vehicle)",
+              "Driver Hours Log (Working time)",
+              "Route Plan / Dispatch Sheet",
+              "Trailer / Container Register (if applicable)",
+              "GPS Tracking Log",
+              "Licence & Permit Register (vehicle)",
+              "Cross‑border Clearance Log (if international)"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Driver Fatigue Management Policy",
+              "Site‑Specific Risk Assessment (loading depots)",
+              "Safe Work Method Statement (Loading/unloading)",
+              "Incident Report Form (general)",
+              "First Aid Kit Register (per vehicle)",
+              "Fire Extinguisher Log (per vehicle)",
+              "Dangerous Goods Spill Response Plan (if applicable)",
+              "Personal Protective Equipment (PPE) Register",
+              "Toolbox Talk Register (drivers)"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (per client)",
+              "Client Payment History",
+              "Supplier Invoice Register (fuel, maintenance, tyres)",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Fuel Card Transaction Log",
+              "Supplier Contract – Fuel (fleet card)",
+              "Supplier Contract – Tyres",
+              "Supplier Contract – Vehicle Service Provider",
+              "Bank Reconciliation Template"
+            ],
+            "Assets & Equipment": [
+              "Fleet Asset Register (Master)",
+              "Vehicle Registration & Licence Disk Log",
+              "Vehicle Roadworthy Certificate Register (COR)",
+              "GPS Tracker Maintenance Log",
+              "Pallet / Container Register",
+              "Small Tool Register (straps, chains, tarps)",
+              "Asset Disposal Form (selling old vehicles)",
+              "Vehicle Auction / Sale Record"
+            ],
+            "Forms & Templates": [
+              "Daily Fuel Reconciliation",
+              "Driver Leave / Off‑day Request",
+              "Overtime Authorization Form",
+              "Client Credit Note (damaged goods)",
+              "Customer Satisfaction Survey",
+              "Load Confirmation Form (client order)",
+              "Termination Checklist (driver offboarding)"
+            ]
+          },
+          "Retail (General)": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Business Licence (Local Municipality)",
+              "Liquor Licence (if selling alcohol)",
+              "Health Certificate (if selling food)",
+              "Fire Clearance Certificate",
+              "B-BBEE Certificate"
+            ],
+            "Contracts & Client Docs": [
+              "Lease Agreement (Retail Premises)",
+              "Supplier Agreement (Wholesaler)",
+              "Consignment Agreement (if selling on behalf)",
+              "Credit Application Form (for customers)",
+              "Lay‑Bye Agreement (if offering)",
+              "Return / Refund Policy",
+              "Gift Voucher Terms & Conditions",
+              "Non‑Disclosure Agreement (NDA)",
+              "Delivery Agreement (if delivering)",
+              "Rental of Equipment Agreement (e.g., gas bottles)"
+            ],
+            "Human Resources": [
+              "Employment Contract – Cashier",
+              "Employment Contract – Sales Assistant",
+              "Employment Contract – Store Manager",
+              "Employment Contract – Stock Clerk / Receiver",
+              "Independent Contractor Agreement (e.g., cleaner)",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Shift Roster Template",
+              "Attendance Register (Daily)",
+              "Training Record – POS / Cash Handling"
+            ],
+            "Operations & Store Management": [
+              "Daily Cash‑Up Sheet (Till Reconciliation)",
+              "Daily Sales Report",
+              "Stock Take Sheet (Physical Count)",
+              "Stock Adjustment Register (Damaged, expired, stolen)",
+              "Supplier Delivery Note Log",
+              "Purchase Order Template",
+              "Price Change Log (markdowns, promotions)",
+              "Customer Complaint / Feedback Log",
+              "Refund / Exchange Register",
+              "Store Opening Checklist (daily)",
+              "Store Closing Checklist (daily)",
+              "Safe / Cash Float Register"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Risk Assessment (Store Premises)",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register",
+              "Fire Extinguisher Inspection Log",
+              "Emergency Evacuation Plan (store)",
+              "Personal Protective Equipment (PPE) Policy",
+              "Toolbox Talk Register (staff safety)"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (to corporate customers)",
+              "Supplier Invoice Register",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Daily Banking Register",
+              "Supplier Payment Schedule",
+              "Credit Card / EFT Transaction Log",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Refrigeration Temperature Log (if selling cold goods)",
+              "POS System Maintenance Log",
+              "CCTV Camera Log",
+              "Security Alarm Log",
+              "Small Equipment Register (scanners, label makers)",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Credit Note Form (customer returns)",
+              "Customer Information Form (for warranties)",
+              "Staff Discount Authorization Form",
+              "Overtime Authorization Form",
+              "Leave Application Form",
+              "Supplier Evaluation Form",
+              "Mystery Shopper Report Template",
+              "Termination Checklist"
+            ]
+          },
+          "Restaurant & Takeaway": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Business Licence (Municipal)",
+              "Health Certificate (Municipality)",
+              "Fire Clearance Certificate",
+              "Liquor Licence (if selling alcohol)",
+              "Zoning Certificate (Business zoning)",
+              "Certificate of Acceptability (Food premises)",
+              "B-BBEE Certificate"
+            ],
+            "Contracts & Client Docs": [
+              "Lease Agreement (Restaurant Premises)",
+              "Catering Service Agreement (for events)",
+              "Supplier Agreement (Food & Beverage)",
+              "Event Booking Form / Deposit Agreement",
+              "Corkage Agreement (if BYO allowed)",
+              "Non‑Disclosure Agreement (NDA)",
+              "Equipment Rental Agreement (e.g., marquee, chairs)",
+              "Wedding / Function Contract (detailed)"
+            ],
+            "Human Resources": [
+              "Employment Contract – Chef / Cook",
+              "Employment Contract – Waiter / Waitress",
+              "Employment Contract – Kitchen Assistant",
+              "Employment Contract – Bartender (if licensed)",
+              "Employment Contract – Restaurant Manager",
+              "Independent Contractor Agreement (DJ, entertainer)",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Shift Roster Template",
+              "Attendance Register (Daily)",
+              "Training Record – Food Hygiene (Level 1/2)"
+            ],
+            "Operations & Kitchen Management": [
+              "Daily Food Temperature Log (fridges, freezers)",
+              "Daily Cooking Temperature Log (meat, poultry)",
+              "Cleaning Schedule (Kitchen & Dining)",
+              "Pest Control Log (monthly inspections)",
+              "Stock Take Sheet (raw ingredients)",
+              "Waste / Spoilage Log",
+              "Supplier Delivery Note Log",
+              "Purchase Order Template",
+              "Daily Sales Summary (POS report)",
+              "Table Turnover Log (peak hours)",
+              "Reservation Register (booking log)",
+              "Event / Function Checklist (setup, menu, staff)",
+              "Customer Feedback / Comment Card",
+              "Daily Cash‑Up Sheet (till reconciliation)"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Risk Assessment (Kitchen – burns, slips, cuts)",
+              "HACCP Plan (Hazard Analysis Critical Control Points)",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register",
+              "Fire Extinguisher Inspection Log",
+              "Fire Blanket Log (kitchen)",
+              "Emergency Evacuation Plan (dining area)",
+              "Personal Protective Equipment (PPE) Policy",
+              "Toolbox Talk Register (staff safety)"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (corporate catering)",
+              "Supplier Invoice Register",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Daily Banking Register",
+              "Supplier Payment Schedule",
+              "Credit Card / EFT Transaction Log",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Equipment Maintenance Log (fridge, freezer, stove)",
+              "Gas Installation Certificate (if gas stove)",
+              "Extracter Fan / Ventilation Cleaning Log",
+              "Glassware / Crockery Breakage Register",
+              "Cutlery / Utensil Inventory",
+              "CCTV Camera Log",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Daily Specials Board Template",
+              "Allergen Declaration Form (for customers)",
+              "Function Quotation Template",
+              "Overtime Authorization Form",
+              "Leave Application Form",
+              "Supplier Evaluation Form",
+              "Employee Meal / Break Policy",
+              "Termination Checklist"
+            ]
+          },
+          "Security Services": {
+            "Registration & Licences": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "PSIRA Registration Certificate",
+              "PSIRA Business Licence",
+              "Firearm Licences Register (if armed)",
+              "B-BBEE Certificate"
+            ],
+            "Governance & Admin": [
+              "Register of Directors",
+              "Share Register (if Pty Ltd)",
+              "Conflict of Interest Register",
+              "Board Meeting Minutes Template",
+              "Annual Return (CIPC) filing record",
+              "Company Policies Index",
+              "Code of Conduct (Board)",
+              "Code of Ethics (Company)"
+            ],
+            "Contracts & Client Docs": [
+              "Service Level Agreement (SLA) – Master Template",
+              "SLA – Site‑Specific Addendum",
+              "Site Security Instructions / Post Orders",
+              "Quotation / Proposal Template",
+              "Non-Disclosure Agreement (NDA)",
+              "Client Induction Checklist",
+              "Access Control Register Template",
+              "Key Register Template",
+              "Visitor Register Template",
+              "Vehicle Access Register",
+              "Incident Report Form (Client Copy)",
+              "Contract Renewal / Termination Letter Template"
+            ],
+            "Human Resources": [
+              "Employment Contract – Security Guard (Permanent)",
+              "Employment Contract – Security Guard (Casual)",
+              "Employment Contract – Supervisor",
+              "Employment Contract – Manager",
+              "Independent Contractor Agreement",
+              "PSIRA Registration Form (for employees)",
+              "Code of Conduct (Employees)",
+              "Shift Roster Template",
+              "Attendance Register (Daily)",
+              "Uniform Issue Register",
+              "Training Record – Firearms",
+              "Training Record – First Aid",
+              "Training Record – Basic Security",
+              "Disciplinary Code & Procedure",
+              "Leave Application Form"
+            ],
+            "Operations & Site Management": [
+              "Daily Occurrence Book (DOB) Template",
+              "Shift Handover Report",
+              "Patrol Log (Foot / Vehicle)",
+              "Incident Report Form (Internal)",
+              "Accident / Injury Report",
+              "Vehicle Log Sheet",
+              "Equipment Sign-Out Register",
+              "Firearm Sign-Out Register (if armed)",
+              "Key Register (Detailed)",
+              "Alarm Activation Log",
+              "CCTV Footage Request Form",
+              "Lost Property Register",
+              "Search Register (Vehicle / Person)",
+              "Emergency Contact List (per site)",
+              "Site Inspection Checklist (Daily)"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Risk Assessment – General",
+              "Risk Assessment – Per Site",
+              "Safe Work Method Statement",
+              "First Aid Kit Register",
+              "Fire Equipment Inspection Log",
+              "Fire Drill Log",
+              "Personal Protective Equipment (PPE) Register",
+              "Health & Safety Committee Minutes",
+              "OHS Training Record"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template",
+              "Supplier Invoice Register",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Uniform Purchase Register",
+              "Equipment Purchase Register",
+              "Client Payment History",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Vehicle Maintenance Log",
+              "Two-Way Radio Register",
+              "Uniform Stock Take",
+              "Equipment Calibration Log",
+              "Asset Disposal Form"
+            ],
+            "Training & Development": [
+              "Training Needs Assessment",
+              "Training Attendance Register",
+              "PSIRA Grade Training Certificates",
+              "First Aid Certificate Register",
+              "Firearm Proficiency Records",
+              "Refresher Training Schedule"
+            ],
+            "Forms & Templates": [
+              "Employee Personnel File Checklist",
+              "Incident Report Form (Short)",
+              "Witness Statement Form",
+              "Client Complaint Form",
+              "Request for Leave",
+              "Overtime Authorization Form",
+              "Vehicle Inspection Checklist (Daily)",
+              "Site Opening/Closing Checklist",
+              "Contractor Induction Form",
+              "Termination Checklist"
+            ],
+            "Marketing & Business Development": [
+              "Capability Statement (Company Profile)",
+              "Services Brochure",
+              "Client Testimonial Log",
+              "Tender Checklist (PSIRA, CIDB, etc.)",
+              "Marketing Plan (Security)",
+              "Social Media Policy (for staff)"
+            ],
+            "Legal & Insurance": [
+              "Public Liability Insurance Certificate",
+              "Goods-in-Transit Insurance (if mobile)",
+              "Workmen's Compensation (COIDA)",
+              "Legal Compliance Checklist",
+              "Data Protection / POPIA Policy"
+            ]
+          },
+          "Light Manufacturing": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Product Liability Insurance",
+              "Factory / Business Licence (Municipal)",
+              "Zoning Certificate (Industrial)",
+              "Fire Clearance Certificate",
+              "B-BBEE Certificate",
+              "CSD Registration"
+            ],
+            "Contracts & Client Docs": [
+              "Manufacturing Agreement (Master)",
+              "Supply Agreement (repeat orders)",
+              "Quotation / Proposal Template",
+              "Purchase Order Template (from client)",
+              "Delivery Note / Waybill",
+              "Non-Disclosure Agreement (NDA)",
+              "Subcontractor Agreement",
+              "Raw Material Supply Agreement",
+              "Equipment Lease Agreement",
+              "Warranty Policy (finished goods)"
+            ],
+            "Human Resources": [
+              "Employment Contract – Machine Operator",
+              "Employment Contract – Assembler",
+              "Employment Contract – Quality Control Inspector",
+              "Employment Contract – Production Supervisor",
+              "Employment Contract – Factory Manager",
+              "Independent Contractor Agreement",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Shift Roster Template",
+              "Attendance Register (Daily)"
+            ],
+            "Operations & Production Management": [
+              "Production Schedule / Job Card",
+              "Bill of Materials (BOM) per product",
+              "Raw Material Inventory Log",
+              "Finished Goods Inventory Log",
+              "Daily Production Report",
+              "Machine Operating Log (run hours)",
+              "Quality Control Inspection Sheet",
+              "Non‑Conforming Product Report",
+              "Supplier Delivery Note Log",
+              "Purchase Order Template (to suppliers)",
+              "Tool / Die Sign-Out Register",
+              "Packaging & Dispatch Log",
+              "Customer Return / Complaint Log (RMA)",
+              "Maintenance Work Order",
+              "Factory Layout / Emergency Exit Map"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Factory‑Specific Risk Assessment",
+              "Safe Work Method Statement (SWMS) per machine",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register (per station)",
+              "Fire Extinguisher Inspection Log",
+              "Emergency Evacuation Plan (factory)",
+              "Personal Protective Equipment (PPE) Register",
+              "Noise Monitoring Log",
+              "Dust / Fume Extraction Log",
+              "Hazardous Chemical Register",
+              "Toolbox Talk Register"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (to clients)",
+              "Supplier Invoice Register",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Costing Sheet per product",
+              "Client Payment History",
+              "Supplier Payment Schedule",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Equipment Maintenance Log (per machine)",
+              "Calibration Log (measuring tools)",
+              "Small Tool Register",
+              "Forklift / Pallet Jack Inspection Log",
+              "Compressor / Air System Log",
+              "Vehicle Log Sheet (delivery van)",
+              "Spare Parts Inventory",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Job Card Template",
+              "Overtime Authorization Form",
+              "Leave Application Form",
+              "New Employee Induction Checklist (factory safety)",
+              "Supplier Evaluation Form",
+              "Customer Satisfaction Survey",
+              "Termination Checklist"
+            ]
+          },
+          "Automotive Repair & Sales": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Motor Dealer Licence (if selling vehicles)",
+              "Workshop / Repair Centre Licence",
+              "Zoning Certificate (Industrial / Business)",
+              "Fire Clearance Certificate",
+              "Waste Carrier Licence (for used oil, tyres, batteries)",
+              "B-BBEE Certificate"
+            ],
+            "Contracts & Client Docs": [
+              "Repair Order / Job Card (per vehicle)",
+              "Quotation / Estimate Template",
+              "Final Invoice (repairs completed)",
+              "Vehicle Sale Agreement (if selling cars)",
+              "Warranty Policy (repairs)",
+              "Non-Disclosure Agreement (NDA)",
+              "Parts Supply Agreement",
+              "Trade‑in / Part Exchange Agreement",
+              "Vehicle Collection / Delivery Log",
+              "Damage / Pre‑repair Inspection Form",
+              "Courtesy Car Agreement (if loaning)",
+              "Indemnity Form (customer test drives)"
+            ],
+            "Human Resources": [
+              "Employment Contract – Mechanic (Qualified)",
+              "Employment Contract – Apprentice Mechanic",
+              "Employment Contract – Panel Beater / Spray Painter",
+              "Employment Contract – Service Advisor",
+              "Employment Contract – Workshop Manager",
+              "Independent Contractor Agreement (towing, detailing)",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Shift / Appointment Roster",
+              "Attendance Register (Daily)"
+            ],
+            "Operations & Workshop Management": [
+              "Daily Job Card Log (all vehicles in workshop)",
+              "Repair Time Tracking (hours per job)",
+              "Parts Used Register (per job card)",
+              "Supplier Delivery Note Log (spares received)",
+              "Parts Inventory / Stock Take Sheet",
+              "Customer Vehicle Key Register",
+              "Waiting Area Customer Sign‑In Sheet",
+              "Vehicle Lot / Yard Register",
+              "Tool & Equipment Sign‑Out Register",
+              "Diagnostic Scan Log (per vehicle)",
+              "Test Drive Register (per vehicle)",
+              "Waste Disposal Log (used oil, batteries, tyres)",
+              "Customer Complaint / Dispute Log",
+              "Vehicle Completion Checklist (pre‑delivery)"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Workshop‑Specific Risk Assessment",
+              "Safe Work Method Statement (SWMS) per task",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register (workshop and office)",
+              "Fire Extinguisher Inspection Log (including lifts)",
+              "Emergency Evacuation Plan (workshop)",
+              "Personal Protective Equipment (PPE) Register",
+              "Chemical / Solvent Register",
+              "Toolbox Talk Register"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (repairs / sales)",
+              "Supplier Invoice Register (spares, consumables)",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Customer Payment Log (cash, card, EFT)",
+              "Fleet Customer Credit Application",
+              "Supplier Payment Schedule",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Equipment Maintenance Log (lifts, balancers)",
+              "Calibration Log (diagnostic tools, torque wrenches)",
+              "Tool Inventory (hand tools per mechanic)",
+              "Vehicle Lift Inspection Log (certification)",
+              "Compressor / Air System Log",
+              "Recovery / Tow Vehicle Log (if towing)",
+              "Customer Courtesy Car Log",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Vehicle Condition Report (pre‑repair / pre‑sale)",
+              "Road Test Report (post‑repair)",
+              "Overtime Authorization Form",
+              "Leave Application Form",
+              "New Mechanic Induction Checklist (workshop safety)",
+              "Supplier Evaluation Form",
+              "Customer Satisfaction Survey",
+              "Termination Checklist"
+            ]
+          },
+          "Health & Beauty (Salon/Spa)": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Business Licence (Municipal)",
+              "Health Certificate (Municipality)",
+              "Fire Clearance Certificate",
+              "Zoning Certificate (Commercial)",
+              "Professional Indemnity Insurance",
+              "B-BBEE Certificate"
+            ],
+            "Contracts & Client Docs": [
+              "Client Service Agreement / Consultation Form",
+              "Terms & Conditions of Service",
+              "Cancellation / No‑Show Policy",
+              "Membership / Loyalty Programme Agreement",
+              "Gift Voucher Terms & Conditions",
+              "Product Sales Receipt / Warranty",
+              "Rental Agreement (chair/room to independent stylist)",
+              "Non‑Disclosure Agreement (NDA)",
+              "Consent Form (photography / social media)",
+              "Minor Consent Form"
+            ],
+            "Human Resources": [
+              "Employment Contract – Hair Stylist / Barber",
+              "Employment Contract – Beautician / Nail Technician",
+              "Employment Contract – Massage Therapist",
+              "Employment Contract – Receptionist",
+              "Employment Contract – Salon Manager",
+              "Independent Contractor Agreement (chair renter)",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Appointment / Shift Roster",
+              "Attendance Register (Daily)"
+            ],
+            "Operations & Salon Management": [
+              "Daily Appointment Log (booking sheet)",
+              "Client History / Preference Card",
+              "Daily Sales Summary (by service and retail)",
+              "Stock Take Sheet (retail products)",
+              "Consumables Usage Log (disposables)",
+              "Supplier Delivery Note Log",
+              "Purchase Order Template",
+              "Equipment Sterilisation Log",
+              "Towel / Linen Laundry Log",
+              "Daily Opening Checklist",
+              "Daily Closing Checklist",
+              "Customer Feedback / Comment Card"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Risk Assessment (Salon – chemicals, slips, sharps)",
+              "Chemical Safety Data Sheet Register",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register",
+              "Fire Extinguisher Inspection Log",
+              "Emergency Evacuation Plan",
+              "Sharps Disposal Log",
+              "Personal Protective Equipment (PPE) Policy",
+              "Toolbox Talk Register"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (corporate / event services)",
+              "Supplier Invoice Register",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Daily Banking Register",
+              "Supplier Payment Schedule",
+              "Commission Calculator",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Equipment Maintenance Log",
+              "Tool Inventory (scissors, clippers, files)",
+              "Calibration Log (scales, timers)",
+              "Towel / Linen Inventory",
+              "Electrical Appliance Test Log",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Appointment Reminder Template",
+              "Consultation Card (new clients)",
+              "Overtime Authorization Form",
+              "Leave Application Form",
+              "New Employee Induction Checklist",
+              "Supplier Evaluation Form",
+              "Termination Checklist"
+            ]
+          },
+          "Information Technology (IT)": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Professional Indemnity Insurance",
+              "Cyber Liability Insurance",
+              "B-BBEE Certificate",
+              "CSD Registration"
+            ],
+            "Contracts & Client Docs": [
+              "Software Development Agreement (Master)",
+              "IT Support / Maintenance Agreement (SLA)",
+              "Website Development Agreement",
+              "Non‑Disclosure Agreement (NDA)",
+              "Data Processing Agreement (DPA)",
+              "Hosting / Server Colocation Agreement",
+              "Software Licence Agreement",
+              "Quotation / Proposal Template",
+              "Change Order / Variation Form",
+              "Acceptance Testing Sign‑Off (UAT)",
+              "Warranty / Maintenance Period Addendum",
+              "Subcontractor Agreement (freelance developer/designer)"
+            ],
+            "Human Resources": [
+              "Employment Contract – Software Developer",
+              "Employment Contract – IT Support Technician",
+              "Employment Contract – Project Manager",
+              "Employment Contract – Sales / Account Manager",
+              "Independent Contractor Agreement (freelance coder)",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Remote Work Policy",
+              "Attendance / Timesheet Register",
+              "Training Record (certifications – AWS, Azure, etc.)"
+            ],
+            "Operations & Project Management": [
+              "Project Brief / Requirements Document",
+              "Statement of Work (SOW) per project",
+              "Project Plan / Gantt Chart",
+              "Weekly Progress Report (client)",
+              "Bug / Issue Tracker Log",
+              "Change Request Log",
+              "Timesheet Log (per employee / per project)",
+              "Code Repository Access Log (Git, etc.)",
+              "Backup & Disaster Recovery Log",
+              "Server / Website Uptime Monitoring Log",
+              "Client Login / Password Register (secured)",
+              "Intellectual Property Assignment Form"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Ergonomic Workstation Assessment (per employee)",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register (office)",
+              "Fire Extinguisher Inspection Log (office)",
+              "Emergency Evacuation Plan (office)",
+              "Remote Work Health & Safety Checklist"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (per project / retainer)",
+              "Supplier Invoice Register (licences, hosting, hardware)",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Retainer / Subscription Billing Schedule",
+              "Client Payment History",
+              "Supplier Payment Schedule",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Software Licence Register (Microsoft, Adobe, etc.)",
+              "Domain Name Register (all client domains)",
+              "SSL Certificate Renewal Log",
+              "Equipment Maintenance Log (cleaning, hardware)",
+              "Vehicle Log Sheet (if onsite support)",
+              "Tool / Development Environment Access Log",
+              "Cloud Subscription Register (AWS, Azure, Google)",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Client Onboarding Checklist",
+              "Offboarding / Data Handover Checklist",
+              "Overtime Authorization Form",
+              "Leave Application Form",
+              "New Employee IT Access Request Form",
+              "Supplier Evaluation Form (hosting, software vendor)",
+              "Client Satisfaction Survey",
+              "Termination Checklist"
+            ]
+          },
+          "Event Management & Catering": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Event Specific Insurance (per event)",
+              "Food Handling / Catering Licence",
+              "Health Certificate (Municipality)",
+              "Temporary Event Liquor Licence (if serving alcohol)",
+              "Fire Clearance Certificate",
+              "B-BBEE Certificate"
+            ],
+            "Contracts & Client Docs": [
+              "Event Management Agreement (Master)",
+              "Catering Service Agreement (if standalone)",
+              "Venue Hire Agreement (with event space)",
+              "Supplier Agreement (Decor, AV, Photography)",
+              "Quotation / Proposal Template (per event)",
+              "Deposit / Payment Schedule",
+              "Cancellation Policy (sliding scale)",
+              "Event Order / Run Sheet (client sign‑off)",
+              "Dietary Requirements Declaration Form",
+              "Indemnity / Waiver Form (activities, alcohol)",
+              "Non‑Disclosure Agreement (NDA)",
+              "Photography / Media Consent Form"
+            ],
+            "Human Resources": [
+              "Employment Contract – Event Coordinator / Planner",
+              "Employment Contract – Chef / Catering Manager",
+              "Employment Contract – Waitron / Bartender (casual)",
+              "Employment Contract – Logistics / Setup Crew",
+              "Independent Contractor Agreement (DJ, photographer)",
+              "Code of Conduct (Event Staff)",
+              "Disciplinary Code & Procedure",
+              "Event Staff Roster (per event)",
+              "Attendance Register (per event)",
+              "Training Record – Food Safety (catering staff)"
+            ],
+            "Operations & Event Management": [
+              "Master Event Checklist (per event size)",
+              "Event Run Sheet (timeline: setup, start, breakdown)",
+              "Floor Plan Layout (seating, stage, bars, buffet)",
+              "Guest List / RSVP Tracker",
+              "Seating Plan (weddings, galas)",
+              "Supplier Contact List (per event)",
+              "Equipment / Furniture Sign‑Out Log (tables, chairs)",
+              "Food & Beverage Consumption Log (per event)",
+              "Bar Tab / Drink Voucher Register",
+              "On‑Site Incident Log (medical, behaviour issues)",
+              "Lost Property Register",
+              "Client Feedback / Post‑Event Evaluation Form",
+              "Post‑Event Financial Reconciliation",
+              "Thank You Letter / Follow‑up Template"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Event‑Specific Risk Assessment (per event type)",
+              "Safe Work Method Statement (SWMS) per activity",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register (per event)",
+              "Fire Extinguisher / Fire Blanket Log",
+              "Emergency Evacuation Plan (per venue)",
+              "Food Safety / Temperature Log (buffet lines, fridges)",
+              "Personal Protective Equipment (PPE) Policy",
+              "Toolbox Talk Register (pre‑event safety briefing)"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (per event)",
+              "Supplier Invoice Register (catering supplies, rentals)",
+              "Payroll Register (permanent and casual staff)",
+              "Petty Cash Log (for event day purchases)",
+              "Client Payment Log (deposits, final balance)",
+              "Supplier Payment Schedule",
+              "Event Profit / Loss Statement (per event)",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Equipment Maintenance Log (generators, fridges, ovens)",
+              "Vehicle Log Sheet (delivery / setup vehicles)",
+              "Crockery / Glassware Breakage Register",
+              "Marquee / Tent Inspection Log (if owned)",
+              "Sound / Lighting Equipment Check Log",
+              "Generator / Power Distribution Log (events)",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Event Brief Template (client questionnaire)",
+              "Venue Site Visit Checklist",
+              "Overtime Authorization Form (event staff)",
+              "Leave Application Form (permanent staff)",
+              "Casual Staff Induction Checklist (per event)",
+              "Supplier Evaluation Form",
+              "Guest Feedback / Testimonial Request",
+              "Termination Checklist (staff offboarding)"
+            ]
+          },
+          "Farming & Agriculture": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Agricultural Business Licence (if processing)",
+              "Zoning Certificate (Agricultural)",
+              "Water Use Licence",
+              "Fencing / Game Permit (if game farming)",
+              "Pest Control Operator Licence (if applying chemicals)",
+              "B-BBEE Certificate",
+              "Export Registration (if exporting produce)"
+            ],
+            "Contracts & Client Docs": [
+              "Produce Supply Agreement (to buyers)",
+              "Land Lease / Sharecropping Agreement",
+              "Equipment Hire Agreement (tractors, harvesters)",
+              "Transportation / Logistics Agreement (produce delivery)",
+              "Quotation / Price List Template (per kg, per unit)",
+              "Non‑Disclosure Agreement (NDA)",
+              "Co‑operative Membership Agreement (if applicable)",
+              "Input Supply Agreement (seed, fertiliser, chemicals)",
+              "Storage / Silo Rental Agreement",
+              "Indemnity Form (for farm visitors, pick‑your‑own)"
+            ],
+            "Human Resources": [
+              "Employment Contract – General Farm Worker (permanent)",
+              "Employment Contract – Tractor Driver / Machine Operator",
+              "Employment Contract – Picker / Harvester (seasonal)",
+              "Employment Contract – Farm Manager",
+              "Independent Contractor Agreement (contract harvester, aerial spraying)",
+              "Code of Conduct (Farm Workers)",
+              "Disciplinary Code & Procedure (Sectoral Determination)",
+              "Shift / Seasonal Roster",
+              "Attendance Register (Daily)",
+              "Training Record – Chemical Handling / Spraying"
+            ],
+            "Operations & Farm Management": [
+              "Daily Farm Operations Log (weather, activities, incidents)",
+              "Crop Planting / Seeding Record (per field)",
+              "Irrigation Log (per field, per day)",
+              "Fertiliser / Chemical Application Log (per field)",
+              "Pest / Disease Monitoring Log",
+              "Harvest Record (per field, per day)",
+              "Livestock Inventory Register (if animals)",
+              "Veterinary Treatment Log (animals)",
+              "Feed Consumption Log (per animal group)",
+              "Equipment Maintenance Log (tractors, implements)",
+              "Fuel Usage Log (per vehicle / machine)",
+              "Stock Take – Seed, Fertiliser, Chemical Inventory",
+              "Produce Grading / Quality Control Log",
+              "Cold Storage Temperature Log (if applicable)"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Farm‑Specific Risk Assessment",
+              "Safe Work Method Statement (SWMS) per task",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register (per tractor, per shed)",
+              "Fire Extinguisher Inspection Log (machinery, buildings)",
+              "Emergency Evacuation Plan (farm layout)",
+              "Personal Protective Equipment (PPE) Register",
+              "Chemical / Pesticide Safety Data Sheet Register",
+              "Toolbox Talk Register (weekly safety talks)"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (to buyers)",
+              "Supplier Invoice Register (seed, chemicals, fuel)",
+              "Payroll Register (farm workers)",
+              "Petty Cash Log",
+              "Client Payment History (buyers)",
+              "Supplier Payment Schedule",
+              "Crop / Enterprise Budget Template",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Vehicle / Tractor Log Sheet (per machine)",
+              "Equipment Maintenance Schedule",
+              "Tyre / Implement Wear Log",
+              "Irrigation System Inspection Log",
+              "Fencing / Infrastructure Maintenance Log",
+              "Grain Silo / Cold Storage Inspection Log",
+              "Generator / Pump Log (if off‑grid)",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Daily Worker Task Assignment Sheet",
+              "Overtime Authorization Form (workers)",
+              "Leave Application Form (permanent staff)",
+              "New Worker Induction Checklist (farm safety)",
+              "Supplier Evaluation Form (seed, chemical vendors)",
+              "Buyer Feedback Form (produce quality)",
+              "Termination Checklist (worker offboarding)"
+            ]
+          },
+          "Funeral Services": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Funeral Undertaker Licence (Municipal/Provincial)",
+              "Health Certificate (Mortuary / Preparation Room)",
+              "Fire Clearance Certificate",
+              "Zoning Certificate (Commercial)",
+              "Transport / Hearse Operator Permit",
+              "B-BBEE Certificate",
+              "Professional Indemnity Insurance (for prepaid policies)"
+            ],
+            "Contracts & Client Docs": [
+              "Funeral Service Agreement (with family)",
+              "Pre‑Need Funeral Plan Contract",
+              "Cremation Authorisation Form",
+              "Embalming / Body Preparation Consent Form",
+              "Transport / Removal of Deceased Authorisation",
+              "Quotation / Price List Template (standard packages)",
+              "Supplier Agreement (coffin, flowers, catering)",
+              "Chapel / Venue Hire Agreement (if using own chapel)",
+              "Non‑Disclosure Agreement (NDA)",
+              "Indemnity Form (for delays beyond control)",
+              "Grave / Cemetery Booking Form (with municipality)",
+              "Memorial / Tombstone Agreement (if selling)"
+            ],
+            "Human Resources": [
+              "Employment Contract – Funeral Director / Mortician",
+              "Employment Contract – Embalmer / Body Preparer",
+              "Employment Contract – Hearse Driver",
+              "Employment Contract – Pallbearers / General Assistants",
+              "Employment Contract – Office Administrator",
+              "Independent Contractor Agreement (florist, caterer)",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Funeral Staff Roster (per day / per funeral)",
+              "Attendance Register (Daily)"
+            ],
+            "Operations & Funeral Management": [
+              "Case File per Deceased (master record)",
+              "Death Certificate Copy Log",
+              "Removal of Remains Log (date, time, place, staff)",
+              "Mortuary / Cold Storage Log (body holding)",
+              "Embalming / Preparation Record (per body)",
+              "Coffin / Casket Inventory (by type)",
+              "Hearse / Fleet Vehicle Log (per trip)",
+              "Order of Service (funeral programme) template",
+              "Flower Order Log (per funeral)",
+              "Catering Order Log (per funeral)",
+              "Cemetery / Crematorium Booking Register",
+              "Family Complaint / Feedback Log",
+              "Prepaid Policy Register (clients, payments, status)",
+              "Death Notice / Obituary Template (for newspapers)"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Risk Assessment (Mortuary – chemicals, lifting, body fluids)",
+              "Safe Work Method Statement (SWMS) per task",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register (mortuary, office, vehicles)",
+              "Fire Extinguisher Inspection Log (chapel, mortuary)",
+              "Emergency Evacuation Plan (chapel, mortuary)",
+              "Personal Protective Equipment (PPE) Register",
+              "Hazardous Chemical Register (formaldehyde, embalming fluids)",
+              "Toolbox Talk Register (staff safety)"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (per funeral)",
+              "Supplier Invoice Register (coffins, flowers, catering)",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Client Payment Log (families, insurance payouts)",
+              "Supplier Payment Schedule",
+              "Prepaid Funeral Policy Trust Account Register",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Vehicle Maintenance Log (hearses, support vehicles)",
+              "Mortuary Fridge / Cold Storage Temperature Log",
+              "Embalming Machine / Equipment Maintenance Log",
+              "Stretcher / Trolley Inspection Log",
+              "Chapel Audio / Visual Equipment Log (if used)",
+              "Fleet Tyre / Brake Inspection Log",
+              "Generator / Backup Power Log (mortuary critical)",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Pre‑Funeral Planning Checklist (for clients)",
+              "Overtime Authorization Form (staff)",
+              "Leave Application Form",
+              "New Employee Induction Checklist (mortuary safety)",
+              "Supplier Evaluation Form",
+              "Bereavement Support / Aftercare Survey",
+              "Termination Checklist"
+            ]
+          },
+          "ECD (Daycare/Crèche)": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate (NPC or Pty Ltd)",
+              "Memorandum of Incorporation (MOI) or Constitution",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "ECD Registration Certificate (Department of Social Development)",
+              "Health Certificate (Municipality)",
+              "Fire Clearance Certificate",
+              "Zoning Certificate (Residential / Business)",
+              "Food Handling / Kitchen Licence (if providing meals)",
+              "B-BBEE Certificate (or affidavit)",
+              "NPO / PBO Registration (if non‑profit)"
+            ],
+            "Contracts & Client Docs": [
+              "Enrollment Agreement / Parent Contract",
+              "Child Information & Emergency Contact Form",
+              "Medical Consent Form (for emergency treatment)",
+              "Permission Slip (outings, photos, sunscreen)",
+              "Fee Schedule / Payment Policy",
+              "Late Pick‑Up Policy & Fee Agreement",
+              "Sickness / Exclusion Policy (signed by parent)",
+              "Medication Administration Authorisation",
+              "Supplier Agreement (food, nappies, cleaning supplies)",
+              "Volunteer / Intern Agreement (unpaid)"
+            ],
+            "Human Resources": [
+              "Employment Contract – ECD Teacher / Practitioner",
+              "Employment Contract – Assistant Teacher",
+              "Employment Contract – Cook (if meals provided)",
+              "Employment Contract – Cleaner / Driver",
+              "Employment Contract – Centre Manager",
+              "Independent Contractor Agreement (music, sports coach)",
+              "Code of Conduct (Staff)",
+              "Disciplinary Code & Procedure",
+              "Staff Roster (daily ratios compliance)",
+              "Attendance Register (staff)"
+            ],
+            "Operations & Centre Management": [
+              "Daily Attendance Register (children)",
+              "Sign‑In / Sign‑Out Log (parent/guardian signature)",
+              "Daily Child Observation Log (milestones, incidents)",
+              "Nap / Sleep Log (for infants)",
+              "Nappy / Toileting Log",
+              "Meal / Snack Record (what child ate)",
+              "Accident / Incident Report (child injury)",
+              "Medication Administration Log (per child)",
+              "Daily Cleaning / Sanitisation Log",
+              "Outdoor Playground Inspection Log",
+              "Vehicle / Transport Log (if school transport)",
+              "Parent Communication Log (calls, meetings)",
+              "Waiting List Register (prospective children)",
+              "Daily Programme / Lesson Plan Template"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Risk Assessment (playground, indoor, kitchen)",
+              "Safe Work Method Statement (SWMS) – diaper changing, food prep",
+              "Child Protection / Safeguarding Policy (mandatory)",
+              "Infectious Disease Outbreak Plan",
+              "Incident / Accident Report Form (staff or child)",
+              "First Aid Kit Register (per classroom)",
+              "Fire Extinguisher / Smoke Alarm Inspection Log",
+              "Emergency Evacuation Plan (fire, intruder)",
+              "Fire Drill Log (monthly)",
+              "Personal Protective Equipment (PPE) Register",
+              "Toolbox Talk Register (staff safety meetings)"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (school fees)",
+              "Supplier Invoice Register (food, supplies, toys)",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Fee Collection Register (cash, EFT, card)",
+              "Supplier Payment Schedule",
+              "Subsidy / Funding Claim Log (from DSD)",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Equipment Maintenance Log (swings, slides, fridge)",
+              "Toy Inventory / Rotation Log (age‑appropriate)",
+              "Vehicle Log Sheet (if transporting children)",
+              "CCTV Camera Log (if installed)",
+              "Playground Surface / Mulch Inspection Log",
+              "Kitchen Appliance Log (fridge temp, stove safety)",
+              "Asset Disposal Form (broken equipment, toys)"
+            ],
+            "Forms & Templates": [
+              "Daily Parent Report (what child ate, slept, did)",
+              "Incident Report to Parent (copy for file)",
+              "Overtime Authorization Form (staff)",
+              "Leave Application Form",
+              "New Employee Induction Checklist (child protection, first aid)",
+              "Supplier Evaluation Form",
+              "Parent Satisfaction Survey",
+              "Termination Checklist (staff offboarding)"
+            ]
+          },
+          "Electrical & Solar": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Electrical Contractor Registration (ECB)",
+              "Master Electrician / Installation Electrician License (DQ/SP)",
+              "Solar PV Installation Accreditation (SAPVIA / P4 / GES)",
+              "Business Licence (Municipal)",
+              "Zoning Certificate (if workshop / yard)",
+              "B-BBEE Certificate",
+              "CSD Registration"
+            ],
+            "Contracts & Client Docs": [
+              "Electrical Installation Contract (Master)",
+              "Solar PV Installation Agreement (specific)",
+              "Quotation / Estimate Template",
+              "Certificate of Compliance (COC) – Electrical",
+              "Solar PV Certificate of Compliance (COC)",
+              "Non‑Disclosure Agreement (NDA)",
+              "Subcontractor Agreement (other electricians, labourers)",
+              "Material / Equipment Supply Agreement",
+              "Warranty Certificate (labour and parts)",
+              "Variation / Extra Work Order Form",
+              "Indemnity / Hold Harmless Agreement"
+            ],
+            "Human Resources": [
+              "Employment Contract – Electrician (Qualified)",
+              "Employment Contract – Apprentice Electrician",
+              "Employment Contract – Solar Installer Technician",
+              "Employment Contract – Site Supervisor",
+              "Employment Contract – Admin / Estimator",
+              "Independent Contractor Agreement (casual labour)",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Shift / Job Roster (per project)",
+              "Attendance Register (Daily)"
+            ],
+            "Operations & Project Management": [
+              "Job Card / Work Order (per site)",
+              "Site Assessment / Inspection Report (pre‑installation)",
+              "Bill of Materials (BOM) per job",
+              "Test Report – Electrical (mandatory for COC)",
+              "Test Report – Solar PV (string voltage, current, earthing)",
+              "Daily Site Log (progress, weather, delays)",
+              "Vehicle / Van Inventory Log (tools, stock on board)",
+              "Tool Sign‑Out Register (specialist test equipment)",
+              "Stock / Inventory Register (cables, DB boards, inverters, panels)",
+              "Supplier Delivery Note Log",
+              "Purchase Order Template",
+              "Client Site Safety Induction Form",
+              "Commissioning / Handover Certificate (client sign‑off)",
+              "After‑Call / Warranty Service Log (callouts)"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Site‑Specific Risk Assessment (working at height, live electrical)",
+              "Safe Work Method Statement (SWMS) – isolation, roof work, ladder",
+              "Lockout / Tagout Procedure (for panel work)",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register (per vehicle, per workshop)",
+              "Fire Extinguisher Inspection Log (vehicles, workshop)",
+              "Emergency / Rescue Plan (working at height)",
+              "Personal Protective Equipment (PPE) Register",
+              "Toolbox Talk Register"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (per job)",
+              "Supplier Invoice Register (cables, panels, inverters)",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Client Payment History",
+              "Supplier Payment Schedule",
+              "Job Costing Sheet (labour + materials per job)",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Vehicle / Van Log Sheet (fuel, trips, maintenance)",
+              "Test Equipment Calibration Log (multimeters, insulation testers)",
+              "Power Tool Inventory (drills, saws, crimpers)",
+              "Ladder / Scaffold Inspection Log",
+              "Stock / Warehouse Inventory (panels, batteries, DB boards)",
+              "PPE Replacement Log",
+              "Generator / Battery Charger Log",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Daily Job Report (for client progress)",
+              "Emergency Call‑Out Acknowledgment Form",
+              "Overtime Authorization Form",
+              "Leave Application Form",
+              "New Employee Induction Checklist (electrical safety, lockout/tagout)",
+              "Supplier Evaluation Form",
+              "Customer Satisfaction Survey",
+              "Termination Checklist"
+            ]
+          },
+          "Plumbing & Sanitation": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Plumbing Contractor Registration (PIRB)",
+              "Qualified Plumber Trade Certificate (Red Seal)",
+              "Business Licence (Municipal)",
+              "Waste / Effluent Carrier Licence (if emptying septic tanks)",
+              "B-BBEE Certificate",
+              "CSD Registration"
+            ],
+            "Contracts & Client Docs": [
+              "Plumbing Service Agreement (Master)",
+              "Quotation / Estimate Template",
+              "Certificate of Compliance (COC) – Plumbing (geyser, solar, gas)",
+              "Drainage / Sewer Inspection Report (camera)",
+              "Water Installation Test Report (pressure test)",
+              "Geyser Installation / Replacement Certificate",
+              "Non‑Disclosure Agreement (NDA)",
+              "Subcontractor Agreement (labour hire)",
+              "Material Supply Agreement (pipes, fittings, geysers)",
+              "Warranty Certificate (labour, parts)",
+              "Variation / Extra Work Order Form"
+            ],
+            "Human Resources": [
+              "Employment Contract – Qualified Plumber",
+              "Employment Contract – Apprentice Plumber",
+              "Employment Contract – Drainage / Jet Vacuum Operator",
+              "Employment Contract – General Assistant / Labourer",
+              "Employment Contract – Admin / Dispatch Estimator",
+              "Independent Contractor Agreement (casual labour)",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Job / Call‑Out Roster (per day)",
+              "Attendance Register (Daily)"
+            ],
+            "Operations & Project Management": [
+              "Job Card / Work Order (per site)",
+              "Site Inspection Report (pre‑work)",
+              "Bill of Materials (BOM) per job",
+              "Daily Site / Work Log (progress, weather, delays)",
+              "Vehicle / Van Inventory Log (tools, stock on board)",
+              "Tool Sign‑Out Register (specialist tools – drain camera, press tools)",
+              "Stock / Inventory Register (pipes, fittings, geysers)",
+              "Supplier Delivery Note Log",
+              "Purchase Order Template",
+              "Client Site Safety / Access Form",
+              "Commissioning / Handover Certificate (client sign‑off)",
+              "After‑Call / Warranty Service Log (callbacks)",
+              "Emergency Call‑Out Log (after hours)",
+              "Septic Tank / Conservancy Tank Emptying Log (if applicable)"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Site‑Specific Risk Assessment (confined spaces, sewage, hot water, working at height)",
+              "Safe Work Method Statement (SWMS) – drain cleaning, geyser replacement, roof work",
+              "Confined Space Entry Permit (for sewer, septic tanks)",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register (per vehicle, per workshop)",
+              "Fire Extinguisher Inspection Log (vehicles, workshop)",
+              "Emergency / Rescue Plan (confined space)",
+              "Personal Protective Equipment (PPE) Register",
+              "Biological Hazard / Pathogen Exposure Plan (sewage work)",
+              "Toolbox Talk Register"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (per job)",
+              "Supplier Invoice Register (materials, geysers, tools)",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Client Payment History",
+              "Supplier Payment Schedule",
+              "Job Costing Sheet (labour + materials per job)",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Vehicle / Van Log Sheet (fuel, trips, maintenance)",
+              "Tool / Equipment Calibration Log (gas detectors, pressure gauges, camera systems)",
+              "Power Tool Inventory (drills, grinders, pipe cutters, threaders)",
+              "Ladder / Step Stool Inspection Log",
+              "Stock / Warehouse Inventory (geysers, pipes, valves)",
+              "PPE Replacement Log",
+              "Drain Camera / Inspection Equipment Log",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Daily Job Report (for client progress)",
+              "Emergency Call‑Out Acknowledgment Form (client signature)",
+              "Overtime Authorization Form",
+              "Leave Application Form",
+              "New Employee Induction Checklist (plumbing safety, confined space)",
+              "Supplier Evaluation Form",
+              "Customer Satisfaction Survey",
+              "Termination Checklist"
+            ]
+          },
+          "Logistics & Warehousing": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate",
+              "Memorandum of Incorporation (MOI)",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "Goods‑in‑Transit Insurance (for goods stored)",
+              "Warehouse Business Licence (Municipal)",
+              "Zoning Certificate (Industrial / Warehouse)",
+              "Fire Clearance Certificate (warehouse)",
+              "B-BBEE Certificate",
+              "CSD Registration"
+            ],
+            "Contracts & Client Docs": [
+              "Warehouse Storage Agreement (Master)",
+              "Logistics / Distribution Services Agreement (value‑added services)",
+              "Quotation / Rate Card Template (per pallet, per sqm, per hour)",
+              "Goods Received Note (GRN) – per delivery",
+              "Stock Discrepancy / Damage Report Form",
+              "Release Authorisation Form (client)",
+              "Non‑Disclosure Agreement (NDA)",
+              "Subcontractor Agreement (transport, labour hire)",
+              "Supplier Agreement (racking, pallets, packaging)",
+              "Indemnity / Hold Harmless Agreement (client)",
+              "Cold Storage Addendum (temperature‑controlled)"
+            ],
+            "Human Resources": [
+              "Employment Contract – Warehouse Manager",
+              "Employment Contract – Forklift / Reach Truck Operator",
+              "Employment Contract – Pickers / Packers",
+              "Employment Contract – Receiving / Despatch Clerk",
+              "Employment Contract – Admin / Inventory Controller",
+              "Independent Contractor Agreement (seasonal labour)",
+              "Code of Conduct (Employees)",
+              "Disciplinary Code & Procedure",
+              "Shift Roster (warehouse)",
+              "Attendance Register (Daily)"
+            ],
+            "Operations & Warehouse Management": [
+              "Daily Warehouse Activity Log (receipts, picks, dispatches)",
+              "Receiving Log (incoming goods)",
+              "Put‑Away Log (bin locations)",
+              "Inventory Stock Take Sheet (cycle count / full)",
+              "Daily Cycle Count Log",
+              "Picking List (per client order)",
+              "Packing Checklist (per shipment)",
+              "Despatch / Loading Log (outgoing)",
+              "Return / RMA Log (client returns)",
+              "Warehouse Bin / Location Register (grid map)",
+              "Equipment Inspection Log (forklifts, pallet jacks, reach trucks)",
+              "Forklift / Reach Truck Daily Checklist",
+              "Charging Station Log (electric forklifts)",
+              "Pallet / Stillage Register (asset tracking)",
+              "Packaging Material Inventory (boxes, tape, shrink wrap)",
+              "Client Inventory Report (per client, monthly)"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Warehouse Risk Assessment (racking collapse, forklift traffic, falling objects)",
+              "Safe Work Method Statement (SWMS) – forklift operation, high stacking, manual lifting",
+              "Incident / Accident Report Form",
+              "First Aid Kit Register (per zone)",
+              "Fire Extinguisher / Sprinkler Inspection Log",
+              "Emergency Evacuation Plan (warehouse layout)",
+              "Fire Drill Log (quarterly)",
+              "Personal Protective Equipment (PPE) Register",
+              "Racking / Shelving Inspection Log (annual)",
+              "Hazardous Goods Storage Register (if applicable)",
+              "Toolbox Talk Register (weekly safety)"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (storage fees, handling, value‑added services)",
+              "Supplier Invoice Register (packaging, cleaning, maintenance)",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Client Payment History",
+              "Supplier Payment Schedule",
+              "Client Billing Summary (per client, per month)",
+              "Bank Reconciliation Template"
+            ],
+            "Equipment & Assets": [
+              "Asset Register (Master)",
+              "Forklift / Material Handling Equipment Maintenance Log",
+              "Racking / Shelving Asset Register (by bay)",
+              "Barcode Scanner / RF Equipment Log",
+              "Weighbridge / Scale Calibration Log (if owned)",
+              "Vehicle / Delivery Truck Log (if own fleet)",
+              "CCTV / Security Camera Log",
+              "Generator / Backup Power Log (if cold storage)",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Daily Warehouse Housekeeping Checklist",
+              "Client Access / Visitor Register (for stocktakes)",
+              "Overtime Authorization Form",
+              "Leave Application Form",
+              "New Employee Induction Checklist (warehouse safety, forklift training)",
+              "Supplier Evaluation Form",
+              "Client Satisfaction Survey (warehouse service)",
+              "Termination Checklist"
+            ]
+          },
+          "NGO / Non-Profit": {
+            "Registration & Compliance": [
+              "CIPC Registration Certificate (NPC – Non-Profit Company)",
+              "Memorandum of Incorporation (MOI) or Constitution",
+              "SARS Registration (IT, PAYE, VAT)",
+              "COIDA Registration",
+              "Public Liability Insurance",
+              "NPO Registration Certificate (DSD)",
+              "PBO Registration Certificate (SARS)",
+              "Section 18A Certificate (if applicable)",
+              "B-BBEE Certificate (or affidavit)",
+              "CSD Registration",
+              "DSD Annual Report Filing Proof",
+              "CIPC Annual Return (if registered as NPC)",
+              "POPIA Compliance Register",
+              "Child Protection Clearance (if working with children)"
+            ],
+            "Contracts & Client Docs": [
+              "Service Level Agreement (SLA) – with funder / donor",
+              "Beneficiary / Participant Enrollment Form",
+              "Volunteer Agreement (unpaid)",
+              "Memorandum of Understanding (MOU) – with partners",
+              "Sponsorship Agreement (corporate)",
+              "Donation Acknowledgement / Section 18A Receipt Template",
+              "Grant Agreement (with foundation / government)",
+              "Quotation / Proposal Template (for fee-for-service work)",
+              "Confidentiality Agreement (staff, board)",
+              "Media Consent Form (photos, videos)"
+            ],
+            "Human Resources & Governance": [
+              "Employment Contract – Programme Manager",
+              "Employment Contract – Social Worker / Field Officer",
+              "Employment Contract – Administrator / Finance Officer",
+              "Independent Contractor Agreement (consultants, trainers)",
+              "Code of Conduct (Staff & Board)",
+              "Disciplinary Code & Procedure",
+              "Board of Directors Register (names, terms, minutes)",
+              "Conflict of Interest Register (board and staff)",
+              "Board Meeting Minutes Template",
+              "Staff / Volunteer Attendance Register",
+              "Training Record (safeguarding, first aid)",
+              "Volunteer Timesheet Log"
+            ],
+            "Operations & Programme Management": [
+              "Beneficiary Database (anonymised where required)",
+              "Attendance Register (per programme session)",
+              "Programme Activity Log (daily / weekly)",
+              "Case File (per beneficiary – social work, counselling)",
+              "Referral Log (to other services)",
+              "Incident / Safeguarding Report Form",
+              "Whistleblower Report Form (anonymous)",
+              "Donor / Funder Communication Log",
+              "Grant Reporting Schedule (per funder)",
+              "Monthly / Quarterly Progress Report Template (for funders)",
+              "Event / Workshop Planning Checklist",
+              "Equipment / Resource Sign‑Out Log (laptops, phones, projectors)",
+              "Vehicle Log Sheet (if own transport for beneficiaries)",
+              "Stakeholder / Partner Contact Register"
+            ],
+            "Health & Safety": [
+              "Occupational Health & Safety (OHS) Policy",
+              "Risk Assessment (programme activities, events, transport)",
+              "Safeguarding / Child Protection Policy (mandatory for child‑serving NPOs)",
+              "Incident / Accident Report Form (staff, volunteer, beneficiary)",
+              "First Aid Kit Register (office, vehicles, event kits)",
+              "Fire Extinguisher Inspection Log (office)",
+              "Emergency Evacuation Plan (office / programme venues)",
+              "Personal Protective Equipment (PPE) Policy (if applicable)",
+              "Toolbox Talk Register (staff safety meetings)"
+            ],
+            "Finance & Suppliers": [
+              "Invoice Template (for fee‑for‑service or cost recovery)",
+              "Donation Receipt / Section 18A Certificate Log",
+              "Supplier Invoice Register (office supplies, programme materials)",
+              "Payroll Register",
+              "Petty Cash Log",
+              "Bank Reconciliation Template",
+              "Donor / Grant Income Register (per funder, per grant)",
+              "Grant Expenditure Log (actual vs budget)",
+              "Annual Financial Statements (compiled/reviewed/audited)",
+              "Budget Template (per programme, per grant)"
+            ],
+            "Assets & Equipment": [
+              "Asset Register (Master)",
+              "Equipment Maintenance Log",
+              "Donated Goods / In‑Kind Register",
+              "Vehicle Log Sheet (if own vehicle)",
+              "IT / Software Licence Register",
+              "Inventory – Programme Supplies (food, blankets, stationery)",
+              "Asset Disposal Form"
+            ],
+            "Forms & Templates": [
+              "Beneficiary Intake / Needs Assessment Form",
+              "Volunteer Application & Screening Form",
+              "Staff / Volunteer Exit / Offboarding Checklist",
+              "Overtime Authorization Form (if applicable)",
+              "Leave Application Form",
+              "New Employee Induction Checklist (NPO policies)",
+              "Supplier Evaluation Form",
+              "Beneficiary Satisfaction Survey",
+              "Funder Reporting Checklist (per donor)"
+            ]
+          }
+        };
+
+        // ========================
+        // PRICE CONFIGURATION
+        // ========================
+        const FDS_PRICE = 700;
+        const ROADMAP_PRICE = 700;
+        const BUNDLE_PRICES = { startup: 1750, compliance: 1050, franchise: 6000, 'industry-combo': 1500, none: 0 };
+
+        function updateTotal() {
+            let total = 0;
+            if (document.getElementById('includeFDS').checked) total += FDS_PRICE;
+            if (document.getElementById('includeRoadmap').checked) total += ROADMAP_PRICE;
+            const bundle = document.querySelector('input[name="bundle"]:checked');
+            if (bundle) total += BUNDLE_PRICES[bundle.value] || 0;
+            document.querySelectorAll('.personal-service:checked').forEach(cb => total += parseFloat(cb.dataset.price) || 0);
+            const advCount = document.querySelectorAll('.adv-doc:checked').length;
+            total += advCount * 30;
+            document.getElementById('totalAmount').innerText = total;
+        }
+
+        // Toggle industry select for FDS/Roadmap
+        function toggleIndustrySelect() {
+            const show = document.getElementById('includeFDS').checked || document.getElementById('includeRoadmap').checked;
+            document.getElementById('industrySelectGroup').style.display = show ? 'block' : 'none';
+        }
+        document.getElementById('includeFDS').addEventListener('change', toggleIndustrySelect);
+        document.getElementById('includeRoadmap').addEventListener('change', toggleIndustrySelect);
+        document.getElementById('includeFDS').addEventListener('change', updateTotal);
+        document.getElementById('includeRoadmap').addEventListener('change', updateTotal);
+        document.querySelectorAll('input[name="bundle"]').forEach(radio => radio.addEventListener('change', updateTotal));
+        document.querySelectorAll('.personal-service').forEach(cb => cb.addEventListener('change', updateTotal));
+
+        // Load advanced document categories
+        const advSelect = document.getElementById('advIndustrySelect');
+        const advContainer = document.getElementById('advCategoriesContainer');
+        if (advSelect) {
+            advSelect.addEventListener('change', function() {
+                const industry = this.value;
+                if (!industry || !industryDocs[industry]) {
+                    advContainer.innerHTML = '<p>Please select an industry to see documents.</p>';
+                    return;
+                }
+                const data = industryDocs[industry];
+                let html = '';
+                for (const [category, docs] of Object.entries(data)) {
+                    const catId = category.replace(/\s+/g, '_');
+                    html += `
+                        <div class="category-accordion">
+                            <div class="category-header" data-cat="${catId}">
+                                <span>📁 ${category}</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="category-content" id="content_${catId}">
+                                <div class="doc-list">
+                                    ${docs.map(doc => `
+                                        <label class="doc-item">
+                                            <input type="checkbox" class="adv-doc" data-doc="${doc.replace(/"/g, '&quot;')}">
+                                            <span>${doc}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                advContainer.innerHTML = html;
+                // Attach accordion toggles
+                document.querySelectorAll('.category-header').forEach(header => {
+                    header.addEventListener('click', function() {
+                        const catId = this.getAttribute('data-cat');
+                        const content = document.getElementById(`content_${catId}`);
+                        content.classList.toggle('open');
+                        const arrow = this.querySelector('span:last-child');
+                        arrow.textContent = content.classList.contains('open') ? '▲' : '▼';
+                    });
+                });
+                // Attach document checkboxes to update total
+                document.querySelectorAll('.adv-doc').forEach(cb => cb.addEventListener('change', updateTotal));
+                updateTotal();
+            });
+        }
+
+        // Pre‑fill from URL parameters (for industry pages)
+        const urlParams = new URLSearchParams(window.location.search);
+        const preselectedParam = urlParams.get('preselected');
+        const preselectedIndustry = urlParams.get('industry');
+        if (preselectedParam && preselectedIndustry) {
+            const preselectedDocs = JSON.parse(decodeURIComponent(preselectedParam));
+            advSelect.value = preselectedIndustry;
+            setTimeout(() => {
+                const event = new Event('change');
+                advSelect.dispatchEvent(event);
+                setTimeout(() => {
+                    const checkboxes = document.querySelectorAll('.adv-doc');
+                    preselectedDocs.forEach(pd => {
+                        for (let cb of checkboxes) {
+                            if (cb.getAttribute('data-doc') === pd.doc) {
+                                cb.checked = true;
+                                break;
+                            }
+                        }
+                    });
+                    updateTotal();
+                }, 300);
+            }, 100);
+        }
+
+        // Form submission (placeholder – replace with your actual web app URL)
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            if (!name || !email) { alert('Please enter your name and email.'); return; }
+            document.getElementById('loading').style.display = 'block';
+            const payload = {
+                name, email,
+                phone: document.getElementById('phone').value,
+                company: document.getElementById('company').value,
+                companyType: document.getElementById('companyType').value,
+                proposedNames: [ document.getElementById('name1').value, document.getElementById('name2').value, document.getElementById('name3').value, document.getElementById('name4').value ].filter(n => n),
+                includeFDS: document.getElementById('includeFDS').checked,
+                includeRoadmap: document.getElementById('includeRoadmap').checked,
+                industryForDocs: document.getElementById('industryForDocs').value,
+                bundle: document.querySelector('input[name="bundle"]:checked') ? document.querySelector('input[name="bundle"]:checked').value : 'none',
+                personalServices: Array.from(document.querySelectorAll('.personal-service:checked')).map(cb => cb.dataset.name),
+                advancedDocs: Array.from(document.querySelectorAll('.adv-doc:checked')).map(cb => cb.getAttribute('data-doc')),
+                total: document.getElementById('totalAmount').innerText,
+                notes: document.getElementById('notes').value,
+                timestamp: new Date().toISOString()
+            };
+            try {
+                // Replace with your actual Google Apps Script URL
+                await fetch('YOUR_APPS_SCRIPT_WEB_APP_URL', {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                alert('🎉 Congratulations! Your order has been received. We will send a quote and invoice within 24 hours.');
+                document.getElementById('orderForm').reset();
+                advContainer.innerHTML = '';
+                updateTotal();
+            } catch (err) {
+                alert('Error submitting. Please contact us directly.');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
