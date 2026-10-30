@@ -84,6 +84,7 @@
             <!-- ===== FORM ===== -->
             <div class="order-form-card">
                 <form id="orderForm">
+                            <input type="text" name="_hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">
 
                     <!-- Client Info -->
                     <div class="form-row-2">
@@ -2399,14 +2400,31 @@
                 notes: document.getElementById('notes').value,
                 timestamp: new Date().toISOString()
             };
+            // ---- Lead intake (Google Apps Script) ----------------------
+            // Paste the deployed /exec URL + the shared token from
+            // apps-script/Code.gs. Until then the order is queued locally.
+            const LEAD_ENDPOINT = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
+            const LEAD_TOKEN = 'REPLACE_WITH_A_LONG_RANDOM_STRING';
+            payload.formType = 'Order';
+            payload.token = LEAD_TOKEN;
+            payload.id = 'order-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+            payload.page = 'order-documents.html';
+            const honeypot = document.querySelector('#orderForm input[name="_hp"]');
+            if (honeypot) { payload._hp = honeypot.value; }
             try {
-                // Replace with your actual Google Apps Script URL
-                await fetch('YOUR_APPS_SCRIPT_WEB_APP_URL', {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                if (LEAD_ENDPOINT.indexOf('https://script.google.com/') === 0) {
+                    await fetch(LEAD_ENDPOINT, {
+                        method: 'POST',
+                        mode: 'no-cors',                       // Apps Script sends no CORS headers
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    // Not configured yet – keep the order so it can be resent.
+                    const q = JSON.parse(localStorage.getItem('neonLeadQueue') || '[]');
+                    q.push(payload);
+                    localStorage.setItem('neonLeadQueue', JSON.stringify(q.slice(-25)));
+                }
                 alert('🎉 Congratulations! Your order has been received. We will send a quote and invoice within 24 hours.');
                 document.getElementById('orderForm').reset();
                 advContainer.innerHTML = '';
