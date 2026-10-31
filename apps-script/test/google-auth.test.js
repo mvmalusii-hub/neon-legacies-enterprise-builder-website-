@@ -1032,8 +1032,10 @@ async function wiringTests() {
     await test('auth.js and Auth.gs speak the same protocol', async () => {
         const authJs = read('auth.js');
         const authGs = read('apps-script/Auth.gs');
-        assert(/authEndpoint: 'https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec'/.test(authJs),
-            'auth.js has the live Apps Script endpoint wired in');
+        assert(authJs.indexOf(
+            "authEndpoint: 'https://script.google.com/macros/s/" +
+            "AKfycbzi1M47_YIp0-_wQNiDrWrLbyWRs0LcQPsrhrs5Iw-HSmSBO1mybmKbGySCwRPE14nJ/exec'"
+        ) !== -1, 'auth.js has the live Apps Script endpoint wired in');
         assert(/action === 'login'/.test(authGs), 'Auth.gs handles login');
         assert(/action === 'session'/.test(authGs), 'Auth.gs handles session');
         assert(/action === 'signout'/.test(authGs), 'Auth.gs handles signout');

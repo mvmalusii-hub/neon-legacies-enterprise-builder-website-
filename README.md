@@ -208,10 +208,12 @@ See `.gitignore` – excludes system files (`.DS_Store`), editor settings, temp 
 - [ ] Add actual PDFs to `assets/pdfs/`.
 - [x] Connect contact form to a backend – `apps-script/Code.gs` (see its README).
 - [x] Sign in with Google – `auth.js` + `Auth.gs` (no OAuth client) or `Code.gs`.
-- [ ] Auth.gs web-app URL in `auth.js` currently 404s from Google – copy the
-  correct *Web app URL* from **Deploy ▸ Manage deployments** in the Apps Script
-  editor (it must end in `/exec`) and paste it into `NEON_AUTH.authEndpoint`,
-  or into the "Set up Google sign-in" panel and press *Test connection*.
+- [x] Auth.gs deployed as a web app and wired into `auth.js`
+  (`NEON_AUTH.authEndpoint`, deployment `AKfycbzi1M47…`; anonymous probe shows
+  Google's sign-in redirect, which is correct).
+- [ ] Final check on the live site: press "Sign in with Google", pick an
+  account, confirm it returns to `profile.html` signed in and the Business Hub
+  opens.
 - [ ] Password sign-in / email verification (needs a user store in Apps Script).
 - [ ] Add Google Analytics (optional).
 

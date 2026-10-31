@@ -70,12 +70,14 @@
         // /exec URL here. Google still signs the visitor in; the script reads
         // their address and hands the site a session token.
         //
-        // LIVE DEPLOYMENT (set by the owner): Auth.gs deployed 2026-10-31.
-        // Health check: open this URL while signed in to Google –
+        // LIVE DEPLOYMENT (set by the owner): Auth.gs web app, probed OK on
+        // 2026-10-31 – an anonymous request is redirected to Google's sign-in
+        // page, as expected for "Anyone with Google account". Health check:
+        // open this URL while signed in to Google –
         //   {"ok":true,"service":"neon-legacies-google-auth","signedInAs":"you@…"}
         // If signedInAs is missing, switch Deploy ▸ Manage deployments to
         // "Execute as: User accessing the web app".
-        authEndpoint: 'https://script.google.com/macros/s/AKfycbw3GlRo78arwKPDMQEUFJPwpSRCHNUC9PKyLkALxT0/exec',
+        authEndpoint: 'https://script.google.com/macros/s/AKfycbzi1M47_YIp0-_wQNiDrWrLbyWRs0LcQPsrhrs5Iw-HSmSBO1mybmKbGySCwRPE14nJ/exec',
 
         // The owner can paste either credential into the page itself
         // (profile.html ▸ "Site owner") to test before committing it here.
