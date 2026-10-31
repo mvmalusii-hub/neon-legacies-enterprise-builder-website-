@@ -154,4 +154,136 @@ function loadCode(options) {
     };
 }
 
-module.exports = { loadCode: loadCode, CODE_PATH: CODE_PATH };
+/* ------------------------------------------------------------------ */
+/* apps-script/Auth.gs – Google login with no OAuth client             */
+/* ------------------------------------------------------------------ */
+const AUTH_PATH = path.join(__dirname, '..', 'Auth.gs');
+
+function loadAuth(options) {
+    options = options || {};
+    const crypto = require('crypto');
+    const state = {
+        properties: new Map(),
+        html: [],
+        locks: 0,
+        // Who Google says is running the script (the visiting user).
+        signedInAs: options.email === undefined ? 'thabo.mokoena@gmail.com' : options.email
+    };
+
+    function propertiesApi() {
+        return {
+            getProperty: function (key) {
+                return state.properties.has(key) ? state.properties.get(key) : null;
+            },
+            setProperty: function (key, value) { state.properties.set(key, String(value)); },
+            deleteProperty: function (key) { state.properties.delete(key); },
+            getKeys: function () { return Array.from(state.properties.keys()); },
+            deleteAllProperties: function () { state.properties.clear(); }
+        };
+    }
+
+    const sandbox = {
+        console: { error: function () {}, log: function () {}, info: function () {}, warn: function () {} },
+
+        Session: {
+            getActiveUser: function () {
+                return { getEmail: function () { return state.signedInAs || ''; } };
+            },
+            getEffectiveUser: function () {
+                return { getEmail: function () { return 'owner@example.com'; } };
+            }
+        },
+
+        PropertiesService: {
+            getScriptProperties: propertiesApi,
+            getUserProperties: propertiesApi
+        },
+
+        LockService: {
+            getScriptLock: function () {
+                return {
+                    tryLock: function () { state.locks += 1; return true; },
+                    waitLock: function () { state.locks += 1; },
+                    releaseLock: function () { state.locks -= 1; }
+                };
+            }
+        },
+
+        Utilities: {
+            DigestAlgorithm: { SHA_256: 'SHA_256', MD5: 'MD5' },
+            getUuid: function () {
+                return crypto.randomBytes(16).toString('hex').replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5');
+            },
+            base64EncodeWebSafe: function (value) {
+                return Buffer.from(String(value), 'utf8').toString('base64')
+                    .replace(/\+/g, '-').replace(/\//g, '_');
+            },
+            computeDigest: function (algorithm, value) {
+                return Array.from(crypto.createHash('sha256').update(String(value)).digest());
+            }
+        },
+
+        ContentService: {
+            MimeType: { JSON: 'application/json', TEXT: 'text/plain' },
+            createTextOutput: function (text) {
+                return {
+                    text: String(text),
+                    mimeType: null,
+                    setMimeType: function (type) { this.mimeType = type; return this; },
+                    getContent: function () { return this.text; }
+                };
+            }
+        },
+
+        HtmlService: {
+            XFrameOptionsMode: { ALLOWALL: 'ALLOWALL', DEFAULT: 'DEFAULT' },
+            createHtmlOutput: function (html) {
+                const output = {
+                    html: String(html),
+                    title: '',
+                    xframe: null,
+                    setTitle: function (value) { this.title = value; return this; },
+                    setXFrameOptionsMode: function (mode) { this.xframe = mode; return this; },
+                    getContent: function () { return this.html; }
+                };
+                state.html.push(output);
+                return output;
+            }
+        }
+    };
+
+    vm.createContext(sandbox);
+    vm.runInContext(fs.readFileSync(AUTH_PATH, 'utf8'), sandbox, { filename: 'Auth.gs' });
+
+    return {
+        sandbox: sandbox,
+        state: state,
+        /** Runs doGet and returns the raw output object. */
+        get: function (params) { return sandbox.doGet({ parameter: params || {} }); },
+        /** Runs doGet and parses a JSON reply. */
+        json: function (params) {
+            const output = this.get(params);
+            try { return JSON.parse(output.text); } catch (e) { return output.text; }
+        },
+        /** Runs doGet and unwraps a JSONP reply. */
+        jsonp: function (params, callback) {
+            const name = callback || 'cb';
+            const output = this.get(Object.assign({ callback: name }, params || {}));
+            const match = /^[^(]*\(([\s\S]*)\);?$/.exec(output.text);
+            return match ? JSON.parse(match[1]) : null;
+        },
+        /** Runs doGet and returns the rendered HTML page. */
+        html: function (params) {
+            const output = this.get(params);
+            return output.getContent ? output.getContent() : output.text;
+        }
+    };
+}
+
+module.exports = {
+    loadCode: loadCode,
+    loadAuth: loadAuth,
+    CODE_PATH: CODE_PATH,
+    AUTH_PATH: AUTH_PATH
+};
+

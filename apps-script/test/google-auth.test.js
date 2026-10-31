@@ -312,13 +312,17 @@ function makeProfilePage(options) {
     const google = dom.makeGoogleMock(doc, googleState);
     const win = dom.makeWindow(doc, {
         google: google,
+        hash: options.hash || '',
         fetch: function (url, opts) { return makeFetch(win, options.tokenInfo)(url, opts); }
     });
 
     dom.loadScript(win, 'auth.js');
-    win.NEON_AUTH.googleClientId = options.unconfigured
-        ? 'REPLACE_WITH_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com'
-        : CLIENT_ID;
+    if (options.clientId !== undefined) {
+        win.NEON_AUTH.googleClientId = options.clientId;      // '' = leave unconfigured
+    } else if (!options.unconfigured) {
+        win.NEON_AUTH.googleClientId = CLIENT_ID;
+    }
+    if (options.endpoint) { win.NEON_AUTH.authEndpoint = options.endpoint; }
     if (options.app) { dom.loadScript(win, 'app.js'); }
     doc.fireDomReady();
 
@@ -656,6 +660,256 @@ async function integrationTests() {
 }
 
 /* ------------------------------------------------------------------ */
+/* 3b. Google login with no OAuth client (apps-script/Auth.gs)         */
+/* ------------------------------------------------------------------ */
+const AUTH_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxTESTDEPLOY/exec';
+const SITE_PAGE = 'https://www.neonlegacies.co.za/profile.html';
+
+/** Answers the JSONP call auth.js just made, the way Apps Script would. */
+function answerJsonp(page, reply) {
+    const scripts = page.doc.head.children.filter(function (el) {
+        return el.tagName === 'SCRIPT' && /callback=/.test(String(el.src || ''));
+    });
+    const last = scripts[scripts.length - 1];
+    if (!last) { return false; }
+    const name = decodeURIComponent(/callback=([^&]+)/.exec(String(last.src))[1]);
+    if (typeof page.win[name] !== 'function') { return false; }
+    page.win[name](reply);
+    return true;
+}
+
+/** Pulls the session token out of the "continue" page Auth.gs renders. */
+function tokenFromPage(html) {
+    const match = /#nl_auth=([^&"']+)/.exec(String(html));
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
+async function authScriptTests() {
+    console.log('\nApps Script Google login (Auth.gs)');
+
+    await test('health check reports the service and the signed-in Google account', async () => {
+        const auth = backend.loadAuth();
+        const reply = auth.json({});
+        eq(reply.ok, true, 'service is up');
+        eq(reply.service, 'neon-legacies-google-auth', 'service name');
+        eq(reply.signedInAs, 'thabo.mokoena@gmail.com', 'Google says who is running it');
+    });
+
+    await test('login signs the Google account in and issues a session token', async () => {
+        const auth = backend.loadAuth();
+        const html = auth.html({ action: 'login', 'return': SITE_PAGE });
+        assert(/target="_top"/.test(html), 'continue link escapes the Apps Script frame');
+        assert(html.indexOf('thabo.mokoena@gmail.com') !== -1, 'page names the Google account');
+        const token = tokenFromPage(html);
+        assert(token && token.length === 64, 'a 64-character session token: ' + token);
+        assert(html.indexOf(SITE_PAGE) !== -1, 'visitor is sent back to the site');
+        eq(auth.state.properties.size, 1, 'session stored server-side');
+        assert(/window\.top\.location\.replace/.test(html), 'also tries an automatic redirect');
+    });
+
+    await test('the session token is validated over JSONP and can be ended', async () => {
+        const auth = backend.loadAuth();
+        const token = tokenFromPage(auth.html({ action: 'login', 'return': SITE_PAGE }));
+
+        const valid = auth.jsonp({ action: 'session', token: token }, 'NEON_AUTH.cb1');
+        eq(valid.ok, true, 'token accepted');
+        eq(valid.user.email, 'thabo.mokoena@gmail.com', 'server returns the Google address');
+        eq(valid.user.name, 'Thabo Mokoena', 'name derived from the address');
+        eq(valid.user.method, 'apps-script', 'method recorded');
+
+        const bogus = auth.jsonp({ action: 'session', token: 'not-a-real-token' }, 'NEON_AUTH.cb2');
+        eq(bogus.ok, false, 'a made-up token is refused');
+        eq(bogus.error, 'unknown or expired session', 'says why');
+
+        const out = auth.jsonp({ action: 'signout', token: token }, 'NEON_AUTH.cb3');
+        eq(out.ok, true, 'sign-out accepted');
+        eq(auth.jsonp({ action: 'session', token: token }, 'NEON_AUTH.cb4').ok, false,
+            'the token no longer works');
+    });
+
+    await test('a return URL that is not ours is refused', async () => {
+        const auth = backend.loadAuth();
+        const html = auth.html({ action: 'login', 'return': 'https://evil.example.com/steal' });
+        assert(html.indexOf('evil.example.com') === -1, 'token never goes to another site');
+        assert(html.indexOf(SITE_PAGE) !== -1, 'falls back to our own page');
+    });
+
+    await test('a mis-deployed script explains the fix instead of issuing a token', async () => {
+        const auth = backend.loadAuth({ email: '' });     // "Execute as: Me" gives nobody
+        const html = auth.html({ action: 'login', 'return': SITE_PAGE });
+        assert(/Execute as: User accessing the web app/.test(html), 'names the deployment setting');
+        assert(/Anyone with Google account/.test(html), 'names the access setting');
+        assert(!/#nl_auth=/.test(html), 'no session token handed out');
+        eq(auth.state.properties.size, 0, 'nothing stored');
+    });
+
+    await test('Auth.gs asks the visitor for no permissions', async () => {
+        const source = fs.readFileSync(backend.AUTH_PATH, 'utf8');
+        ['SpreadsheetApp.', 'MailApp.', 'DriveApp.', 'UrlFetchApp.', 'CalendarApp.', 'DocumentApp.']
+            .forEach(function (service) {
+                assert(source.indexOf(service) === -1,
+                    'Auth.gs does not call ' + service.replace(/\.$/, '') +
+                    ' (that would trigger a consent screen)');
+            });
+        assert(/Session\.getActiveUser\(\)/.test(source), 'identity comes from Google itself');
+        assert(/PropertiesService\.getScriptProperties/.test(source), 'sessions live in script properties');
+    });
+}
+
+async function authScriptClientTests() {
+    console.log('\nApps Script Google login (auth.js)');
+
+    await test('auth.js picks the Apps Script route when there is no OAuth client', async () => {
+        const page = makeProfilePage({ unconfigured: true, endpoint: AUTH_ENDPOINT });
+        eq(page.win.NEON_AUTH.method(), 'apps-script', 'route chosen');
+        assert(page.doc.getElementById('neonGoogleGo'), 'a real Sign in with Google button');
+        eq(page.googleState.initializeCalls, 0, 'GIS is not involved');
+    });
+
+    await test('clicking the button takes the visitor to Google', async () => {
+        const page = makeProfilePage({ unconfigured: true, endpoint: AUTH_ENDPOINT });
+        page.doc.getElementById('neonGoogleGo').click();
+        const href = String(page.win.location.href);
+        assert(href.indexOf(AUTH_ENDPOINT) === 0, 'goes to the Apps Script web app: ' + href);
+        assert(/action=login/.test(href), 'asks for a login');
+        assert(/return=https%3A%2F%2F/.test(href), 'says where to come back to');
+        eq(page.win.NEON_AUTH.isLoggedIn(), false, 'not signed in yet');
+    });
+
+    await test('coming back from Google starts the session and confirms it', async () => {
+        const hash = '#nl_auth=' + encodeURIComponent('token-from-google') +
+            '&nl_email=' + encodeURIComponent('thabo.mokoena@gmail.com') +
+            '&nl_name=' + encodeURIComponent('Thabo Mokoena') +
+            '&nl_method=apps-script';
+        const page = makeProfilePage({ unconfigured: true, endpoint: AUTH_ENDPOINT, hash: hash });
+
+        eq(page.win.NEON_AUTH.isLoggedIn(), true, 'signed in straight away');
+        const user = page.win.NEON_AUTH.getUser();
+        eq(user.email, 'thabo.mokoena@gmail.com', 'Google address stored');
+        eq(user.method, 'apps-script', 'route recorded');
+        eq(user.token, 'token-from-google', 'token kept for the server check');
+        eq(page.win.location.hash, '', 'token removed from the address bar');
+        eq(page.win.history.replaced.length, 1, 'address bar cleaned');
+        assert(!page.accountPanel.classList.contains('hidden'), 'account card shown');
+        assert(page.accountPanel.innerHTML.indexOf('thabo.mokoena@gmail.com') !== -1,
+            'card names the account');
+
+        assert(answerJsonp(page, {
+            ok: true,
+            user: { email: 'thabo.mokoena@gmail.com', name: 'Thabo Mokoena' }
+        }), 'the token is re-checked with the server');
+        await settle();
+        eq(page.win.NEON_AUTH.isLoggedIn(), true, 'still signed in after the check');
+    });
+
+    await test('a token the server does not know is thrown away', async () => {
+        const page = makeProfilePage({
+            unconfigured: true,
+            endpoint: AUTH_ENDPOINT,
+            hash: '#nl_auth=forged-token&nl_email=thabo.mokoena@gmail.com'
+        });
+        eq(page.win.NEON_AUTH.isLoggedIn(), true, 'a local session starts first');
+        assert(answerJsonp(page, { ok: false, error: 'unknown or expired session' }), 'server asked');
+        await settle();
+        eq(page.win.NEON_AUTH.isLoggedIn(), false, 'forged session dropped');
+        eq(page.win.localStorage.getItem('neonAuthSession'), null, 'nothing left behind');
+        assert(/no longer valid/.test(page.authMessage.innerHTML),
+            'visitor told why: ' + page.authMessage.innerHTML);
+    });
+
+    await test('signing out ends the session on the server too', async () => {
+        const page = makeProfilePage({
+            unconfigured: true,
+            endpoint: AUTH_ENDPOINT,
+            hash: '#nl_auth=real-token&nl_email=thabo.mokoena@gmail.com&nl_name=Thabo%20Mokoena'
+        });
+        answerJsonp(page, {
+            ok: true,
+            user: { email: 'thabo.mokoena@gmail.com', name: 'Thabo Mokoena' }
+        });
+        await settle();
+
+        page.win.NEON_AUTH.logout();
+        eq(page.win.NEON_AUTH.isLoggedIn(), false, 'signed out locally');
+
+        const calls = page.doc.head.children.filter(function (el) {
+            return el.tagName === 'SCRIPT' && /action=signout/.test(String(el.src || ''));
+        });
+        eq(calls.length, 1, 'the server was told to end the session');
+        assert(/token=real-token/.test(String(calls[0].src)), 'the right token was revoked');
+    });
+
+    await test('the setup panel switches Google sign-in on without a deploy', async () => {
+        const page = makeProfilePage({ unconfigured: true });
+        eq(page.win.NEON_AUTH.method(), 'none', 'nothing configured yet');
+        assert(page.doc.getElementById('neonAuthSetup'), 'setup panel offered');
+
+        // Paste the Apps Script URL and save.
+        page.doc.getElementById('neonAuthSetupEndpoint').value = AUTH_ENDPOINT;
+        page.doc.getElementById('neonAuthSetupSave').click();
+
+        eq(page.win.NEON_AUTH.method(), 'apps-script', 'Apps Script route now live');
+        assert(page.doc.getElementById('neonGoogleGo'), 'Sign in with Google button appeared');
+        assert(/Ready: Apps Script/.test(
+            String(page.doc.getElementById('neonAuthSetupStatus').textContent)),
+            'status line says ready');
+        assert(page.win.localStorage.getItem('neonGoogleAuthConfig') !== null,
+            'saved on this device');
+
+        // A pasted OAuth client id takes priority over the URL.
+        page.doc.getElementById('neonAuthSetupClientId').value = CLIENT_ID;
+        page.doc.getElementById('neonAuthSetupSave').click();
+        eq(page.win.NEON_AUTH.method(), 'identity-services', 'OAuth client takes priority');
+        await settle();
+        eq(page.googleState.initializeCalls, 1, 'GIS initialised with the pasted client id');
+        eq(page.googleState.config.client_id, CLIENT_ID, 'GIS got the pasted client id');
+    });
+
+    await test('end to end: Auth.gs issue → site session → Auth.gs confirmation', async () => {
+        // 1. The visitor clicks "Sign in with Google"; Google has already
+        //    signed them in, so Auth.gs issues a session token.
+        const auth = backend.loadAuth({ email: 'lindiwe.khumalo@gmail.com' });
+        const html = auth.html({ action: 'login', 'return': SITE_PAGE });
+        const token = tokenFromPage(html);
+
+        // 2. The "Continue" link brings the visitor back with the fragment.
+        const hash = '#nl_auth=' + encodeURIComponent(token) +
+            '&nl_email=' + encodeURIComponent('lindiwe.khumalo@gmail.com') +
+            '&nl_name=' + encodeURIComponent('Lindiwe Khumalo');
+        const page = makeProfilePage({ unconfigured: true, endpoint: AUTH_ENDPOINT, hash: hash });
+
+        eq(page.win.NEON_AUTH.isLoggedIn(), true, 'visitor is signed in');
+        eq(page.win.NEON_AUTH.getUser().email, 'lindiwe.khumalo@gmail.com',
+            'session carries the Google address');
+
+        // 3. auth.js re-checks the token with the REAL Auth.gs answer.
+        const scripts = page.doc.head.children.filter(function (el) {
+            return el.tagName === 'SCRIPT' && /action=session/.test(String(el.src || ''));
+        });
+        eq(scripts.length, 1, 'the server was asked about the token');
+        const callback = decodeURIComponent(/callback=([^&]+)/.exec(String(scripts[0].src))[1]);
+        const reply = auth.jsonp({ action: 'session', token: token }, callback);
+        page.win[callback](reply);
+        await settle();
+
+        eq(page.win.NEON_AUTH.isLoggedIn(), true, 'still signed in after confirmation');
+        eq(page.win.NEON_AUTH.getUser().name, 'Lindiwe Khumalo',
+            'the server copy of the name was adopted');
+
+        // 4. Signing out kills the token server-side as well.
+        page.win.NEON_AUTH.logout();
+        const signoutScript = page.doc.head.children.filter(function (el) {
+            return el.tagName === 'SCRIPT' && /action=signout/.test(String(el.src || ''));
+        })[0];
+        const signoutCallback = decodeURIComponent(
+            /callback=([^&]+)/.exec(String(signoutScript.src))[1]);
+        auth.jsonp({ action: 'signout', token: token }, signoutCallback);
+        eq(auth.jsonp({ action: 'session', token: token }, 'last').ok, false,
+            'the token no longer works after sign-out');
+    });
+}
+
+/* ------------------------------------------------------------------ */
 /* 4. The shipped pages are actually wired to auth.js                  */
 /* ------------------------------------------------------------------ */
 const fs = require('fs');
@@ -735,14 +989,30 @@ async function wiringTests() {
                /oauth2\.googleapis\.com\/tokeninfo/.test(auth),
             'both sides verify with Google');
     });
+
+    await test('auth.js and Auth.gs speak the same protocol', async () => {
+        const authJs = read('auth.js');
+        const authGs = read('apps-script/Auth.gs');
+        assert(/authEndpoint: ''/.test(authJs), 'auth.js has the Apps Script endpoint slot');
+        assert(/action === 'login'/.test(authGs), 'Auth.gs handles login');
+        assert(/action === 'session'/.test(authGs), 'Auth.gs handles session');
+        assert(/action === 'signout'/.test(authGs), 'Auth.gs handles signout');
+        assert(/action: 'session'/.test(authJs), 'auth.js checks the session server-side');
+        assert(/action: 'signout'/.test(authJs), 'auth.js ends the server session');
+        assert(/nl_auth=/.test(authGs), 'Auth.gs sends the visitor back with #nl_auth');
+        assert(/nl_auth/.test(authJs), 'auth.js reads #nl_auth');
+        assert(/User accessing the web app/.test(authGs), 'deploy instructions name the execution mode');
+    });
 }
 
 /* ------------------------------------------------------------------ */
 (async function main() {
-    console.log('Google Sign-in tests – real Code.gs, real auth.js, real app.js');
+    console.log('Google Sign-in tests – real Code.gs, real Auth.gs, real auth.js, real app.js');
     await backendTests();
     await clientTests();
     await integrationTests();
+    await authScriptTests();
+    await authScriptClientTests();
     await wiringTests();
 
     console.log('\n' + tests + ' tests, ' + assertions + ' assertions');

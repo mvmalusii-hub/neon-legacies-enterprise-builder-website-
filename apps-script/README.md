@@ -16,6 +16,41 @@ Google sign-in | `profile.html` | verified, then written to the `Logins` tab (no
 Liquor licence | `liquor-licence.html` | `Liquor Licence`
 Spaza compliance | `spaza-compliance.html` | `Spaza Compliance`
 
+## Google account login (`Auth.gs` – recommended first step)
+
+`Auth.gs` is a **separate** tiny web app that signs members in with their
+Google account **without an OAuth client id** – no Google Cloud Console needed.
+(The `action=googleLogin` section below is the optional nicer-button route.)
+
+**Deploy it (3 minutes)**
+
+1. <https://script.google.com> → **New project** → paste the whole of `Auth.gs`
+   → Save.
+2. **Deploy ▸ New deployment ▸ Web app**
+   - *Execute as:* **User accessing the web app** ← this is what makes Google
+     authenticate the visitor as *their* Google account
+   - *Who has access:* **Anyone with Google account**
+   - Deploy.
+3. Copy the `/exec` URL into `auth.js` → `NEON_AUTH.authEndpoint` – or paste it
+   into the **Set up Google sign-in** panel on `profile.html` to test it on that
+   device before committing.
+
+**How it works**
+
+- The site sends the visitor there; Google signs them in (no permissions are
+  requested, so there is no consent screen).
+- The script reads `Session.getActiveUser().getEmail()`, mints a 64-character
+  session token, stores it **hashed** in the script's own properties and sends
+  the visitor back to the site with `#nl_auth=<token>&nl_email=…`.
+- `auth.js` strips the token from the address bar, then re-checks it over JSONP
+  (`?action=session&token=…&callback=…`) on every visit; `?action=signout`
+  revokes it server-side.
+
+**Check it**: open the `/exec` URL in a browser while signed in to Google →
+`{"ok":true,"service":"neon-legacies-google-auth","signedInAs":"you@…"}`. If
+`signedInAs` is missing, the deployment is running as *Me* – switch *Execute as*
+to *User accessing the web app*.
+
 ## Deploy it (about 5 minutes)
 
 1. **Create the sheet** with the Google account that owns the data
@@ -106,10 +141,11 @@ Logins tab and the team email are the audit trail.
 node apps-script/test/google-auth.test.js
 ```
 
-Runs the **real** `Code.gs` through an Apps Script stub and the **real**
-`auth.js` / `app.js` through a small fake DOM: token verification, replay and
-throttling, session restore/expiry, sign-out, gated-page unlocking, XSS
-escaping, page wiring and the browser → backend hand-off.
+Runs the **real** `Code.gs` and `Auth.gs` through an Apps Script stub and the
+**real** `auth.js` / `app.js` through a small fake DOM: token verification,
+replay and throttling, both login routes (OAuth + Apps Script), session
+restore/expiry, sign-out, gated-page unlocking, XSS escaping, page wiring and
+the browser → backend hand-off.
 
 ## Notes
 

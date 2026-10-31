@@ -375,6 +375,46 @@ body {
     padding: 2px 6px;
     border-radius: 4px;
 }
+.auth-setup-panel {
+    margin-top: 18px;
+    text-align: left;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 12px 16px;
+    background: #f8fafc;
+}
+.auth-setup-panel summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 0.85rem;
+}
+.auth-setup-steps {
+    margin: 10px 0 12px 18px;
+    color: #475569;
+    font-size: 0.82rem;
+}
+.auth-setup-steps li {
+    margin-bottom: 8px;
+}
+.auth-setup-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #475569;
+    margin: 10px 0 4px;
+}
+.auth-setup-panel input {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.85rem;
+}
+.auth-setup-panel .btn {
+    margin-top: 12px;
+}
 .account-panel {
     border-left: 5px solid #fbbf24;
 }

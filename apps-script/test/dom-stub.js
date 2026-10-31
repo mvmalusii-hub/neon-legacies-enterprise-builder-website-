@@ -275,10 +275,25 @@ function makeWindow(doc, options) {
         alerts: [],
         fetchCalls: [],
         location: {
+            href: options.href ||
+                'https://www.neonlegacies.co.za/' +
+                (options.pathname || '/profile.html').replace(/^\//, '') +
+                (options.hash || ''),
+            hash: options.hash || '',
+            search: options.search || '',
             pathname: options.pathname || '/profile.html',
-            href: '',
+            origin: options.origin || 'https://www.neonlegacies.co.za',
+            protocol: 'https:',
+            host: 'www.neonlegacies.co.za',
             replace: function (url) { win.location.href = url; },
             assign: function (url) { win.location.href = url; }
+        },
+        history: {
+            replaced: [],
+            replaceState: function (state, title, url) {
+                win.history.replaced.push(String(url));
+                win.location.hash = '';
+            }
         },
         navigator: { userAgent: 'node-dom-stub', clipboard: null },
         atob: function (value) { return Buffer.from(String(value), 'base64').toString('binary'); },
