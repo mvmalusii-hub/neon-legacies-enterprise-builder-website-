@@ -323,6 +323,7 @@ function makeProfilePage(options) {
         win.NEON_AUTH.googleClientId = CLIENT_ID;
     }
     if (options.endpoint) { win.NEON_AUTH.authEndpoint = options.endpoint; }
+    else { win.NEON_AUTH.authEndpoint = ''; }   // tests stay hermetic
     if (options.app) { dom.loadScript(win, 'app.js'); }
     doc.fireDomReady();
 
@@ -865,6 +866,32 @@ async function authScriptClientTests() {
         eq(page.googleState.config.client_id, CLIENT_ID, 'GIS got the pasted client id');
     });
 
+    await test('the setup panel can test the sign-in service connection', async () => {
+        const page = makeProfilePage({ unconfigured: true });
+        page.doc.getElementById('neonAuthSetupEndpoint').value = AUTH_ENDPOINT;
+        page.doc.getElementById('neonAuthSetupTest').click();
+
+        const scripts = page.doc.head.children.filter(function (el) {
+            return el.tagName === 'SCRIPT' && /callback=/.test(String(el.src || ''));
+        });
+        eq(scripts.length, 1, 'health check sent to the service');
+        assert(/action=health/.test(String(scripts[0].src)), 'asks the service how it is');
+        assert(answerJsonp(page, {
+            ok: true, service: 'neon-legacies-google-auth', version: 1,
+            signedInAs: 'you@example.com', actions: []
+        }), 'the service answered');
+        await settle();
+        assert(/✔ Service reachable/.test(
+            String(page.doc.getElementById('neonAuthSetupStatus').textContent)),
+            'status says reachable: ' + page.doc.getElementById('neonAuthSetupStatus').textContent);
+
+        page.doc.getElementById('neonAuthSetupTest').click();
+        assert(answerJsonp(page, { ok: false, error: 'server error' }), 'second check answered');
+        await settle();
+        assert(/✖/.test(String(page.doc.getElementById('neonAuthSetupStatus').textContent)),
+            'a dead service is reported honestly');
+    });
+
     await test('end to end: Auth.gs issue → site session → Auth.gs confirmation', async () => {
         // 1. The visitor clicks "Sign in with Google"; Google has already
         //    signed them in, so Auth.gs issues a session token.
@@ -993,7 +1020,8 @@ async function wiringTests() {
     await test('auth.js and Auth.gs speak the same protocol', async () => {
         const authJs = read('auth.js');
         const authGs = read('apps-script/Auth.gs');
-        assert(/authEndpoint: ''/.test(authJs), 'auth.js has the Apps Script endpoint slot');
+        assert(/authEndpoint: 'https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec'/.test(authJs),
+            'auth.js has the live Apps Script endpoint wired in');
         assert(/action === 'login'/.test(authGs), 'Auth.gs handles login');
         assert(/action === 'session'/.test(authGs), 'Auth.gs handles session');
         assert(/action === 'signout'/.test(authGs), 'Auth.gs handles signout');

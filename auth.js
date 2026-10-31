@@ -69,7 +69,13 @@
         // accessing the web app" + "Anyone with Google account" and paste the
         // /exec URL here. Google still signs the visitor in; the script reads
         // their address and hands the site a session token.
-        authEndpoint: '',
+        //
+        // LIVE DEPLOYMENT (set by the owner): Auth.gs deployed 2026-10-31.
+        // Health check: open this URL while signed in to Google –
+        //   {"ok":true,"service":"neon-legacies-google-auth","signedInAs":"you@…"}
+        // If signedInAs is missing, switch Deploy ▸ Manage deployments to
+        // "Execute as: User accessing the web app".
+        authEndpoint: 'https://script.google.com/macros/s/AKfycbw3GlRo78arwKPDMQEUFJPwpSRCHNUC9PKyLkALxT0/exec',
 
         // The owner can paste either credential into the page itself
         // (profile.html ▸ "Site owner") to test before committing it here.
@@ -949,6 +955,8 @@
                 'value="' + this.escapeHtml(saved.clientId || '') + '">' +
                 '<button type="button" class="btn btn-sm" id="neonAuthSetupSave">' +
                 'Save on this device &amp; test</button>' +
+                '<button type="button" class="btn btn-sm btn-outline" id="neonAuthSetupTest">' +
+                'Test connection</button>' +
                 '<p class="auth-setup" id="neonAuthSetupStatus">' +
                 this.escapeHtml(this.statusLine()) + '</p>';
             container.appendChild(panel);
@@ -969,6 +977,59 @@
                     self.renderGoogleButton();
                 });
             }
+
+            var testBtn = document.getElementById('neonAuthSetupTest');
+            if (testBtn) {
+                testBtn.addEventListener('click', function () {
+                    var endpoint = document.getElementById('neonAuthSetupEndpoint');
+                    var clientId = document.getElementById('neonAuthSetupClientId');
+                    self.saveOverrides({
+                        endpoint: endpoint ? endpoint.value : '',
+                        clientId: clientId ? clientId.value : ''
+                    });
+                    var status = document.getElementById('neonAuthSetupStatus');
+                    if (status) { status.textContent = 'Testing the sign-in service…'; }
+                    self.checkEndpoint().then(function (report) {
+                        var box = document.getElementById('neonAuthSetupStatus');
+                        if (!box) { return; }
+                        if (report.ok) {
+                            box.textContent = '✔ Service reachable. Google sees: ' +
+                                (report.signedInAs || 'a signed-in visitor') + '.';
+                            self.showMessage('Connection works – press "Sign in with Google".', true);
+                        } else {
+                            box.textContent = '✖ ' + (report.error || 'unreachable') +
+                                ' – check the URL: it must end in /exec and come from ' +
+                                'Deploy ▸ Manage deployments ▸ Web app.';
+                            self.showMessage('Could not reach the sign-in service: ' +
+                                (report.error || 'unreachable'), false);
+                        }
+                    });
+                });
+            }
+        },
+
+        /**
+         * Probes the Apps Script URL over JSONP and reports what Google says.
+         * The site owner uses this from the setup panel before going live.
+         */
+        checkEndpoint: function () {
+            var self = this;
+            if (!this.isEndpointConfigured()) {
+                return Promise.resolve({ ok: false, error: 'no Apps Script URL set' });
+            }
+            return this.jsonp(this.endpoint(), { action: 'health' })
+                .then(function (reply) {
+                    if (reply && reply.ok && reply.service === 'neon-legacies-google-auth') {
+                        return { ok: true, signedInAs: reply.signedInAs || null };
+                    }
+                    return { ok: false, error: (reply && reply.error) || 'unexpected answer' };
+                })
+                .catch(function (err) {
+                    return {
+                        ok: false,
+                        error: (err && err.message) ? err.message : 'unreachable'
+                    };
+                });
         },
 
         /** One-line diagnosis: what is configured and what is still missing. */
