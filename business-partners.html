@@ -79,7 +79,7 @@
                     ⚠️ You are not logged in. <a href="profile.html">Please log in or create a profile</a> to book a session.
                 </div>
 
-                <form id="directorSessionForm">
+                <form id="directorSessionForm" data-requires-auth="true">
                     <div class="form-group">
                         <label for="directorName">Your name / Company name</label>
                         <input type="text" id="directorName" required>
@@ -126,7 +126,7 @@
                     ⚠️ You are not logged in. <a href="profile.html">Please log in or create a profile</a> to apply.
                 </div>
 
-                <form id="partnerApplicationForm">
+                <form id="partnerApplicationForm" data-requires-auth="true">
                     <div class="form-group">
                         <label for="partnerCompanyName">Company name</label>
                         <input type="text" id="partnerCompanyName" required>
@@ -181,6 +181,7 @@
     <!-- 3. EXTERNAL JAVASCRIPT                                       -->
     <!-- ============================================================ -->
     <script src="app.js"></script>
+    <script src="auth.js"></script>
 
 </body>
 </html>

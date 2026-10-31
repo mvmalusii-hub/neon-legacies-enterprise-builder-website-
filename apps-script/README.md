@@ -3,24 +3,37 @@
 One web app receives **every** form on the site, writes a row to a Google
 Sheet, emails the team and receipts the customer.
 
-Form | Page | Form type in the sheet
----|---|---
-Order | `order-documents.html` | `Order`
-Hire admin | `hire-admin.html` | `Hire Admin`
-Growth consultation | `strategic-growth.html` | `Growth Consultation`
-Director session | `business-partners.html` | `Director Session`
-Partner application | `partners.html` | `Partner Application`
-Company registration | `market-leads.html` | `Market Lead Company`
-Account signup | `profile.html` | `Account Signup`
-Liquor licence | `liquor-licence.html` | `Liquor Licence`
-Spaza compliance | `spaza-compliance.html` | `Spaza Compliance`
+Form | Page | Form type in the sheet | Fills the extra columns
+---|---|---|---
+Order | `order-documents.html` | `Order` | Industry, Amount, Service
+Hire admin | `hire-admin.html` | `Hire Admin` | Preferred Date
+Growth consultation | `strategic-growth.html` | `Growth Consultation` | Preferred Date
+Director session | `business-partners.html` | `Director Session` | Preferred Date
+Partner application | `partners.html` | `Partner Application` | Industry
+Company registration | `market-leads.html` | `Market Lead Company` | Industry
+Account signup | `profile.html` | `Account Signup` | –
+Liquor licence | `liquor-licence.html` | `Liquor Licence` | Service (licence type)
+Spaza compliance | `spaza-compliance.html` | `Spaza Compliance` | –
+
+## The sheet
+
+`Timestamp | Reference | Form | Status | Name | Email | Phone | Company |
+Service / Interest | Industry | Amount | Preferred Date | Message | Page |
+Source ID | Payload JSON`
+
+- **Status** carries a dropdown (`New`, `Contacted`, `Quoted`, `Won`, `Lost`,
+  `Spam`) so the sheet can be worked as a pipeline instead of a log.
+- **Source ID** is the browser's idempotency key – searching it tells you
+  whether a lead was already handled.
+- **Payload JSON** keeps the raw submission, so nothing is ever lost even if a
+  question has no column.
 
 ## Deploy it (about 5 minutes)
 
 1. **Create the sheet** with the Google account that owns the data
    (`mv.malusii@gmail.com`): <https://sheets.new> → name it
-   *Neon Legacies – Website Leads*. The `Leads` tab and its headers are
-   created automatically on the first submission.
+   *Neon Legacies – Website Leads*. The `Leads` tab, its headers and the Status
+   dropdown are created automatically on the first submission.
 2. In that sheet: **Extensions ▸ Apps Script**.
 3. Delete the placeholder `myFunction` and paste the whole of `Code.gs`.
    `SHARED_TOKEN` is already set to the value the site sends, so **do not edit it**
@@ -29,7 +42,7 @@ Spaza compliance | `spaza-compliance.html` | `Spaza Compliance`
    - `NOTIFY_EMAILS` – where new-lead alerts land (default `mv.malusii@gmail.com`).
    - `AUTO_REPLY` – `true` sends the customer a receipt with a reference number.
 4. **Deploy ▸ New deployment ▸ Web app**
-   - Description: `Website leads v1`
+   - Description: `Website leads v2`
    - **Execute as: Me**
    - **Who has access: Anyone** ← required, the site is public
    - **Deploy**, then authorise the script (Google will warn that the app is
@@ -47,19 +60,82 @@ Spaza compliance | `spaza-compliance.html` | `Spaza Compliance`
 > the honeypot, the per-email throttle and server-side validation. Rotate the
 > token if you start seeing junk rows.
 
+## Upgrading from v1
+
+Deploy the new `Code.gs` as a **new version** of the same web app (the URL does
+not change). The first submission – or running `migrateSheet()` once from the
+editor – appends the missing columns to the existing `Leads` tab and leaves all
+rows untouched. No data is moved or deleted.
+
 ## Verify
 
+- **Status page** (fastest): open `status.html` on the site. It calls the deployment
+  through the readable transport and shows **healthy**, the service version and the
+  row count of each tab – or **unreachable** with the exact fix.
 - **Health check**: open the `/exec` URL in a browser; you should see
-  `{"ok":true,"service":"neon-legacies-leads","version":1}`.
-- **End to end**: submit the order form on the live site; a row appears in
-  `Leads` within a few seconds, the team email arrives, and the customer gets
-  a receipt with a reference like `ORD-261030-4821`.
-- **Command line** (replace URL + token):
+  `{"ok":true,"service":"neon-legacies-leads","version":3}`.
+- **Sheet + email**: in the Apps Script editor run `sendTestLead()` once. It
+  writes a `TES-…` row using mixed field names (`businessEmail`, `total`) and
+  sends the team email – proof that the field aliases work.
+- **End to end**: submit a form on the live site; a row appears in `Leads`
+  within a few seconds with Name, Email and Phone filled, the team email
+  arrives (Reply goes straight to the customer) and the customer gets a receipt
+  with a reference like `ORD-261030-4821`.
+- **Command line** (replace URL, `TOKEN`):
 
 ```bash
 curl -sS -X POST '<EXEC_URL>' -H 'Content-Type: text/plain' \
-  --data '{"formType":"Test","name":"Test Lead","email":"you@example.com","message":"hello","token":"<TOKEN>"}'
+  --data '{"formType":"Test","businessName":"Test Lead","businessEmail":"you@example.com","businessPhone":"072 000 0000","token":"<TOKEN>"}'
 ```
+
+- **Tests** (no installs, plain Node):
+
+```bash
+node apps-script/test/code.test.js   # the Apps Script backend
+node apps-script/test/app.test.js    # the site-wide form hook, end to end
+node apps-script/test/forms.test.js  # every real <form> on the site, field by field
+```
+
+`appsscript-stub.js` fakes `SpreadsheetApp`, `MailApp`, `CacheService`,
+`LockService` and `PropertiesService`, so `Code.gs` runs unmodified. The tests
+replay real payloads from every page, including the id-only field names and the
+placeholder-only liquor / spaza forms. `forms.test.js` parses the actual HTML
+and fails if any visible field would be dropped (`9 forms, 87 fields`).
+
+## What v2 fixed (audit, 31 Oct 2026)
+
+1. **Leads were being rejected.** v1 only accepted `name` and `email`, but the
+   pages send `directorName`, `businessName`, `regCompanyName`, `companyName`,
+   `signupName`… so every one of those forms got
+   `{"ok":false,"error":"name required"}`. Because the browser uses `no-cors`
+   it never saw the error: the visitor was told “thank you”, nothing was saved.
+   The backend now normalises 60+ field names onto the canonical columns.
+2. **Liquor and spaza submissions were empty.** Those inputs only have
+   placeholders – no `name`, no `id` – so the old collector skipped them. The
+   collector now falls back to the label, the placeholder, the select prompt and
+   the checkbox group question, so every answer is captured.
+3. **Checkbox and radio answers were dropped** (growth areas, admin services,
+   contract length) because they had no `name`. They are now collected per
+   question as one readable answer.
+4. **Everything useful was buried in `Payload JSON`.** The sheet now has real
+   columns for Service / Interest, Industry, Amount, Preferred Date and Source
+   ID, plus a Status pipeline column with a dropdown.
+5. **The team email hid the questionnaire.** It printed only `message`, so the
+   answers never reached the inbox. It now lists every answered question and
+   sets `Reply-To` to the lead's address.
+6. **A mail quota error could fail a saved lead.** `MailApp` calls are wrapped
+   so a failed notification never turns a stored lead into an error response.
+7. **Concurrent submits could interleave rows.** Writes are serialised with
+   `LockService`.
+8. **Failed sends vanished.** The order page now queues a submission when the
+   `fetch` itself fails (offline, blocked), same as when the endpoint is
+   unconfigured; ids keep the retry idempotent.
+9. **Owner tooling.** `sendTestLead()` and `migrateSheet()` run from the editor.
+
+Still open (needs a decision, not code): file uploads on the partner / growth /
+admin / market-lead forms cannot be posted to Apps Script as JSON – either drop
+the upload fields or send them by email; and `profile.html` signup is a lead
+only – there is no real account system behind it.
 
 ## Notes
 
@@ -74,3 +150,102 @@ curl -sS -X POST '<EXEC_URL>' -H 'Content-Type: text/plain' \
 - **Quota**: a free consumer Gmail account allows 100 recipients/day via
   `MailApp` (1 500 for Workspace). A notification + a receipt per lead uses
   two recipients, so roughly 50 leads/day on Gmail.
+- **Duplicate forms on a page**: `profile.html` holds a login form marked
+  `data-no-lead="true"` (never sent) and a signup form (sent). Passwords are
+  always stripped before the payload leaves the browser.
+
+## Accounts (v3)
+
+The same web app now runs a real account system — the site no longer pretends
+anyone is logged out.
+
+Sheet | Columns | Used for
+---|---|---
+`Users` | Id, Created, Name, Email, Phone, Company, Role, Status, Salt, Hash, Iterations, Last Login, Password Changed, Reset Token, Reset Expires | one row per account; `Status` must stay `active` to sign in
+`Sessions` | Token Hash, User Id, Email, Created, Expires, Device, Last Seen | one row per signed-in device (7 days)
+
+**How it works**
+
+- Passwords are stored as **salted, 600× iterated SHA-256** (`Salt` + `Hash`).
+  Apps Script has no PBKDF2/Argon2, so the iteration count is the defence;
+  bump `CONFIG.HASH_ITERATIONS` if you want it slower (it costs ~1 ms each).
+- Sign-in returns a 64-character session token. Only its SHA-256 is written to
+  `Sessions`, so a leaked sheet cannot be replayed as a login.
+- Rate limits: 10 failed logins per email per 15 min, 3 signups per email per
+  hour, 3 reset mails per email per hour.
+- Password change signs every other device out. Password reset links are single
+  use and expire after 60 minutes.
+- `requestReset` answers identically for unknown emails (no account probing).
+
+**Why an iframe:** Apps Script cannot set CORS headers, so `fetch()` can never
+read a web-app reply. Account calls are posted from a hidden form into a hidden
+iframe and the reply page does `parent.postMessage(JSON)`; `auth.js` matches it
+by `requestId`. Credentials therefore never travel in a URL.
+
+**Site wiring**
+
+File | Role
+---|---
+`auth.js` | `window.NEON_AUTH` – signup, login, logout, refresh, updateProfile, changePassword, requestReset, resetPassword, `onChange`, `requireUser`
+`profile.html` + `app.js` | sign-in / sign-up tabs, signed-in panel (details, password change, sign out), forgot-password form
+`reset.html` + `reset.js` | the page the reset email links to
+`logout.html` | ends the server session, then clears local storage
+
+Gated forms (`data-requires-auth="true"`): director session, partner application,
+growth consultation, hire-admin and market-lead registration. Their leads are
+only recorded once a real session exists, and the payload is stamped with
+`accountId` / `accountEmail`.
+
+**Owner tasks**
+
+- `migrateAccounts()` – creates the `Users`/`Sessions` tabs, reports counts.
+- `testAccounts()` – proves hashing is deterministic and rejects a wrong password.
+- Create an admin by changing that user's `Role` to `admin` in the sheet (no UI yet).
+
+**Not built yet** (deliberate, needs your decision): email verification on
+signup, Google sign-in, self-service account deletion (POPIA), and an admin
+screen for the `Users` / `Leads` sheets.
+
+## Tests
+
+```bash
+node apps-script/test/code.test.js        # lead intake backend
+node apps-script/test/accounts.test.js    # accounts backend (7 tests, 75 assertions)
+node apps-script/test/app.test.js         # lead hook + gated forms
+node apps-script/test/auth-client.test.js # auth.js ↔ Code.gs end to end
+node apps-script/test/forms.test.js       # every real <form> on the site
+node apps-script/test/wiring.test.js      # pages load the right scripts
+node apps-script/test/profile-ui.test.js  # profile page UI -> auth.js -> Code.gs
+```
+
+## The deployed endpoint (read this first)
+
+`CONFIG.SPREADSHEET_ID` is now **pinned** to the leads workbook, so a script
+bound to the wrong file can never scatter rows. The tabs are `Leads`, `Users`
+and `Sessions` (the workbook already carries all three with their headers).
+
+On 31 Oct 2026 the deployment ID shipped in `app.js`
+(`AKfycbzM082roGPD0iDJy8XgmSdFATcPS8Ma5b2Y7XtAAEiO`) answered **HTTP 404**, the
+workbook had no `Leads` tab, and Gmail had never received a `New website
+submission` alert – i.e. no form submission had ever reached a backend. If
+`status.html` still says *unreachable*, the deployment has not been created:
+follow **Deploy it** above and paste the new `/exec` URL (or bare ID) into
+`app.js` and `order-documents.html`.
+
+Leads now travel over the same readable transport as accounts, so the page gets
+`{ok, reference}` back. If the server does not answer, the payload is queued in
+`localStorage` and retried on the next visit instead of vanishing.
+
+## Auditing an existing spreadsheet
+
+If you would rather not connect an account, export the tab as CSV
+(**File ▸ Download ▸ Comma-separated values**) and run:
+
+```bash
+node apps-script/tools/audit-sheet.js leads.csv users.csv
+```
+
+It lists the v3 columns that are missing, rows with no name / email / phone
+(the leads the old backend mangled), duplicate references, status values that
+are not on the dropdown, and the per-form breakdown. Sample fixtures live in
+`testdata/`.

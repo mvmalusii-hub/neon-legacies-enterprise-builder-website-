@@ -1,0 +1,2 @@
+Id,Created,Name,Email,Phone,Company,Role,Status,Salt,Hash,Iterations,Last Login,Password Changed,Reset Token,Reset Expires
+USR-261031-4821,2026-10-31,Lindi Nkosi,lindi@example.co.za,0821112222,Nkosi Trading,client,active,abc,deadbeef,600,2026-10-31,2026-10-31,,
