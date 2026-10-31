@@ -4,6 +4,7 @@
  * Run: node apps-script/test/wiring.test.js
  */
 const assert = require('assert');
+const vm = require('vm');
 const fs = require('fs');
 const path = require('path');
 
@@ -60,6 +61,36 @@ test('logout page ends the server session, not just local storage', () => {
   const html = read('logout.html');
   ok(/NEON_AUTH\.logout\(\)/.test(html), 'calls NEON_AUTH.logout()');
   ok(html.indexOf("'neonAuth'") !== -1, 'clears the cached session key too');
+});
+
+test('app.js boots on pages that have none of its elements', () => {
+  const listeners = {};
+  const node = () => ({
+    style: {}, classList: { add() {}, remove() {}, toggle() {} },
+    addEventListener() {}, appendChild() {}, setAttribute() {},
+    getAttribute() { return null; }, querySelector() { return null; },
+    querySelectorAll() { return []; }
+  });
+  const bareDocument = {
+    readyState: 'complete', body: node(), head: node(),
+    addEventListener: (type, fn) => { (listeners[type] = listeners[type] || []).push(fn); },
+    removeEventListener() {}, appendChild() {}, createElement: node,
+    getElementById: () => null, querySelector: () => null, querySelectorAll: () => []
+  };
+  const sandbox = {
+    window: {}, document: bareDocument, console, JSON, Date, Math, String, Number,
+    Object, Array, Promise, RegExp, Error, setTimeout, clearTimeout,
+    location: { pathname: '/logout.html', search: '', href: '' },
+    localStorage: { getItem: () => null, setItem() {}, removeItem() {} },
+    sessionStorage: { getItem: () => null, setItem() {}, removeItem() {} },
+    alert() {}, fetch: () => Promise.resolve()
+  };
+  sandbox.window = sandbox;
+  sandbox.window.document = bareDocument;
+  vm.createContext(sandbox);
+  vm.runInContext(read('app.js'), sandbox, { filename: 'app.js' });
+  (listeners.DOMContentLoaded || []).forEach(fn => fn());
+  ok(true, 'no exception while booting');
 });
 
 const failures = results.filter(line => line.indexOf('FAIL') === 0);
