@@ -557,7 +557,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const companyListEl = document.getElementById('companyList');
     const regForm = document.getElementById('registerCompanyForm');
 
-    if (marketLoginWarning || dataConsentSection || databaseSection) {
+    // Only market-leads.html has these sections. Keying the block off
+    // #loginWarning instead made it run on every gated page, where it
+    // threw a TypeError on the missing sections and killed the rest of
+    // this file (business hub, hire admin and referrals never wired up).
+    if (dataConsentSection || databaseSection) {
         const isLoggedIn = authed();
         let companies = [];
 
@@ -604,20 +608,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function updateMarketUI() {
             if (!isLoggedIn) {
-                marketLoginWarning.classList.remove('hidden');
-                dataConsentSection.classList.add('hidden');
-                databaseSection.classList.add('hidden');
+                if (marketLoginWarning) { marketLoginWarning.classList.remove('hidden'); }
+                if (dataConsentSection) { dataConsentSection.classList.add('hidden'); }
+                if (databaseSection) { databaseSection.classList.add('hidden'); }
                 return;
             }
-            marketLoginWarning.classList.add('hidden');
+            if (marketLoginWarning) { marketLoginWarning.classList.add('hidden'); }
             const hasAgreed = localStorage.getItem('marketConsent') === 'true';
             if (hasAgreed) {
-                dataConsentSection.classList.add('hidden');
-                databaseSection.classList.remove('hidden');
+                if (dataConsentSection) { dataConsentSection.classList.add('hidden'); }
+                if (databaseSection) { databaseSection.classList.remove('hidden'); }
                 renderCompanies();
             } else {
-                dataConsentSection.classList.remove('hidden');
-                databaseSection.classList.add('hidden');
+                if (dataConsentSection) { dataConsentSection.classList.remove('hidden'); }
+                if (databaseSection) { databaseSection.classList.add('hidden'); }
             }
         }
 
@@ -681,7 +685,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const postBtn = document.getElementById('postCommentBtn');
     const newCommentInput = document.getElementById('newComment');
 
-    if (hubLoginWarning || commentArea) {
+    // Only business-hub.html has the comment area – see the note above.
+    if (commentArea) {
         const isLoggedIn = authed();
         let comments = [];
 
@@ -737,10 +742,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function updateHubUI() {
             if (!isLoggedIn) {
-                hubLoginWarning.classList.remove('hidden');
+                if (hubLoginWarning) { hubLoginWarning.classList.remove('hidden'); }
                 commentArea.classList.add('hidden');
             } else {
-                hubLoginWarning.classList.add('hidden');
+                if (hubLoginWarning) { hubLoginWarning.classList.add('hidden'); }
                 commentArea.classList.remove('hidden');
                 loadComments();
             }
@@ -757,8 +762,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('Please enter a comment.');
                     return;
                 }
+                // Real name from the Google session, not a placeholder.
+                const commenter = window.NEON_AUTH ? NEON_AUTH.getUser() : null;
                 const comment = {
-                    author: "LoggedInUser",
+                    author: (commenter && commenter.name) ? commenter.name : 'Member',
                     date: new Date().toLocaleString(),
                     text: newText
                 };
