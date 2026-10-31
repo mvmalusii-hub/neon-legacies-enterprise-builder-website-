@@ -122,6 +122,17 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
+    //  0. AUTHENTICATION – real sessions via Google Sign-in
+    //     auth.js (window.NEON_AUTH) owns the Google flow and the
+    //     session it produces. Every gated page below asks it
+    //     whether the visitor is signed in, instead of assuming
+    //     "demo = false" and locking everybody out forever.
+    // ============================================================
+    function authed() {
+        return !!(window.NEON_AUTH && NEON_AUTH.isLoggedIn());
+    }
+
+    // ============================================================
     //  1. MOBILE NAV TOGGLES (Top Nav + Sidebar)
     // ============================================================
 
@@ -203,7 +214,9 @@ document.addEventListener('DOMContentLoaded', function() {
             loginDiv.style.display = 'none';
         });
 
-        // Login form mock
+        // Login form – password sign-in has no backend yet. The real
+        // session comes from Google (auth.js), so say that plainly
+        // instead of pretending the login worked.
         const loginForm = document.getElementById('loginFormElement');
         if (loginForm) {
             loginForm.addEventListener('submit', function(e) {
@@ -211,15 +224,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 const email = document.getElementById('loginEmail').value;
                 const pwd = document.getElementById('loginPassword').value;
                 const msg = document.getElementById('loginMessage');
-                if (email && pwd) {
-                    msg.innerHTML = '<span style="color:green;">✅ Login successful (demo). Backend will be connected soon.</span>';
-                } else {
+                if (!email || !pwd) {
                     msg.innerHTML = '<span style="color:red;">❌ Please enter both email and password.</span>';
+                    return;
                 }
+                msg.innerHTML = '<span style="color:red;">❌ Password sign-in is not switched on yet. ' +
+                    'Use <strong>Sign in with Google</strong> above – one tap, and it unlocks every member area.</span>';
             });
         }
 
-        // Signup form mock
+        // Signup form – the details go to the team as a lead (see the
+        // NEON_LEADS hook at the top of this file). The account itself
+        // is created the first time the person signs in with Google.
         const signupForm = document.getElementById('signupFormElement');
         if (signupForm) {
             signupForm.addEventListener('submit', function(e) {
@@ -237,16 +253,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     msg.innerHTML = '<span style="color:red;">❌ Passwords do not match.</span>';
                     return;
                 }
-                msg.innerHTML = '<span style="color:green;">✅ Account created! Your request has been sent to our team – check your email for confirmation.</span>';
+                msg.innerHTML = '<span style="color:green;">✅ Thanks – your details are with our team. ' +
+                    'To use the member areas right away, use <strong>Sign in with Google</strong>: ' +
+                    'your account is created the first time you sign in.</span>';
             });
         }
 
-        // Google login placeholder
-        const googleBtn = document.getElementById('googleLoginBtn');
-        if (googleBtn) {
-            googleBtn.addEventListener('click', function() {
-                alert('Google Sign‑in will be integrated later using OAuth.');
+        // Google Sign-in is owned by auth.js (window.NEON_AUTH): it renders
+        // Google's own button in #googleSignInContainer, asks Google to
+        // verify the ID token it returns, and writes the session that
+        // unlocks the member areas. #googleLoginBtn is wired there too,
+        // so this page only has to react to the session changing.
+        if (window.NEON_AUTH) {
+            NEON_AUTH.onChange(function (event) {
+                const msg = document.getElementById('loginMessage');
+                if (!msg || event.type !== 'signin' || !event.user) { return; }
+                msg.innerHTML = '<span style="color:green;">✅ Signed in as ' +
+                    NEON_AUTH.escapeHtml(event.user.email) + '.</span>';
             });
+        } else {
+            const googleBtn = document.getElementById('googleLoginBtn');
+            if (googleBtn) {
+                googleBtn.addEventListener('click', function() {
+                    alert('Google Sign-in needs auth.js on this page – add <script src="auth.js"></script> before app.js.');
+                });
+            }
         }
     }
 
@@ -260,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const partnerLoginWarning = document.getElementById('loginWarning');
 
     if (partnerType && dynamicForm) {
-        let isLoggedIn = false; // demo
+        const isLoggedIn = authed();
 
         if (partnerLoginWarning) {
             isLoggedIn ? partnerLoginWarning.classList.add('hidden') : partnerLoginWarning.classList.remove('hidden');
@@ -331,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const intlLoginWarning = document.getElementById('loginWarning');
 
     if (entityType && intlDynamicForm) {
-        let isLoggedIn = false;
+        const isLoggedIn = authed();
         if (intlLoginWarning) {
             isLoggedIn ? intlLoginWarning.classList.add('hidden') : intlLoginWarning.classList.remove('hidden');
         }
@@ -383,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const growthLoginWarning = document.getElementById('loginWarning');
 
     if (growthForm) {
-        let isLoggedIn = false;
+        const isLoggedIn = authed();
         if (growthLoginWarning) {
             isLoggedIn ? growthLoginWarning.classList.add('hidden') : growthLoginWarning.classList.remove('hidden');
         }
@@ -419,7 +450,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const partnerListEl = document.getElementById('partnerList');
 
     if (directorForm || partnerAppForm) {
-        let isLoggedIn = false;
+        const isLoggedIn = authed();
 
         function updateBusinessWarnings() {
             document.querySelectorAll('.login-warning').forEach(w => {
@@ -527,7 +558,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const regForm = document.getElementById('registerCompanyForm');
 
     if (marketLoginWarning || dataConsentSection || databaseSection) {
-        let isLoggedIn = false;
+        const isLoggedIn = authed();
         let companies = [];
 
         // Load from localStorage
@@ -651,7 +682,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const newCommentInput = document.getElementById('newComment');
 
     if (hubLoginWarning || commentArea) {
-        let isLoggedIn = false;
+        const isLoggedIn = authed();
         let comments = [];
 
         function loadComments() {
@@ -750,7 +781,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const startDateInput = document.getElementById('startDate');
 
     if (hireAdminForm) {
-        let isLoggedIn = false;
+        const isLoggedIn = authed();
         if (hireLoginWarning) {
             isLoggedIn ? hireLoginWarning.classList.add('hidden') : hireLoginWarning.classList.remove('hidden');
         }
@@ -797,7 +828,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const simulateBtn = document.getElementById('simulatePurchaseBtn');
 
     if (refLoginWarning && refContent) {
-        let isLoggedIn = false;
+        const isLoggedIn = authed();
         let referralData = { referralCode: '', referrals: [], totalEarned: 0 };
 
         function initReferralData() {

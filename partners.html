@@ -76,7 +76,7 @@
 
                 <!-- Login warning (hidden by default, shown via JS if not logged in) -->
                 <div id="loginWarning" class="login-warning hidden">
-                    ⚠️ You are not logged in. <a href="profile.html">Please log in or create a profile</a> before submitting a partnership application.
+                    ⚠️ You are not logged in. <a href="profile.html">Sign in with Google</a> before submitting a partnership application.
                 </div>
 
                 <!-- Partner Type Dropdown -->
@@ -117,6 +117,8 @@
     <!-- ============================================================ -->
     <!-- 3. EXTERNAL JAVASCRIPT                                       -->
     <!-- ============================================================ -->
+    <!-- auth.js first: it owns the Google session app.js gates on -->
+    <script src="auth.js"></script>
     <script src="app.js"></script>
 
 </body>

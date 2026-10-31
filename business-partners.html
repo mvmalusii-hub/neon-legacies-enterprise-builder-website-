@@ -76,7 +76,7 @@
                 <p>Schedule a confidential one‑on‑one session with Msimelelo Victor Malusi. These sessions are for established business owners ready to explore partnerships, capital injection, or strategic overhauls.</p>
 
                 <div id="loginWarning1" class="login-warning hidden">
-                    ⚠️ You are not logged in. <a href="profile.html">Please log in or create a profile</a> to book a session.
+                    ⚠️ You are not logged in. <a href="profile.html">Sign in with Google</a> to book a session.
                 </div>
 
                 <form id="directorSessionForm">
@@ -123,7 +123,7 @@
                 <p>If you are a business owner (existing client or not) and you want to explore a joint venture, capital partnership, or innovation collaboration, complete the form below. Your business will be listed as a <strong>Prospective Partner</strong> while we evaluate the opportunity.</p>
 
                 <div id="loginWarning2" class="login-warning hidden">
-                    ⚠️ You are not logged in. <a href="profile.html">Please log in or create a profile</a> to apply.
+                    ⚠️ You are not logged in. <a href="profile.html">Sign in with Google</a> to apply.
                 </div>
 
                 <form id="partnerApplicationForm">
@@ -180,6 +180,8 @@
     <!-- ============================================================ -->
     <!-- 3. EXTERNAL JAVASCRIPT                                       -->
     <!-- ============================================================ -->
+    <!-- auth.js first: it owns the Google session app.js gates on -->
+    <script src="auth.js"></script>
     <script src="app.js"></script>
 
 </body>

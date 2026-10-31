@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile & Create Profile | Neon Legacies Enterprise Builder</title>
     <meta name="description" content="Create your Neon Legacies Enterprise Builder profile and manage your account settings. Sign up or log in to access advanced features.">
 
@@ -72,6 +74,23 @@
             <!-- Page Header -->
             <h2 class="section-title">👤 Your Profile</h2>
 
+            <!-- Signed-in account card – filled in by auth.js, hidden when logged out -->
+            <div id="accountPanel" class="form-card account-panel hidden"></div>
+
+            <!-- Google Sign-in (Google Identity Services – see auth.js) -->
+            <div class="form-card google-card">
+                <h3 class="google-card-title"><i class="fab fa-google"></i> Sign in with your Google account</h3>
+                <p class="google-card-hint">
+                    No password to remember. Google shares only your name, email address
+                    and profile photo with us – see our <a href="privacy.html">privacy policy</a>.
+                    Signing in unlocks the Business Hub, market leads, referrals and the
+                    partner application forms.
+                </p>
+                <!-- Google renders its official button inside this container -->
+                <div id="googleSignInContainer" class="google-signin-container"></div>
+                <div class="message" id="authMessage"></div>
+            </div>
+
             <!-- Tabs -->
             <div class="tab-container">
                 <button class="tab-btn active" id="loginTab">Login</button>
@@ -90,6 +109,7 @@
                         <input type="password" id="loginPassword" required>
                     </div>
                     <button type="submit" class="btn">Log In →</button>
+                    <!-- Fallback: used when Google's own button could not be rendered -->
                     <button type="button" class="btn google-btn" id="googleLoginBtn">
                         <i class="fab fa-google"></i> Sign in with Google
                     </button>
@@ -141,7 +161,10 @@
 
     <!-- ============================================================ -->
     <!-- 3. EXTERNAL JAVASCRIPT (Replaces all inline JS)              -->
+    <!--    auth.js must load first: it owns the Google session that  -->
+    <!--    app.js reads when it decides whether a form is unlocked.  -->
     <!-- ============================================================ -->
+    <script src="auth.js"></script>
     <script src="app.js"></script>
 
 </body>

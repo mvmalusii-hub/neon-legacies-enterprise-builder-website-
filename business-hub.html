@@ -88,7 +88,7 @@
             <h2 class="section-title">💬 Live Discussion</h2>
             <div class="comment-section">
                 <div id="loginWarning" class="login-warning hidden">
-                    ⚠️ You are not logged in. <a href="profile.html">Please log in or create a profile</a> to join the conversation.
+                    ⚠️ You are not logged in. <a href="profile.html">Sign in with Google</a> to join the conversation.
                 </div>
                 <div id="commentArea" class="hidden">
                     <div class="comment-list" id="commentList">
@@ -119,6 +119,8 @@
     <!-- ============================================================ -->
     <!-- 3. EXTERNAL JAVASCRIPT                                       -->
     <!-- ============================================================ -->
+    <!-- auth.js first: it owns the Google session app.js gates on -->
+    <script src="auth.js"></script>
     <script src="app.js"></script>
 
 </body>

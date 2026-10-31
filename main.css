@@ -293,6 +293,147 @@ body {
     font-weight: bold;
     color: inherit;
 }
+
+/* ============================================================ */
+/* GOOGLE SIGN-IN + ACCOUNT PANEL (auth.js)                      */
+/* ============================================================ */
+.tab-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.tab-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid #cbd5e1;
+    background: white;
+    border-radius: 40px;
+    font-family: inherit;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.tab-btn:hover {
+    border-color: #0f172a;
+    color: #0f172a;
+}
+.tab-btn.active {
+    background: #0f172a;
+    border-color: #0f172a;
+    color: #fbbf24;
+}
+.google-card {
+    text-align: center;
+    border: 2px solid #e2e8f0;
+}
+.google-card-title {
+    font-size: 1.2rem;
+    color: #0f172a;
+    margin-bottom: 10px;
+}
+.google-card-title i {
+    color: #4285f4;
+    margin-right: 6px;
+}
+.google-card-hint {
+    color: #475569;
+    font-size: 0.9rem;
+    max-width: 540px;
+    margin: 0 auto 20px;
+}
+.google-card-hint a {
+    color: #0f172a;
+    font-weight: 600;
+}
+.google-signin-container {
+    display: flex;
+    justify-content: center;
+    min-height: 44px;   /* stops the card jumping while Google renders */
+}
+.google-btn {
+    background: white;
+    color: #1f1f1f;
+    border: 1px solid #747775;
+    margin-left: 10px;
+    font-weight: 600;
+}
+.google-btn:hover {
+    background: #f8f9fa;
+    color: #1f1f1f;
+}
+.google-btn i {
+    color: #4285f4;
+    margin-right: 6px;
+}
+.auth-setup {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+.auth-setup code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.account-panel {
+    border-left: 5px solid #fbbf24;
+}
+.account-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+.account-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #0f172a;
+    color: #fbbf24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    flex: 0 0 auto;
+}
+.account-who h3 {
+    color: #0f172a;
+    margin-bottom: 4px;
+}
+.account-who p {
+    color: #475569;
+    margin-bottom: 2px;
+}
+.account-who p i {
+    color: #4285f4;
+    margin-right: 4px;
+}
+.account-meta {
+    font-size: 0.78rem;
+    color: #94a3b8;
+}
+.account-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+}
+.auth-chip {
+    margin-top: 14px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(251, 191, 36, 0.14);
+    color: #fbbf24;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+.auth-chip a {
+    color: #e2e8f0;
+    margin-left: 8px;
+    text-decoration: underline;
+}
 .footer-contact {
     background: #0f172a;
     color: #94a3b8;
