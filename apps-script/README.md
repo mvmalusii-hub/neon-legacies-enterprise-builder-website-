@@ -90,12 +90,14 @@ curl -sS -X POST '<EXEC_URL>' -H 'Content-Type: text/plain' \
 ```bash
 node apps-script/test/code.test.js   # the Apps Script backend
 node apps-script/test/app.test.js    # the site-wide form hook, end to end
+node apps-script/test/forms.test.js  # every real <form> on the site, field by field
 ```
 
 `appsscript-stub.js` fakes `SpreadsheetApp`, `MailApp`, `CacheService`,
 `LockService` and `PropertiesService`, so `Code.gs` runs unmodified. The tests
 replay real payloads from every page, including the id-only field names and the
-placeholder-only liquor / spaza forms.
+placeholder-only liquor / spaza forms. `forms.test.js` parses the actual HTML
+and fails if any visible field would be dropped (`9 forms, 87 fields`).
 
 ## What v2 fixed (audit, 31 Oct 2026)
 

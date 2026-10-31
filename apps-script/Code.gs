@@ -72,7 +72,7 @@ var ALIASES = {
 
 /** Loose matchers used when no alias hits (e.g. free-text labels). */
 var PATTERNS = {
-  name: /(^|_)name$|fullname|contactperson/,
+  name: /name$|fullname|contactperson/,
   email: /email/,
   phone: /phone|telephone|mobile|cell|whatsapp|contactnumber/,
   company: /company|businessname|organisation|organization|trading/,

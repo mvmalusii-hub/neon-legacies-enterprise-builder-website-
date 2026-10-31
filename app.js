@@ -163,7 +163,7 @@ window.NEON_LEADS = {
 
     /** Looser matches for labels that no alias covers. */
     patterns: {
-        name: /(^|_)name$|fullname|contactperson/,
+        name: /name$|fullname|contactperson/,
         email: /email/,
         phone: /phone|telephone|mobile|cell|whatsapp|contactnumber/,
         company: /company|businessname|organisation|organization|trading/,
