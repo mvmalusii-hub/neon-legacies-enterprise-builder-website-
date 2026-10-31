@@ -51,20 +51,42 @@
             <i class="fas fa-sign-out-alt"></i>
             <h2>You have been signed out</h2>
             <p>Your session details have been cleared from this device. You can sign in again from the Business Hub at any time.</p>
+            <p class="fine" id="signedOutAs"></p>
             <a class="btn" href="index.html">Back to Home</a>
             <p class="fine">Taking you back to the home page in <span id="countdown">5</span> seconds…</p>
         </div>
     </main>
 
+    <!-- auth.js owns the Google session, so it ends it properly -->
+    <script src="auth.js"></script>
     <script>
-        // Clear any locally stored session data for this site.
+        // 1. End the Google session (auth.js also tells Google to stop
+        //    auto-selecting this account on the site).
+        var signedOutAs = '';
         try {
-            ['user', 'userEmail', 'profile', 'session', 'authToken'].forEach(function (key) {
+            if (window.NEON_AUTH) {
+                var user = window.NEON_AUTH.getUser();
+                if (user && user.email) { signedOutAs = user.email; }
+                window.NEON_AUTH.logout();
+            }
+        } catch (e) {
+            // auth.js may be blocked – the sweep below still clears storage.
+        }
+
+        // 2. Clear any other locally stored session data for this site.
+        try {
+            ['user', 'userEmail', 'profile', 'session', 'authToken', 'neonAuthSession'].forEach(function (key) {
                 localStorage.removeItem(key);
             });
             sessionStorage.clear();
         } catch (e) {
             // Storage may be unavailable (private mode) – ignore.
+        }
+
+        // 3. Say which Google account was signed out.
+        if (signedOutAs) {
+            var who = document.getElementById('signedOutAs');
+            if (who) { who.textContent = 'Signed out: ' + signedOutAs; }
         }
 
         var remaining = 5;

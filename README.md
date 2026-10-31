@@ -41,6 +41,18 @@ Neon Legacies Enterprise Builder-website/
 ├── industry-warehousing.html # Logistics & Warehousing
 ├── industry-ngo.html # NGO / Non‑Profit Organisation (NPO)
 │
+├── app.js # Site-wide JS: forms → Apps Script, gated member areas
+├── auth.js # Sign in with Google (Google Identity Services)
+├── main.css # Site stylesheet
+├── profile.html # Sign in / sign up + your account card
+├── logout.html # Ends the Google session
+│
+├── apps-script/
+│ ├── Code.gs # Lead intake + OAuth token verification (option A)
+│ ├── Auth.gs # Google account login, no OAuth client needed (option B)
+│ ├── README.md # How to deploy both
+│ └── test/ # Node tests (run the real Code.gs, Auth.gs, auth.js, app.js)
+│
 ├── assets/
 │ ├── css/
 │ │ └── style.css # (optional – external styles)
@@ -89,9 +101,82 @@ Neon Legacies Enterprise Builder-website/
 
 ---
 
+## 🔐 Sign in with Google
+
+Members sign in with their **Google account** – no password for us to store.
+There are two ways to switch it on; the site automatically uses whichever is
+configured. Until one is set, the button says exactly what is missing instead of
+pretending to work – and the **Set up Google sign-in** panel on `profile.html`
+lets the owner paste either credential and test it in the browser before
+committing it to a file.
+
+### Option B – Apps Script (recommended · ~3 minutes · no Google Cloud Console)
+
+Uses `apps-script/Auth.gs`: a tiny web app deployed to run as *the person
+visiting it*, so **Google signs them in first** and the script simply reads
+their Google address. It needs no permissions, so visitors never see a consent
+screen.
+
+1. <https://script.google.com> → **New project** → paste `apps-script/Auth.gs`
+   → Save.
+2. **Deploy ▸ New deployment ▸ Web app**
+   - *Execute as:* **User accessing the web app** ← this is what makes it their
+     Google account
+   - *Who has access:* **Anyone with Google account**
+   - Deploy.
+3. Paste the `/exec` URL into `auth.js` → `NEON_AUTH.authEndpoint`
+   (or into the setup panel on `profile.html` to test on that device first).
+
+How it works: the visitor is sent to the web app; Google makes sure it is
+*their* account; the script mints a 64-character session token (stored hashed in
+its own properties), sends the visitor back with `#nl_auth=…`; `auth.js` strips
+the token from the address bar, then re-checks it with the script over JSONP on
+every visit and revokes it server-side on sign-out.
+
+### Option A – Google Identity Services (nicer button · ~5 minutes)
+
+Google's own button, name and profile photo – but someone has to create an
+OAuth client id first:
+
+1. <https://console.cloud.google.com/apis/credentials> → **Create
+   credentials ▸ OAuth client ID ▸ Web application**.
+2. *Authorised JavaScript origins*: `https://www.neonlegacies.co.za`
+   (add `http://localhost:8000` while testing).
+3. Paste the client id into **both**:
+   - `auth.js` → `NEON_AUTH.googleClientId`
+   - `apps-script/Code.gs` → `GOOGLE.CLIENT_ID`
+
+   They must match, or every token is refused as *wrong audience*.
+
+How it works: Google Identity Services returns an **ID token** (a JWT signed by
+Google); `auth.js` asks Google itself (`oauth2.googleapis.com/tokeninfo`) to
+confirm it – right issuer, right audience, unexpired, **verified** email – before
+creating a session. The sign-in is also verified a second time in `Code.gs` and
+recorded in the **Logins** tab.
+
+### Both routes
+
+The session unlocks the member areas (business hub, market leads, referrals,
+partner and international applications, strategic growth, hire-admin) for 7 days
+and is ended by `logout.html`.
+
+### Test it
+
+```bash
+node apps-script/test/google-auth.test.js   # 50 tests, ~390 assertions
+```
+
+The suite runs the real `Code.gs`, `Auth.gs`, `auth.js` and `app.js` (through an
+Apps Script stub and a small fake DOM): token verification, both login routes,
+session handling, sign-out, gated-page unlocking, XSS escaping and page wiring.
+
+---
+
 ## 📦 Dependencies
 
 - None – the site uses vanilla HTML/CSS and Font Awesome (CDN).
+- Sign in with Google loads Google Identity Services from
+  `accounts.google.com/gsi/client` on the pages that need it (`auth.js`).
 - No build step required.
 
 ---
@@ -121,7 +206,15 @@ See `.gitignore` – excludes system files (`.DS_Store`), editor settings, temp 
 
 - [ ] Replace logo placeholder with actual logo image.
 - [ ] Add actual PDFs to `assets/pdfs/`.
-- [ ] Connect contact form to a backend (optional).
+- [x] Connect contact form to a backend – `apps-script/Code.gs` (see its README).
+- [x] Sign in with Google – `auth.js` + `Auth.gs` (no OAuth client) or `Code.gs`.
+- [x] Auth.gs deployed as a web app and wired into `auth.js`
+  (`NEON_AUTH.authEndpoint`, deployment `AKfycbzi1M47…`; anonymous probe shows
+  Google's sign-in redirect, which is correct).
+- [ ] Final check on the live site: press "Sign in with Google", pick an
+  account, confirm it returns to `profile.html` signed in and the Business Hub
+  opens.
+- [ ] Password sign-in / email verification (needs a user store in Apps Script).
 - [ ] Add Google Analytics (optional).
 
 ---
