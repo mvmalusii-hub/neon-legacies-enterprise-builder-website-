@@ -42,14 +42,40 @@ window.NEON_LEADS = {
     collect: function (form) {
         const data = {};
         Array.prototype.forEach.call(form.elements, function (el) {
-            if (!el.name && !el.id) { return; }
-            const key = el.name || el.id;
+            if (el.name === '_hp' && !el.value) { return; }
+            let key = el.name || el.id;
+            if (!key && el.placeholder) { key = el.placeholder.slice(0, 40); }   // unnamed fields (liquor / spaza forms)
+            if (!key && el.tagName === 'SELECT') { key = 'selection'; }
+            if (!key) { return; }
             if (el.type === 'checkbox') {
                 data[key] = el.checked;
             } else if (el.type === 'radio') {
                 if (el.checked) { data[key] = el.value; }
             } else if (el.type !== 'submit' && el.type !== 'button' && el.type !== 'password') {
                 if (!(key in data) || el.value) { data[key] = el.value; }
+            }
+        });
+        return data;
+    },
+
+    /** Maps page-specific field names onto the keys Code.gs expects. */
+    normalize: function (data) {
+        const alias = {
+            name: ['fullName', 'directorName', 'signupName', 'Full name'],
+            email: ['businessEmail', 'directorEmail', 'signupEmail', 'Email address'],
+            phone: ['businessPhone', 'directorPhone', 'signupPhone', 'Phone number'],
+            company: ['companyName', 'businessName', 'partnerCompanyName', 'regCompanyName'],
+            message: ['notes', 'directorIdea', 'painPoints', 'growthGoals', 'partnerDescription', 'regServices']
+        };
+        Object.keys(alias).forEach(function (target) {
+            if (data[target]) { return; }
+            for (let i = 0; i < alias[target].length; i++) {
+                const v = data[alias[target][i]];
+                if (v) { data[target] = v; return; }
+            }
+            if (target === 'message') {
+                const k = Object.keys(data).filter(function (x) { return x.indexOf('Tell me about') === 0 && data[x]; })[0];
+                if (k) { data.message = data[k]; }
             }
         });
         return data;
@@ -90,7 +116,7 @@ window.NEON_LEADS = {
     /** Collect + submit a form. */
     submit: function (form) {
         if (!form) { return Promise.resolve(); }
-        const payload = this.collect(form);
+        const payload = this.normalize(this.collect(form));
         payload.formType = this.formName(form);
         payload.token = this.token;
         payload.id = 'lead-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);

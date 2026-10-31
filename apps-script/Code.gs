@@ -51,15 +51,17 @@ function doPost(e) {
     if (cache.get('lead:' + id)) { return out({ ok: true, duplicate: true, id: id }); }
 
     // 4. Minimal validation.
-    var name = String(data.name || '').trim();
+    var name = String(data.name || data.company || '').trim();
+    data.name = name;
     var email = String(data.email || '').trim();
     if (!name) { return out({ ok: false, error: 'name required' }); }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    var phone = String(data.phone || '').trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return out({ ok: false, error: 'valid email required' });
     }
 
     // 5. Throttle: max 5 submissions per email address per hour.
-    var throttleKey = 'thr:' + email.toLowerCase();
+    var throttleKey = 'thr:' + (email || phone || name + ':' + data.formType).toLowerCase();
     var hits = Number(cache.get(throttleKey) || 0);
     if (hits >= 5) { return out({ ok: false, error: 'too many submissions' }); }
 
@@ -72,7 +74,7 @@ function doPost(e) {
 
     // 7. Tell the team, then receipt the customer.
     notifyTeam(reference, data);
-    if (CONFIG.AUTO_REPLY) { receiptCustomer(reference, data); }
+    if (CONFIG.AUTO_REPLY && email) { receiptCustomer(reference, data); }
 
     return out({ ok: true, id: id, reference: reference });
   } catch (err) {
