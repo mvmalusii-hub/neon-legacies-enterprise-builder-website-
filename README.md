@@ -130,6 +130,7 @@ File | Role
 `profile.html` | sign-in / sign-up, signed-in account panel, password change
 `reset.html` | choose a new password from an emailed link
 `logout.html` | ends the server session and clears this device
+`status.html` | live backend health check (version + row counts, or the exact fix)
 `apps-script/Code.gs` | leads + accounts backend (Sheets: `Leads`, `Users`, `Sessions`)
 `apps-script/README.md` | deployment, sheet schema, security notes, tests
 

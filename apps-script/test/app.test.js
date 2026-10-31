@@ -92,11 +92,12 @@ function loadApp(options) {
       querySelectorAll: () => []
     }
   };
-  if (opts.user) {
+  if (opts.user || opts.submitLead) {
     sandbox.NEON_AUTH = {
-      isLoggedIn: () => true,
-      user: () => Object.assign({}, opts.user)
+      isLoggedIn: () => !!opts.user,
+      user: () => (opts.user ? Object.assign({}, opts.user) : null)
     };
+    if (opts.submitLead) { sandbox.NEON_AUTH.submitLead = opts.submitLead; }
   }
   sandbox.window = sandbox;
   vm.createContext(sandbox);
@@ -301,10 +302,44 @@ test('gated forms only become leads for signed-in visitors', () => {
   eq(signedIn.sent[0].name, 'Lindi Traders', 'typed values win over the account');
 });
 
-/* ---------------------------------------------------------------- */
+/* -------------------- transport preference ------------------------ */
 
-const failures = results.filter(line => line.indexOf('FAIL') === 0);
-results.forEach(line => console.log(line));
-console.log('\n' + results.length + ' tests, ' + checks + ' assertions, ' + failures.length + ' failures');
-if (failures.length) { process.exit(1); }
-console.log('ALL TESTS PASSED');
+function asyncTest(name, fn) {
+  return Promise.resolve().then(fn).then(
+    () => { results.push('PASS  ' + name); },
+    err => { results.push('FAIL  ' + name + ' :: ' + err.message); }
+  );
+}
+
+(async function run() {
+  await asyncTest('leads go through the readable transport when it is available', async () => {
+    const app = loadApp({ submitLead: () => Promise.resolve({ ok: true, reference: 'HIR-261031-1234' }) });
+    const form = makeForm('hireAdminForm', hireAdminForm);
+    const res = await app.leads.submit(form);
+    eq(res.reference, 'HIR-261031-1234', 'server reference handed back');
+    eq(app.sent.length, 0, 'no blind no-cors fetch');
+    eq(app.stored.neonLeadQueue, undefined, 'nothing queued when accepted');
+  });
+
+  await asyncTest('a lead the server never answered is queued instead of lost', async () => {
+    const app = loadApp({ submitLead: () => Promise.resolve({ ok: false, network: true }) });
+    const form = makeForm('growthForm', growthForm);
+    await app.leads.submit(form);
+    const queue = JSON.parse(app.stored.neonLeadQueue || '[]');
+    eq(queue.length, 1, 'payload kept for the next visit');
+    eq(queue[0].formType, 'Growth Consultation', 'the right form');
+  });
+
+  await asyncTest('without the transport it falls back to the old POST', async () => {
+    const app = loadApp();
+    const form = makeForm('growthForm', growthForm);
+    await app.leads.submit(form);
+    eq(app.sent.length, 1, 'legacy no-cors POST still works');
+  });
+
+  const failures = results.filter(line => line.indexOf('FAIL') === 0);
+  results.forEach(line => console.log(line));
+  console.log('\n' + results.length + ' tests, ' + checks + ' assertions, ' + failures.length + ' failures');
+  if (failures.length) { process.exit(1); }
+  console.log('ALL TESTS PASSED');
+})();

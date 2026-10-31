@@ -255,6 +255,20 @@ window.NEON_LEADS = {
     send: function (payload) {
         const self = this;
         if (!this.isConfigured()) { this.queue(payload); return Promise.resolve({ queued: true }); }
+
+        // Preferred: the iframe transport returns a real answer, so a broken
+        // deployment is detected instead of silently swallowing the lead.
+        if (window.NEON_AUTH && typeof window.NEON_AUTH.submitLead === 'function') {
+            return window.NEON_AUTH.submitLead(payload).then(function (res) {
+                if (res && res.ok) { return res; }
+                if (!res || res.network) { self.queue(payload); }
+                return res || { queued: true };
+            }, function () {
+                self.queue(payload);
+                return { queued: true };
+            });
+        }
+
         return fetch(this.url(), {
             method: 'POST',
             mode: 'no-cors',                      // Apps Script sends no CORS headers

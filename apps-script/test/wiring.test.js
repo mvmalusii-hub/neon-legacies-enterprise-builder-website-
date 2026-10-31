@@ -43,10 +43,11 @@ test('profile page exposes everything app.js binds to', () => {
 });
 
 test('account pages load the client', () => {
-  ['logout.html', 'reset.html'].forEach(page => {
+  ['logout.html', 'reset.html', 'status.html'].forEach(page => {
     ok(read(page).indexOf('src="auth.js"') !== -1, page + ' loads auth.js');
   });
   ok(read('reset.html').indexOf('src="reset.js"') !== -1, 'reset.html loads reset.js');
+  ok(read('status.html').indexOf('src="status.js"') !== -1, 'status.html loads status.js');
 });
 
 test('no page still pretends the visitor is logged out', () => {

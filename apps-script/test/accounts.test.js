@@ -206,6 +206,52 @@ test('account calls need the shared site token and a known action', () => {
   eq(svc.sheet('Sessions').rows[0].slice(0, 3).join(','), 'Token Hash,User Id,Email', 'Sessions headers');
 });
 
+test('diagnose reports the deployment health without leaking data', () => {
+  const svc = loadCode();
+  signup(svc);
+  const report = svc.auth('diagnose', { token: TOKEN });
+  eq(report.ok, true, 'healthy');
+  eq(report.version, 3, 'version');
+  eq(report.tabs.Leads, 1, 'lead rows counted');
+  eq(report.tabs.Users, 1, 'account rows counted');
+  eq(report.tabs.Sessions, 1, 'session rows counted');
+  ok(report.problems.length === 0, 'no problems');
+  const payload = JSON.stringify(report);
+  ok(payload.indexOf('lindi@example.co.za') === -1, 'no personal data in the health check');
+  ok(payload.indexOf('Hash') === -1, 'no password material in the health check');
+
+  const empty = loadCode().auth('diagnose', { token: TOKEN });
+  eq(empty.ok, false, 'flags a workbook with no tabs');
+  ok(empty.problems.length >= 2, 'lists the missing tabs: ' + empty.problems.join(', '));
+});
+
+test('leads sent through the form transport return a real reference', () => {
+  const svc = loadCode();
+  const result = svc.callEncoded({
+    action: 'lead', token: TOKEN, id: 'lead-form-1', formType: 'Hire Admin',
+    name: 'Bright Admin Co', email: 'owner@bright.co.za', phone: '0734445555',
+    company: 'Bright Admin Co', message: 'We use Google Drive',
+    fields: { 'Contract length': '2 years', 'Services Required': 'Compliance Filing, Bookkeeping' }
+  });
+  eq(result.ok, true, 'lead accepted over the iframe transport');
+  ok(/^HIR-\d{6}-\d{4}$/.test(result.reference), 'reference returned: ' + result.reference);
+
+  const row = rows(svc, 'Leads')[0];
+  eq(row.Name, 'Bright Admin Co', 'name stored');
+  eq(row.Email, 'owner@bright.co.za', 'email stored');
+  eq(row.Phone, '0734445555', 'phone stored');
+  eq(row.Message, 'We use Google Drive', 'message stored');
+  ok(row['Payload JSON'].indexOf('Compliance Filing') !== -1, 'checkbox answers kept');
+
+  const duplicate = svc.callEncoded({ action: 'lead', token: TOKEN, id: 'lead-form-1', name: 'X', email: 'x@y.co' });
+  eq(duplicate.duplicate, true, 'retry is idempotent');
+  eq(rows(svc, 'Leads').length, 1, 'no duplicate row');
+
+  const spam = svc.callEncoded({ action: 'lead', token: TOKEN, id: 'lead-form-2', name: 'Bot', _hp: 'filled' });
+  eq(spam.ok, true, 'honeypot still pretends success');
+  eq(rows(svc, 'Leads').length, 1, 'honeypot stored nothing');
+});
+
 /* ---------------------------------------------------------------- */
 
 const failures = results.filter(line => line.indexOf('FAIL') === 0);

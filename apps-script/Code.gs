@@ -28,7 +28,9 @@
 var CONFIG = {
   NOTIFY_EMAILS: 'mv.malusii@gmail.com',   // comma-separate for several people
   SHARED_TOKEN: '32bb90901d4b2c3323c1bb87cb08940f341040813634abc0', // must match window.NEON_LEADS.token in app.js
-  SPREADSHEET_ID: '',                      // blank = sheet this script is bound to
+  // Pinned so a stray 'bound' script can never write to the wrong file.
+  // Override with '' to fall back to whatever spreadsheet the script is bound to.
+  SPREADSHEET_ID: '1fesZbrtngs6l8zXG2mEQbsARucD4BbwXHHhj9rDd2dw',
   SHEET_TAB: 'Leads',
   AUTO_REPLY: true,
   SITE: 'https://www.neonlegacies.co.za',
@@ -59,7 +61,7 @@ var SESSION_HEADERS = ['Token Hash', 'User Id', 'Email', 'Created', 'Expires',
                        'Device', 'Last Seen'];
 
 var AUTH_ACTIONS = ['signup', 'login', 'session', 'logout', 'updateProfile',
-                    'changePassword', 'requestReset', 'resetPassword'];
+                    'changePassword', 'requestReset', 'resetPassword', 'diagnose', 'lead'];
 
 /** Known-good keys per canonical field, most specific first. */
 var ALIASES = {
@@ -142,27 +144,51 @@ function doPost(e) {
       return out({ ok: false, error: 'unauthorised' });
     }
 
-    // 3. Idempotency – double-clicks and retries must not duplicate rows.
-    var id = String(data.id || Utilities.getUuid());
-    var cache = CacheService.getScriptCache();
-    if (cache.get('lead:' + id)) { return out({ ok: true, duplicate: true, id: id }); }
+    // 3-7. Idempotency, validation, throttle, write, notify, receipt.
+    return out(persistLead_(data));
+  } catch (err) {
+    console.error(err);                      // logged for the owner, hidden from the browser
+    return out({ ok: false, error: 'server error' });
+  } finally {
+    try { lock.releaseLock(); } catch (ignore) {}
+  }
+}
+
+/* ------------------------------------------------------------------------- *
+ *  PAYLOAD NORMALISATION
+ * ------------------------------------------------------------------------- */
+
+
+/**
+ * Shared lead pipeline: idempotency, validation, throttling, the sheet row, the
+ * team email and the customer receipt. Used by both the no-cors POST and the
+ * readable iframe transport (`action: 'lead'`).
+ */
+function persistLead_(data) {
+  // Honeypot – the readable transport reaches this function directly.
+  if (data._hp) { return { ok: true }; }
+
+  // 3. Idempotency – double-clicks and retries must not duplicate rows.
+  var id = String(data.id || Utilities.getUuid());
+  var cache = CacheService.getScriptCache();
+  if (cache.get('lead:' + id)) { return { ok: true, duplicate: true, id: id }; }
 
     // 4. Normalise every field naming convention the site uses, then validate.
     var lead = canonicalize(data);
 
     if (!lead.name && lead.company) { lead.name = lead.company; }
     if (lead.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email)) {
-      return out({ ok: false, error: 'valid email required' });
+      return { ok: false, error: 'valid email required' };
     }
     if (!lead.name && !lead.email && !lead.phone) {
-      return out({ ok: false, error: 'contact details required (name, email or phone)' });
+      return { ok: false, error: 'contact details required (name, email or phone)' };
     }
 
     // 5. Throttle: max 5 submissions per email (or phone / sender) per hour.
     var throttleId = (lead.email || lead.phone || 'anon').toLowerCase();
     var throttleKey = 'thr:' + throttleId;
     var hits = Number(cache.get(throttleKey) || 0);
-    if (hits >= 5) { return out({ ok: false, error: 'too many submissions' }); }
+    if (hits >= 5) { return { ok: false, error: 'too many submissions' }; }
 
     // 6. Persist.
     var reference = makeReference(data.formType);
@@ -178,18 +204,8 @@ function doPost(e) {
       try { receiptCustomer(reference, lead); } catch (replyErr) { console.error(replyErr); }
     }
 
-    return out({ ok: true, id: id, reference: reference });
-  } catch (err) {
-    console.error(err);                      // logged for the owner, hidden from the browser
-    return out({ ok: false, error: 'server error' });
-  } finally {
-    try { lock.releaseLock(); } catch (ignore) {}
-  }
+    return { ok: true, id: id, reference: reference };
 }
-
-/* ------------------------------------------------------------------------- *
- *  PAYLOAD NORMALISATION
- * ------------------------------------------------------------------------- */
 
 /** Accepts JSON, text/plain JSON, form-encoded and query-string posts. */
 function parseBody(e) {
@@ -202,7 +218,12 @@ function parseBody(e) {
     raw.split('&').forEach(function (pair) {
       if (!pair) { return; }
       var bits = pair.split('=');
-      parsed[decodeURIComponent(bits[0])] = decodeURIComponent((bits[1] || '').replace(/\+/g, ' '));
+      var value = decodeURIComponent((bits[1] || '').replace(/\+/g, ' '));
+      var trimmed = value.replace(/^\s+|\s+$/g, '');
+      if (trimmed.charAt(0) === '{' || trimmed.charAt(0) === '[') {
+        try { value = JSON.parse(trimmed); } catch (ignoreJson) {}
+      }
+      parsed[decodeURIComponent(bits[0])] = value;
     });
     if (Object.keys(parsed).length) { return parsed; }
   }
@@ -572,6 +593,8 @@ function handleAuth(data) {
     case 'changePassword': return authChangePassword_(data);
     case 'requestReset': return authRequestReset_(data);
     case 'resetPassword': return authResetPassword_(data);
+    case 'diagnose': return authDiagnose_(data);
+    case 'lead': return persistLead_(data);
     default: return { ok: false, error: 'unknown action' };
   }
 }
@@ -1079,4 +1102,40 @@ function testAccounts() {
     rejectsWrong: !safeEqual_(first, hashPassword_('TestPass124', salt, 10)),
     iterations: CONFIG.HASH_ITERATIONS
   };
+}
+
+/* --------------------------- diagnostics -------------------------- */
+
+/**
+ * Health check the website can actually read (unlike doGet, which fetch()
+ * cannot see cross-origin). Returns row counts only – no personal data – so a
+ * broken deployment is visible in seconds instead of silently swallowing leads.
+ */
+function authDiagnose_() {
+  var report = {
+    ok: true,
+    version: CONFIG.VERSION,
+    brand: CONFIG.BRAND,
+    checkedAt: new Date().toISOString(),
+    spreadsheet: CONFIG.SPREADSHEET_ID ? 'pinned' : 'bound',
+    tabs: {}
+  };
+  try {
+    var ss = openSpreadsheet_();
+    report.spreadsheetTitle = ss.getName ? ss.getName() : '';
+    [CONFIG.SHEET_TAB, CONFIG.ACCOUNTS_TAB, CONFIG.SESSIONS_TAB].forEach(function (name) {
+      var sheet = ss.getSheetByName(name);
+      var rows = sheet ? Math.max(sheet.getLastRow() - 1, 0) : -1;
+      report.tabs[name] = rows;
+    });
+    report.ok = report.tabs[CONFIG.SHEET_TAB] >= 0 && report.tabs[CONFIG.ACCOUNTS_TAB] >= 0;
+    report.problems = [];
+    if (report.tabs[CONFIG.SHEET_TAB] < 0) { report.problems.push('missing tab: ' + CONFIG.SHEET_TAB); }
+    if (report.tabs[CONFIG.ACCOUNTS_TAB] < 0) { report.problems.push('missing tab: ' + CONFIG.ACCOUNTS_TAB); }
+    if (report.tabs[CONFIG.SESSIONS_TAB] < 0) { report.problems.push('missing tab: ' + CONFIG.SESSIONS_TAB); }
+  } catch (err) {
+    report.ok = false;
+    report.error = String(err && err.message ? err.message : err);
+  }
+  return report;
 }

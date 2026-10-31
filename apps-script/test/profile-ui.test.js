@@ -192,7 +192,7 @@ function loadPage(svc, storage) {
         const fields = {};
         node.children.forEach(child => { if (child.tagName === 'INPUT' && child.name) { fields[child.name] = child.value; } });
         requested.push(fields.action);
-        const response = svc.postRaw(fields);
+        const response = svc.postEncoded(fields);
         const match = /postMessage\((\{.*?\}), '\*'\)/.exec(response.body);
         if (!match) { throw new Error('no postMessage reply'); }
         const message = JSON.parse(match[1].replace(/\\u003c/g, '<'));

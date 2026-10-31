@@ -69,8 +69,11 @@ rows untouched. No data is moved or deleted.
 
 ## Verify
 
+- **Status page** (fastest): open `status.html` on the site. It calls the deployment
+  through the readable transport and shows **healthy**, the service version and the
+  row count of each tab – or **unreachable** with the exact fix.
 - **Health check**: open the `/exec` URL in a browser; you should see
-  `{"ok":true,"service":"neon-legacies-leads","version":2}`.
+  `{"ok":true,"service":"neon-legacies-leads","version":3}`.
 - **Sheet + email**: in the Apps Script editor run `sendTestLead()` once. It
   writes a `TES-…` row using mixed field names (`businessEmail`, `total`) and
   sends the team email – proof that the field aliases work.
@@ -214,6 +217,24 @@ node apps-script/test/forms.test.js       # every real <form> on the site
 node apps-script/test/wiring.test.js      # pages load the right scripts
 node apps-script/test/profile-ui.test.js  # profile page UI -> auth.js -> Code.gs
 ```
+
+## The deployed endpoint (read this first)
+
+`CONFIG.SPREADSHEET_ID` is now **pinned** to the leads workbook, so a script
+bound to the wrong file can never scatter rows. The tabs are `Leads`, `Users`
+and `Sessions` (the workbook already carries all three with their headers).
+
+On 31 Oct 2026 the deployment ID shipped in `app.js`
+(`AKfycbzM082roGPD0iDJy8XgmSdFATcPS8Ma5b2Y7XtAAEiO`) answered **HTTP 404**, the
+workbook had no `Leads` tab, and Gmail had never received a `New website
+submission` alert – i.e. no form submission had ever reached a backend. If
+`status.html` still says *unreachable*, the deployment has not been created:
+follow **Deploy it** above and paste the new `/exec` URL (or bare ID) into
+`app.js` and `order-documents.html`.
+
+Leads now travel over the same readable transport as accounts, so the page gets
+`{ok, reference}` back. If the server does not answer, the payload is queued in
+`localStorage` and retried on the next visit instead of vanishing.
 
 ## Auditing an existing spreadsheet
 

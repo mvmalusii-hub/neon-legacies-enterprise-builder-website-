@@ -155,12 +155,31 @@ function loadCode(initialSheets) {
     return response;
   }
 
+  function postEncoded(params) {
+    const body = Object.keys(params).map(key => {
+      const value = params[key];
+      const text = value && typeof value === 'object' ? JSON.stringify(value) : String(value == null ? '' : value);
+      return encodeURIComponent(key) + '=' + encodeURIComponent(text);
+    }).join('&');
+    return sandbox.doPost({ postData: { contents: body, type: 'application/x-www-form-urlencoded' }, parameter: params });
+  }
+
   return {
     sheet: name => sheets[name || 'Leads'],
     sheets,
     mail,
     cache,
     props,
+    /** Mimes the browser's form POST into the iframe (urlencoded body). */
+    postEncoded: postEncoded,
+    /** Account/lead call over the form transport, returning the postMessage result. */
+    callEncoded: params => {
+      const request = Object.assign({ requestId: 'req-form' }, params);
+      const response = postEncoded(request);
+      const match = /postMessage\((\{.*?\}), '\*'\)/.exec(response.body);
+      if (!match) { throw new Error('no postMessage payload'); }
+      return JSON.parse(match[1].replace(/\\u003c/g, '<')).result;
+    },
     /** Raw ContentService reply (used by the auth transport test). */
     postRaw: params => doPost(params),
     /** Lead submission – returns the parsed JSON reply. */

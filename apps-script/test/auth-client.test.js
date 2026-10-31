@@ -82,7 +82,7 @@ function createPage(options) {
       if (child.tagName === 'INPUT' && child.name) { fields[child.name] = child.value; }
     });
     transportLog.push(fields.action);
-    const response = svc.postRaw(fields);
+    const response = svc.postEncoded(fields);
     const match = /postMessage\((\{.*?\}), '\*'\)/.exec(response.body);
     if (!match) { throw new Error('no postMessage in reply'); }
     const message = JSON.parse(match[1].replace(/\\u003c/g, '<'));
@@ -251,6 +251,28 @@ function storedAuth(page) {
     eq(reset.ok, true, 'reset accepted');
     const login = await page.auth.login({ email: 'lindi@example.co.za', password: 'Another123' });
     eq(login.ok, true, 'new password works in the browser');
+  });
+
+  await test('submitLead returns the server reference and stores the lead', async () => {
+    const page = createPage();
+    const res = await page.auth.submitLead({
+      id: 'lead-transport-1', formType: 'Liquor Licence',
+      name: 'Lindi Nkosi', phone: '0821112222', email: 'lindi@example.co.za',
+      fields: { 'What type of licence do you need?': 'tavern' }
+    });
+    eq(res.ok, true, 'accepted');
+    ok(/^LIQ-\d{6}-\d{4}$/.test(res.reference), 'reference returned: ' + res.reference);
+
+    const sheets = page.svc.sheets;
+    const rows = sheets.Leads.rows;
+    eq(rows.length, 2, 'header + one lead');
+    const headers = rows[0].map(String);
+    const lead = {};
+    headers.forEach((h, i) => { lead[h] = rows[1][i]; });
+    eq(lead.Name, 'Lindi Nkosi', 'name');
+    eq(lead.Phone, '0821112222', 'phone');
+    eq(lead['Service / Interest'], 'tavern', 'label map decoded server-side');
+    eq(page.transportLog[0], 'lead', 'went through the readable transport');
   });
 
   await test('remember=false uses sessionStorage, not localStorage', async () => {

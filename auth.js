@@ -95,7 +95,7 @@
     }
 
     /** POSTs one account action into the hidden iframe and resolves with its JSON. */
-    function call(action, params) {
+    function call(action, params, timeoutMs) {
         var url = endpoint();
         if (!url) {
             return Promise.resolve({ ok: false, error: 'Accounts are not connected yet.', offline: true });
@@ -116,7 +116,9 @@
                     var input = document.createElement('input');
                     input.type = 'hidden';
                     input.name = key;
-                    input.value = fields[key] == null ? '' : String(fields[key]);
+                    var value = fields[key];
+                    input.value = value == null ? '' :
+                        (typeof value === 'object' ? JSON.stringify(value) : String(value));
                     form.appendChild(input);
                 });
 
@@ -126,7 +128,7 @@
                     timer: setTimeout(function () {
                         delete pending[requestId];
                         resolve({ ok: false, error: 'No reply from the server. Check your connection and try again.', network: true });
-                    }, TIMEOUT_MS)
+                    }, timeoutMs || TIMEOUT_MS)
                 };
                 form.submit();
                 setTimeout(function () { if (form.parentNode) { form.parentNode.removeChild(form); } }, 0);
@@ -266,6 +268,19 @@
                 if (res && res.ok && res.token) { persist(res.token, res.user, state.remember); }
                 return res;
             });
+        },
+
+        /**
+         * Sends a lead through the readable transport so the page knows whether
+         * it was really stored (the old no-cors POST could never tell).
+         */
+        submitLead: function (payload) {
+            return call('lead', payload || {}, 20000);
+        },
+
+        /** Backend health check – readable even when the endpoint is broken. */
+        diagnose: function () {
+            return call('diagnose', {}, 12000);
         },
 
         requestReset: function (email) {
