@@ -598,6 +598,14 @@ async function clientTests() {
         eq(page.win.alerts.length, 0, 'nothing executed');
     });
 
+    await test('the fallback button asks Google for the One Tap prompt', async () => {
+        const page = makeProfilePage();
+        await settle();
+        await page.win.NEON_AUTH.signIn();
+        eq(page.googleState.promptCalls, 1, 'Google was asked for the prompt');
+        eq(page.win.NEON_AUTH.isLoggedIn(), false, 'no session until Google answers');
+    });
+
     await test('app.js still runs on pages that do not load auth.js', async () => {
         const doc = dom.makeDocument();
         const warning = dom.addElement(doc, 'div', 'loginWarning', 'login-warning hidden');

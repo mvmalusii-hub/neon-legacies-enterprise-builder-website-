@@ -41,6 +41,17 @@ Neon Legacies Enterprise Builder-website/
 ├── industry-warehousing.html # Logistics & Warehousing
 ├── industry-ngo.html # NGO / Non‑Profit Organisation (NPO)
 │
+├── app.js # Site-wide JS: forms → Apps Script, gated member areas
+├── auth.js # Sign in with Google (Google Identity Services)
+├── main.css # Site stylesheet
+├── profile.html # Sign in / sign up + your account card
+├── logout.html # Ends the Google session
+│
+├── apps-script/
+│ ├── Code.gs # Lead intake + Google token verification
+│ ├── README.md # How to deploy it
+│ └── test/ # Node tests (run the real Code.gs, auth.js, app.js)
+│
 ├── assets/
 │ ├── css/
 │ │ └── style.css # (optional – external styles)
@@ -89,9 +100,58 @@ Neon Legacies Enterprise Builder-website/
 
 ---
 
+## 🔐 Sign in with Google
+
+Members sign in with their **Google account** – no password for us to store.
+
+**How it works** (`auth.js` → `apps-script/Code.gs`):
+
+1. Google Identity Services renders the *Sign in with Google* button on
+   `profile.html` and returns an **ID token** (a JWT signed by Google).
+2. `auth.js` decodes it and asks Google itself to confirm it
+   (`oauth2.googleapis.com/tokeninfo`). Only a token Google vouches for –
+   issued to *our* client id, unexpired, with a **verified** email address –
+   creates a session. Tokens edited, replayed from another site or expired
+   are refused, and the visitor is told why.
+3. The sign-in is posted to the Apps Script web app (`action=googleLogin`),
+   which verifies the same token a second time and writes a row to the
+   **Logins** tab (idempotent per token, 20 sign-ins/hour, one team email per
+   new account).
+4. The session is cached in `localStorage` for 7 days, which is what unlocks
+   the member areas: business hub, market leads, referrals, partner and
+   international applications, strategic growth, hire-admin. `logout.html`
+   ends it (and switches off Google's auto-select).
+
+**Switch it on (about 5 minutes):**
+
+1. <https://console.cloud.google.com/apis/credentials> → **Create
+   credentials ▸ OAuth client ID ▸ Web application**.
+2. *Authorised JavaScript origins*: `https://www.neonlegacies.co.za`
+   (add `http://localhost:8000` while testing).
+3. Paste the client id into **both**:
+   - `auth.js` → `NEON_AUTH.googleClientId`
+   - `apps-script/Code.gs` → `GOOGLE.CLIENT_ID`
+
+   They must match, or every token is refused as *wrong audience*. Until then
+   the button says exactly what is missing instead of pretending to work.
+
+**Test it:**
+
+```bash
+node apps-script/test/google-auth.test.js   # 34 tests, ~300 assertions
+```
+
+The suite runs the real `Code.gs`, `auth.js` and `app.js` (through an Apps
+Script stub and a small fake DOM): token verification, session handling,
+sign-out, gated-page unlocking and page wiring.
+
+---
+
 ## 📦 Dependencies
 
 - None – the site uses vanilla HTML/CSS and Font Awesome (CDN).
+- Sign in with Google loads Google Identity Services from
+  `accounts.google.com/gsi/client` on the pages that need it (`auth.js`).
 - No build step required.
 
 ---
@@ -121,7 +181,10 @@ See `.gitignore` – excludes system files (`.DS_Store`), editor settings, temp 
 
 - [ ] Replace logo placeholder with actual logo image.
 - [ ] Add actual PDFs to `assets/pdfs/`.
-- [ ] Connect contact form to a backend (optional).
+- [x] Connect contact form to a backend – `apps-script/Code.gs` (see its README).
+- [x] Sign in with Google – `auth.js` + `Code.gs` (`action=googleLogin`).
+- [ ] Paste the Google OAuth client id into `auth.js` and `Code.gs` (go-live step).
+- [ ] Password sign-in / email verification (needs a user store in Apps Script).
 - [ ] Add Google Analytics (optional).
 
 ---

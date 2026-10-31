@@ -56,6 +56,7 @@
         _listeners: [],
         _gsiPromise: null,
         _initialised: false,
+        _google: null,
         _user: null,
 
         /* -------------------------------------------------------- */
@@ -370,6 +371,7 @@
         /** Initialises GIS and renders the official button. */
         initGoogle: function () {
             var self = this;
+            if (this._google) { return Promise.resolve(this._google); }   // already done
             if (this._initialised || !this.isConfigured()) { return Promise.resolve(null); }
             this._initialised = true;
             return this.loadGoogle()
@@ -396,6 +398,7 @@
                         var lookalike = document.getElementById(self.fallbackButtonId);
                         if (lookalike) { lookalike.style.display = 'none'; }
                     }
+                    self._google = google;
                     return google;
                 })
                 .catch(function (err) {
