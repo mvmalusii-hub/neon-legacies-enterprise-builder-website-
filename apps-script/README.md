@@ -214,3 +214,17 @@ node apps-script/test/forms.test.js       # every real <form> on the site
 node apps-script/test/wiring.test.js      # pages load the right scripts
 node apps-script/test/profile-ui.test.js  # profile page UI -> auth.js -> Code.gs
 ```
+
+## Auditing an existing spreadsheet
+
+If you would rather not connect an account, export the tab as CSV
+(**File ▸ Download ▸ Comma-separated values**) and run:
+
+```bash
+node apps-script/tools/audit-sheet.js leads.csv users.csv
+```
+
+It lists the v3 columns that are missing, rows with no name / email / phone
+(the leads the old backend mangled), duplicate references, status values that
+are not on the dropdown, and the per-form breakdown. Sample fixtures live in
+`testdata/`.
