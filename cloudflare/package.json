@@ -1,0 +1,6 @@
+{
+  "name": "neon-legacies-cloudflare",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Worker that adds the security headers GitHub Pages cannot set, tuned for the Google sign-in in auth.js."
+}

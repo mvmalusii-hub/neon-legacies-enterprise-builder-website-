@@ -53,6 +53,10 @@ Neon Legacies Enterprise Builder-website/
 │ ├── README.md # How to deploy both
 │ └── test/ # Node tests (run the real Code.gs, Auth.gs, auth.js, app.js)
 │
+├── cloudflare/
+│ ├── security-headers.worker.js # CSP / HSTS / nosniff for the login page
+│ └── README.md # Cloudflare runbook (DNS, TLS, WAF, rate limits, rollback)
+│
 ├── assets/
 │ ├── css/
 │ │ └── style.css # (optional – external styles)
@@ -169,6 +173,34 @@ node apps-script/test/google-auth.test.js   # 50 tests, ~390 assertions
 The suite runs the real `Code.gs`, `Auth.gs`, `auth.js` and `app.js` (through an
 Apps Script stub and a small fake DOM): token verification, both login routes,
 session handling, sign-out, gated-page unlocking, XSS escaping and page wiring.
+
+---
+
+## 🔒 Login security (Cloudflare)
+
+GitHub Pages cannot send response headers, so Cloudflare sits in front of
+`www.neonlegacies.co.za` and supplies them via
+`cloudflare/security-headers.worker.js`:
+
+- **Content-Security-Policy** that allows exactly the origins the login needs
+  (`accounts.google.com`, `script.google.com`, `oauth2.googleapis.com`,
+  `lh3.googleusercontent.com`, Font Awesome, Google Fonts) and nothing else
+- **HSTS**, `nosniff`, a tight `Referrer-Policy`, `frame-ancestors 'self'`
+  (no click-jacking) and `Cross-Origin-Opener-Policy: same-origin-allow-popups`
+  (keeps Google's sign-in popup working)
+- **Blocks** `/.git`, `/.env`, test sources and source maps that the repo
+  otherwise publishes
+
+The full dashboard runbook — proxied DNS, `Full (strict)` TLS, cache rules so a
+stale `auth.js` can never break sign-in, Bot Fight Mode, WAF rules, the login
+rate limit (30 req/min per IP) and a 30-second rollback — is in
+[`cloudflare/README.md`](cloudflare/README.md). It also lists the settings that
+must stay **off** (Cloudflare Access, Rocket Loader, Flexible SSL), because each
+one would break or bypass the Google login.
+
+```bash
+node apps-script/test/cloudflare-worker.test.js   # 6 tests, 40 assertions
+```
 
 ---
 
