@@ -71,9 +71,11 @@ function makeForm(id, specs) {
   return form;
 }
 
-function loadApp() {
+function loadApp(options) {
+  const opts = options || {};
   const sent = [];
   const stored = {};
+  const docListeners = {};
   const sandbox = {
     console, JSON, Date, Math, String, Number, Object, Array, Promise, RegExp, Error,
     setTimeout,
@@ -85,12 +87,31 @@ function loadApp() {
       removeItem: k => { delete stored[k]; }
     },
     fetch: (url, options) => { sent.push(JSON.parse(options.body)); return Promise.resolve(); },
-    document: { addEventListener: () => {}, querySelectorAll: () => [] }
+    document: {
+      addEventListener: (type, fn) => { (docListeners[type] = docListeners[type] || []).push(fn); },
+      querySelectorAll: () => []
+    }
   };
+  if (opts.user) {
+    sandbox.NEON_AUTH = {
+      isLoggedIn: () => true,
+      user: () => Object.assign({}, opts.user)
+    };
+  }
   sandbox.window = sandbox;
   vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(path.join(__dirname, '..', '..', 'app.js'), 'utf8'), sandbox, { filename: 'app.js' });
-  return { leads: sandbox.window.NEON_LEADS, sent, stored };
+  return {
+    leads: sandbox.window.NEON_LEADS,
+    sent,
+    stored,
+    submitEvent: form => {
+      const handlers = docListeners.submit || [];
+      let allowed = true;
+      handlers.forEach(fn => fn({ target: form, preventDefault() { allowed = false; } }));
+      return allowed;
+    }
+  };
 }
 
 function payloadFor(id, specs) {
@@ -263,6 +284,21 @@ test('a form with no contact details is not posted', () => {
   const form = makeForm('complianceForm', [{ placeholder: 'Full name', value: '' }]);
   app.leads.submit(form);
   eq(app.sent.length, 0, 'nothing sent');
+});
+
+test('gated forms only become leads for signed-in visitors', () => {
+  const signedOut = loadApp();
+  const form = makeForm('growthForm', growthForm);
+  form.dataset.requiresAuth = 'true';
+  signedOut.submitEvent(form);
+  eq(signedOut.sent.length, 0, 'nothing captured while signed out');
+
+  const signedIn = loadApp({ user: { id: 'USR-1', name: 'Lindi Nkosi', email: 'lindi@example.co.za', phone: '0821112222', company: 'Nkosi Trading' } });
+  signedIn.submitEvent(form);
+  eq(signedIn.sent.length, 1, 'captured once signed in');
+  eq(signedIn.sent[0].accountId, 'USR-1', 'payload carries the account id');
+  eq(signedIn.sent[0].accountEmail, 'lindi@example.co.za', 'payload carries the account email');
+  eq(signedIn.sent[0].name, 'Lindi Traders', 'typed values win over the account');
 });
 
 /* ---------------------------------------------------------------- */

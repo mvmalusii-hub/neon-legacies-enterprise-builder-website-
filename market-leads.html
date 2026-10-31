@@ -98,7 +98,7 @@
                 <h2 class="section-title">➕ Add Your Company to the Database</h2>
                 <div class="form-card">
                     <p>Fill in the form below to list your business. Once you agree to the data sharing policy (above), your company will appear here within 24 hours (demo: instantly).</p>
-                    <form id="registerCompanyForm">
+                    <form id="registerCompanyForm" data-requires-auth="true">
                         <div class="form-group">
                             <label for="regCompanyName">Company name</label>
                             <input type="text" id="regCompanyName" required>
@@ -140,6 +140,7 @@
     <!-- 3. EXTERNAL JAVASCRIPT                                       -->
     <!-- ============================================================ -->
     <script src="app.js"></script>
+    <script src="auth.js"></script>
 
 </body>
 </html>

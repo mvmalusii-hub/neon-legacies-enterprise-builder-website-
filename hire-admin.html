@@ -76,7 +76,7 @@
                     ⚠️ You are not logged in. <a href="profile.html">Please log in or create a profile</a> to request admin services.
                 </div>
 
-                <form id="hireAdminForm">
+                <form id="hireAdminForm" data-requires-auth="true">
                     <!-- Basic Info -->
                     <div class="form-group">
                         <label for="companyName">Your name / Company name</label>
@@ -179,6 +179,7 @@
     <!-- 3. EXTERNAL JAVASCRIPT                                       -->
     <!-- ============================================================ -->
     <script src="app.js"></script>
+    <script src="auth.js"></script>
 
 </body>
 </html>

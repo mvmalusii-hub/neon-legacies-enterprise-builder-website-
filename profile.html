@@ -72,6 +72,55 @@
             <!-- Page Header -->
             <h2 class="section-title">👤 Your Profile</h2>
 
+            <!-- Signed-in account panel (filled by app.js / NEON_AUTH) -->
+            <div id="accountPanel" class="form-card hidden">
+                <h3 style="margin-bottom:6px;">✅ You are signed in</h3>
+                <p style="color:#475569; margin-bottom:16px;">
+                    Signed in as <strong id="accountName">–</strong>
+                    (<span id="accountEmail">–</span>)
+                </p>
+                <p class="fine" id="accountMeta" style="margin-bottom:18px;"></p>
+
+                <form id="accountProfileForm" data-no-lead="true">
+                    <div class="form-group">
+                        <label for="accountFullName">Full name</label>
+                        <input type="text" id="accountFullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountPhone">Phone number</label>
+                        <input type="tel" id="accountPhone">
+                    </div>
+                    <div class="form-group">
+                        <label for="accountCompany">Company</label>
+                        <input type="text" id="accountCompany">
+                    </div>
+                    <button type="submit" class="btn">Save details →</button>
+                    <div class="message" id="accountProfileMessage"></div>
+                </form>
+
+                <hr style="margin:26px 0; border:none; border-top:1px solid #e2e8f0;">
+
+                <form id="accountPasswordForm" data-no-lead="true">
+                    <h3 style="margin-bottom:10px;">Change password</h3>
+                    <div class="form-group">
+                        <label for="accountCurrentPassword">Current password</label>
+                        <input type="password" id="accountCurrentPassword" required autocomplete="current-password">
+                    </div>
+                    <div class="form-group">
+                        <label for="accountNewPassword">New password (8+ characters, letters and numbers)</label>
+                        <input type="password" id="accountNewPassword" required autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn">Update password →</button>
+                    <div class="message" id="accountPasswordMessage"></div>
+                </form>
+
+                <p style="margin-top:22px;">
+                    <button type="button" class="btn" id="accountSignOutBtn" style="background:#475569;">Sign out</button>
+                </p>
+            </div>
+
+            <div id="authForms">
+
             <!-- Tabs -->
             <div class="tab-container">
                 <button class="tab-btn active" id="loginTab">Login</button>
@@ -89,17 +138,24 @@
                         <label for="loginPassword">Password</label>
                         <input type="password" id="loginPassword" required>
                     </div>
+                    <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" id="loginRemember" checked style="width:auto;">
+                        <label for="loginRemember" style="margin:0; font-weight:normal;">Keep me signed in on this device</label>
+                    </div>
                     <button type="submit" class="btn">Log In →</button>
                     <button type="button" class="btn google-btn" id="googleLoginBtn">
                         <i class="fab fa-google"></i> Sign in with Google
                     </button>
+                    <p style="margin-top:12px; font-size:0.85rem;">
+                        <a href="#" id="forgotPasswordLink">Forgot your password?</a>
+                    </p>
                     <div class="message" id="loginMessage"></div>
                 </form>
             </div>
 
             <!-- Sign Up Form (Hidden by default via CSS class 'hidden') -->
             <div id="signupForm" class="form-card hidden">
-                <form id="signupFormElement">
+                <form id="signupFormElement" data-no-lead="true">
                     <div class="form-group">
                         <label for="signupName">Full name</label>
                         <input type="text" id="signupName" required>
@@ -113,8 +169,12 @@
                         <input type="tel" id="signupPhone" value="072 152 3293">
                     </div>
                     <div class="form-group">
-                        <label for="signupPassword">Create password</label>
-                        <input type="password" id="signupPassword" required>
+                        <label for="signupCompany">Company (optional)</label>
+                        <input type="text" id="signupCompany">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Create password (8+ characters, letters and numbers)</label>
+                        <input type="password" id="signupPassword" required autocomplete="new-password">
                     </div>
                     <div class="form-group">
                         <label for="signupConfirmPassword">Confirm password</label>
@@ -123,6 +183,25 @@
                     <button type="submit" class="btn">Create Account →</button>
                     <div class="message" id="signupMessage"></div>
                 </form>
+            </div>
+
+            </div><!-- /#authForms -->
+
+            <!-- Forgot password (hidden until needed) -->
+            <div id="forgotPanel" class="form-card hidden">
+                <h3 style="margin-bottom:10px;">Reset your password</h3>
+                <p style="color:#475569; margin-bottom:16px; font-size:0.9rem;">
+                    Enter the email address on your account and we will send you a reset link.
+                </p>
+                <form id="forgotPasswordForm" data-no-lead="true">
+                    <div class="form-group">
+                        <label for="forgotEmail">Email address</label>
+                        <input type="email" id="forgotEmail" required>
+                    </div>
+                    <button type="submit" class="btn">Send reset link →</button>
+                    <div class="message" id="forgotMessage"></div>
+                </form>
+                <p style="margin-top:14px; font-size:0.85rem;"><a href="#" id="backToLoginLink">← Back to sign in</a></p>
             </div>
 
             <!-- Footer / Contact (Shared across all pages) -->
@@ -143,6 +222,7 @@
     <!-- 3. EXTERNAL JAVASCRIPT (Replaces all inline JS)              -->
     <!-- ============================================================ -->
     <script src="app.js"></script>
+    <script src="auth.js"></script>
 
 </body>
 </html>

@@ -56,15 +56,33 @@
         </div>
     </main>
 
+    <!-- app.js defines the Apps Script endpoint, auth.js uses it -->
+    <script src="app.js"></script>
+    <script src="auth.js"></script>
     <script>
-        // Clear any locally stored session data for this site.
-        try {
-            ['user', 'userEmail', 'profile', 'session', 'authToken'].forEach(function (key) {
-                localStorage.removeItem(key);
-            });
-            sessionStorage.clear();
-        } catch (e) {
-            // Storage may be unavailable (private mode) – ignore.
+        // End the server session first, then clear anything cached on this device.
+        function clearLocalSession() {
+            try {
+                ['user', 'userEmail', 'profile', 'session', 'authToken', 'neonAuth'].forEach(function (key) {
+                    localStorage.removeItem(key);
+                });
+                sessionStorage.clear();
+            } catch (e) {
+                // Storage may be unavailable (private mode) – ignore.
+            }
+        }
+
+        var signedOut = false;
+        function finish() {
+            if (signedOut) { return; }
+            signedOut = true;
+            clearLocalSession();
+        }
+
+        if (window.NEON_AUTH) {
+            window.NEON_AUTH.logout().then(finish, finish);
+        } else {
+            finish();
         }
 
         var remaining = 5;
@@ -74,6 +92,7 @@
             if (el) { el.textContent = remaining; }
             if (remaining <= 0) {
                 clearInterval(timer);
+                finish();
                 window.location.replace('index.html');
             }
         }, 1000);

@@ -282,6 +282,14 @@ window.NEON_LEADS = {
         if (!form) { return Promise.resolve(); }
         const collected = this.collect(form);
         const lead = this.normalise(collected.values, collected.fields);
+        // Signed-in visitors: stamp the account and fill any gaps with it.
+        const account = (window.NEON_AUTH && window.NEON_AUTH.user()) || null;
+        if (account) {
+            if (!lead.email && account.email) { lead.email = account.email; }
+            if (!lead.phone && account.phone) { lead.phone = account.phone; }
+            if (!lead.name && account.name) { lead.name = account.name; }
+            if (!lead.company && account.company) { lead.company = account.company; }
+        }
         const payload = {
             formType: this.formName(form),
             name: lead.name,
@@ -294,6 +302,8 @@ window.NEON_LEADS = {
             amount: lead.amount,
             preferredDate: lead.preferredDate,
             fields: collected.fields,             // label -> answer, for the team email
+            accountId: account ? account.id : '',
+            accountEmail: account ? account.email : '',
             token: this.token,
             id: 'lead-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
             page: location.pathname.split('/').pop() || 'index.html',
@@ -310,6 +320,9 @@ document.addEventListener('submit', function (e) {
     const form = e.target;
     if (!form || form.tagName !== 'FORM') { return; }
     if (form.dataset.noLead === 'true') { return; }
+    // Gated forms only count as leads once the visitor really is signed in.
+    if (form.dataset.requiresAuth === 'true' &&
+        !(window.NEON_AUTH && window.NEON_AUTH.isLoggedIn())) { return; }
     window.NEON_LEADS.submit(form);
 }, true);
 
@@ -326,6 +339,26 @@ document.addEventListener('DOMContentLoaded', function () {
 //  MAIN – runs once when DOM is ready
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
+
+    // ============================================================
+    //  ACCOUNT STATE – real sessions (see auth.js)
+    // ============================================================
+    // Every gated form asks the server-backed session instead of the old
+    // hard-coded `isLoggedIn = false`. NEON_AUTH caches the user in
+    // localStorage, so this answer is available on the first paint.
+    function neonSession() {
+        return !!(window.NEON_AUTH && window.NEON_AUTH.isLoggedIn());
+    }
+
+    function refreshAuthGating() {
+        const loggedIn = neonSession();
+        document.querySelectorAll('.login-warning').forEach(function (warning) {
+            warning.classList.toggle('hidden', loggedIn);
+        });
+    }
+
+    if (window.NEON_AUTH) { window.NEON_AUTH.onChange(refreshAuthGating); }
+
 
     // ============================================================
     //  1. MOBILE NAV TOGGLES (Top Nav + Sidebar)
@@ -389,69 +422,272 @@ document.addEventListener('DOMContentLoaded', function() {
     //     but make sure there are no nested DOMContentLoaded listeners.
     // ============================================================
 
-    // --- Profile Page Tabs ---
+    // --- Profile page: real accounts (auth.js) ---
     const loginTab = document.getElementById('loginTab');
     const signupTab = document.getElementById('signupTab');
     const loginDiv = document.getElementById('loginForm');
     const signupDiv = document.getElementById('signupForm');
+    const authForms = document.getElementById('authForms');
+    const accountPanel = document.getElementById('accountPanel');
+    const forgotPanel = document.getElementById('forgotPanel');
+
+    function accountMessage(el, text, ok) {
+        if (!el) { return; }
+        el.innerHTML = '<span style="color:' + (ok ? '#1e6f3f' : '#b91c1c') + ';">' +
+            (ok ? '✅ ' : '❌ ') + text + '</span>';
+    }
+
+    function setBusy(button, busy, label) {
+        if (!button) { return; }
+        if (busy) {
+            button.dataset.label = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = label || 'Please wait…';
+        } else {
+            button.disabled = false;
+            if (button.dataset.label) { button.innerHTML = button.dataset.label; }
+        }
+    }
+
+    function nextPage() {
+        const match = /[?&]next=([^&]+)/.exec(location.search || '');
+        const target = match ? decodeURIComponent(match[1]) : '';
+        return /^[a-z0-9-]+\.html$/i.test(target) ? target : '';
+    }
+
+    function renderAccount(user) {
+        if (!accountPanel) { return; }
+        if (!user) {
+            accountPanel.classList.add('hidden');
+            if (authForms) { authForms.classList.remove('hidden'); }
+            return;
+        }
+        accountPanel.classList.remove('hidden');
+        if (authForms) { authForms.classList.add('hidden'); }
+        if (forgotPanel) { forgotPanel.classList.add('hidden'); }
+
+        const nameEl = document.getElementById('accountName');
+        const emailEl = document.getElementById('accountEmail');
+        const metaEl = document.getElementById('accountMeta');
+        if (nameEl) { nameEl.textContent = user.name || 'Client'; }
+        if (emailEl) { emailEl.textContent = user.email || ''; }
+        if (metaEl) {
+            const bits = [];
+            if (user.company) { bits.push(user.company); }
+            if (user.phone) { bits.push(user.phone); }
+            if (user.created) { bits.push('Member since ' + new Date(user.created).toLocaleDateString()); }
+            metaEl.textContent = bits.join(' · ');
+        }
+        const fullName = document.getElementById('accountFullName');
+        const phone = document.getElementById('accountPhone');
+        const company = document.getElementById('accountCompany');
+        if (fullName) { fullName.value = user.name || ''; }
+        if (phone) { phone.value = user.phone || ''; }
+        if (company) { company.value = user.company || ''; }
+    }
 
     if (loginTab && signupTab && loginDiv && signupDiv) {
-        loginTab.addEventListener('click', function() {
+        loginTab.addEventListener('click', function () {
             loginTab.classList.add('active');
             signupTab.classList.remove('active');
             loginDiv.style.display = 'block';
             signupDiv.style.display = 'none';
         });
-        signupTab.addEventListener('click', function() {
+        signupTab.addEventListener('click', function () {
             signupTab.classList.add('active');
             loginTab.classList.remove('active');
             signupDiv.style.display = 'block';
             loginDiv.style.display = 'none';
         });
 
-        // Login form mock
+        // Sign in
         const loginForm = document.getElementById('loginFormElement');
         if (loginForm) {
-            loginForm.addEventListener('submit', function(e) {
+            loginForm.addEventListener('submit', function (e) {
                 e.preventDefault();
-                const email = document.getElementById('loginEmail').value;
-                const pwd = document.getElementById('loginPassword').value;
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
+                const rememberEl = document.getElementById('loginRemember');
+                const button = loginForm.querySelector('button[type="submit"]');
                 const msg = document.getElementById('loginMessage');
-                if (email && pwd) {
-                    msg.innerHTML = '<span style="color:green;">✅ Login successful (demo). Backend will be connected soon.</span>';
-                } else {
-                    msg.innerHTML = '<span style="color:red;">❌ Please enter both email and password.</span>';
-                }
+
+                if (!window.NEON_AUTH) { accountMessage(msg, 'Accounts are not connected yet.', false); return; }
+                if (!email || !password) { accountMessage(msg, 'Please enter both email and password.', false); return; }
+
+                setBusy(button, true, 'Signing in…');
+                window.NEON_AUTH.login({
+                    email: email, password: password,
+                    remember: rememberEl ? rememberEl.checked : true
+                }).then(function (res) {
+                    setBusy(button, false);
+                    if (!res || !res.ok) {
+                        accountMessage(msg, (res && res.error) || 'Sign-in failed. Please try again.', false);
+                        return;
+                    }
+                    accountMessage(msg, 'Signed in. Welcome back, ' + (res.user.name || '') + '!', true);
+                    loginForm.reset();
+                    const target = nextPage();
+                    if (target) { window.location.href = target; }
+                });
             });
         }
 
-        // Signup form mock
+        // Create account
         const signupForm = document.getElementById('signupFormElement');
         if (signupForm) {
-            signupForm.addEventListener('submit', function(e) {
+            signupForm.addEventListener('submit', function (e) {
                 e.preventDefault();
-                const name = document.getElementById('signupName').value;
-                const email = document.getElementById('signupEmail').value;
+                const name = document.getElementById('signupName').value.trim();
+                const email = document.getElementById('signupEmail').value.trim();
+                const phone = document.getElementById('signupPhone').value.trim();
+                const companyEl = document.getElementById('signupCompany');
                 const pwd = document.getElementById('signupPassword').value;
                 const confirm = document.getElementById('signupConfirmPassword').value;
+                const button = signupForm.querySelector('button[type="submit"]');
                 const msg = document.getElementById('signupMessage');
-                if (!name || !email || !pwd) {
-                    msg.innerHTML = '<span style="color:red;">❌ Please fill all required fields.</span>';
+
+                if (!window.NEON_AUTH) { accountMessage(msg, 'Accounts are not connected yet.', false); return; }
+                if (!name || !email || !pwd) { accountMessage(msg, 'Please fill in your name, email and password.', false); return; }
+                if (pwd.length < 8 || !/[A-Za-z]/.test(pwd) || !/[0-9]/.test(pwd)) {
+                    accountMessage(msg, 'Your password needs at least 8 characters, including a letter and a number.', false);
                     return;
                 }
-                if (pwd !== confirm) {
-                    msg.innerHTML = '<span style="color:red;">❌ Passwords do not match.</span>';
-                    return;
-                }
-                msg.innerHTML = '<span style="color:green;">✅ Account created! Your request has been sent to our team – check your email for confirmation.</span>';
+                if (pwd !== confirm) { accountMessage(msg, 'Passwords do not match.', false); return; }
+
+                setBusy(button, true, 'Creating account…');
+                window.NEON_AUTH.signup({
+                    name: name, email: email, phone: phone,
+                    company: companyEl ? companyEl.value.trim() : '', password: pwd
+                }).then(function (res) {
+                    setBusy(button, false);
+                    if (!res || !res.ok) {
+                        accountMessage(msg, (res && res.error) || 'We could not create your account. Please try again.', false);
+                        return;
+                    }
+                    accountMessage(msg, 'Account created – you are signed in. A welcome email is on its way.', true);
+                    signupForm.reset();
+                    const target = nextPage();
+                    if (target) { window.location.href = target; }
+                });
             });
         }
 
-        // Google login placeholder
+        // Forgot / reset password request
+        const forgotLink = document.getElementById('forgotPasswordLink');
+        const backLink = document.getElementById('backToLoginLink');
+        const forgotForm = document.getElementById('forgotPasswordForm');
+        if (forgotLink && forgotPanel) {
+            forgotLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (authForms) { authForms.classList.add('hidden'); }
+                forgotPanel.classList.remove('hidden');
+                const emailBox = document.getElementById('forgotEmail');
+                const known = document.getElementById('loginEmail');
+                if (emailBox && known && known.value) { emailBox.value = known.value; }
+            });
+        }
+        if (backLink && authForms) {
+            backLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (forgotPanel) { forgotPanel.classList.add('hidden'); }
+                authForms.classList.remove('hidden');
+            });
+        }
+        if (forgotForm) {
+            forgotForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const email = document.getElementById('forgotEmail').value.trim();
+                const msg = document.getElementById('forgotMessage');
+                const button = forgotForm.querySelector('button[type="submit"]');
+                if (!window.NEON_AUTH) { accountMessage(msg, 'Accounts are not connected yet.', false); return; }
+                setBusy(button, true, 'Sending…');
+                window.NEON_AUTH.requestReset(email).then(function (res) {
+                    setBusy(button, false);
+                    if (!res || !res.ok) {
+                        accountMessage(msg, (res && res.error) || 'Could not send the reset link.', false);
+                        return;
+                    }
+                    accountMessage(msg, res.message || 'Check your inbox for the reset link.', true);
+                    forgotForm.reset();
+                });
+            });
+        }
+
+        // Account panel: edit details
+        const profileForm = document.getElementById('accountProfileForm');
+        if (profileForm) {
+            profileForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const msg = document.getElementById('accountProfileMessage');
+                const button = profileForm.querySelector('button[type="submit"]');
+                if (!window.NEON_AUTH || !window.NEON_AUTH.isLoggedIn()) {
+                    accountMessage(msg, 'Please sign in again.', false);
+                    return;
+                }
+                setBusy(button, true, 'Saving…');
+                window.NEON_AUTH.updateProfile({
+                    name: document.getElementById('accountFullName').value.trim(),
+                    phone: document.getElementById('accountPhone').value.trim(),
+                    company: document.getElementById('accountCompany').value.trim()
+                }).then(function (res) {
+                    setBusy(button, false);
+                    accountMessage(msg, (res && res.ok) ? 'Your details have been saved.' :
+                        ((res && res.error) || 'Could not save your details.'), !!(res && res.ok));
+                });
+            });
+        }
+
+        // Account panel: change password
+        const passwordForm = document.getElementById('accountPasswordForm');
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const msg = document.getElementById('accountPasswordMessage');
+                const current = document.getElementById('accountCurrentPassword').value;
+                const next = document.getElementById('accountNewPassword').value;
+                const button = passwordForm.querySelector('button[type="submit"]');
+                if (!window.NEON_AUTH || !window.NEON_AUTH.isLoggedIn()) {
+                    accountMessage(msg, 'Please sign in again.', false);
+                    return;
+                }
+                if (next.length < 8 || !/[A-Za-z]/.test(next) || !/[0-9]/.test(next)) {
+                    accountMessage(msg, 'The new password needs 8+ characters, with a letter and a number.', false);
+                    return;
+                }
+                setBusy(button, true, 'Updating…');
+                window.NEON_AUTH.changePassword({ currentPassword: current, newPassword: next })
+                    .then(function (res) {
+                        setBusy(button, false);
+                        if (res && res.ok) {
+                            accountMessage(msg, 'Password updated. Other devices have been signed out.', true);
+                            passwordForm.reset();
+                        } else {
+                            accountMessage(msg, (res && res.error) || 'Could not update your password.', false);
+                        }
+                    });
+            });
+        }
+
+        // Account panel: sign out
+        const signOutBtn = document.getElementById('accountSignOutBtn');
+        if (signOutBtn) {
+            signOutBtn.addEventListener('click', function () {
+                signOutBtn.disabled = true;
+                const done = function () { window.location.href = 'logout.html'; };
+                if (window.NEON_AUTH) { window.NEON_AUTH.logout().then(done, done); } else { done(); }
+            });
+        }
+
+        if (window.NEON_AUTH) {
+            window.NEON_AUTH.onChange(renderAccount);
+            renderAccount(window.NEON_AUTH.user());
+        }
+
+        // Google sign-in is still a placeholder – say so instead of pretending.
         const googleBtn = document.getElementById('googleLoginBtn');
         if (googleBtn) {
-            googleBtn.addEventListener('click', function() {
-                alert('Google Sign‑in will be integrated later using OAuth.');
+            googleBtn.addEventListener('click', function () {
+                alert('Google sign-in is not enabled yet. Please use your email address and password.');
             });
         }
     }
@@ -466,10 +702,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const partnerLoginWarning = document.getElementById('loginWarning');
 
     if (partnerType && dynamicForm) {
-        let isLoggedIn = false; // demo
 
         if (partnerLoginWarning) {
-            isLoggedIn ? partnerLoginWarning.classList.add('hidden') : partnerLoginWarning.classList.remove('hidden');
+            neonSession() ? partnerLoginWarning.classList.add('hidden') : partnerLoginWarning.classList.remove('hidden');
         }
 
         const partnerForms = {
@@ -518,7 +753,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (submitPartnerBtn) {
             submitPartnerBtn.addEventListener('click', function() {
-                if (!isLoggedIn) {
+                if (!neonSession()) {
                     partnerSubmitMsg.innerHTML = '<span style="color:red;">❌ Please <a href="profile.html">log in</a> to submit a partnership application.</span>';
                     return;
                 }
@@ -537,9 +772,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const intlLoginWarning = document.getElementById('loginWarning');
 
     if (entityType && intlDynamicForm) {
-        let isLoggedIn = false;
         if (intlLoginWarning) {
-            isLoggedIn ? intlLoginWarning.classList.add('hidden') : intlLoginWarning.classList.remove('hidden');
+            neonSession() ? intlLoginWarning.classList.add('hidden') : intlLoginWarning.classList.remove('hidden');
         }
 
         const intlForms = {
@@ -572,7 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (intlSubmitBtn) {
             intlSubmitBtn.addEventListener('click', function() {
-                if (!isLoggedIn) {
+                if (!neonSession()) {
                     intlSubmitMsg.innerHTML = '<span style="color:red;">❌ Please <a href="profile.html">log in</a> to submit an international partnership request.</span>';
                     return;
                 }
@@ -589,9 +823,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const growthLoginWarning = document.getElementById('loginWarning');
 
     if (growthForm) {
-        let isLoggedIn = false;
         if (growthLoginWarning) {
-            isLoggedIn ? growthLoginWarning.classList.add('hidden') : growthLoginWarning.classList.remove('hidden');
+            neonSession() ? growthLoginWarning.classList.add('hidden') : growthLoginWarning.classList.remove('hidden');
         }
 
         const appointmentDate = document.getElementById('appointmentDate');
@@ -604,7 +837,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         growthForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            if (!isLoggedIn) {
+            if (!neonSession()) {
                 growthSubmitMsg.innerHTML = '<span style="color:red;">❌ Please <a href="profile.html">log in</a> to book a strategic growth session.</span>';
                 return;
             }
@@ -625,14 +858,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const partnerListEl = document.getElementById('partnerList');
 
     if (directorForm || partnerAppForm) {
-        let isLoggedIn = false;
 
         function updateBusinessWarnings() {
             document.querySelectorAll('.login-warning').forEach(w => {
-                isLoggedIn ? w.classList.add('hidden') : w.classList.remove('hidden');
+                neonSession() ? w.classList.add('hidden') : w.classList.remove('hidden');
             });
         }
         updateBusinessWarnings();
+        if (window.NEON_AUTH) { window.NEON_AUTH.onChange(updateBusinessWarnings); }
 
         // Director session date min (14 days)
         const sessionDateInput = document.getElementById('sessionDate');
@@ -646,7 +879,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (directorForm) {
             directorForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                if (!isLoggedIn) {
+                if (!neonSession()) {
                     document.getElementById('sessionMessage').innerHTML = '<span style="color:red;">❌ Please <a href="profile.html">log in</a> to book a session.</span>';
                     return;
                 }
@@ -664,7 +897,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (partnerAppForm) {
             partnerAppForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                if (!isLoggedIn) {
+                if (!neonSession()) {
                     document.getElementById('partnerApplicationMessage').innerHTML = '<span style="color:red;">❌ Please <a href="profile.html">log in</a> to apply.</span>';
                     return;
                 }
@@ -733,7 +966,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const regForm = document.getElementById('registerCompanyForm');
 
     if (marketLoginWarning || dataConsentSection || databaseSection) {
-        let isLoggedIn = false;
         let companies = [];
 
         // Load from localStorage
@@ -778,7 +1010,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         function updateMarketUI() {
-            if (!isLoggedIn) {
+            if (!neonSession()) {
                 marketLoginWarning.classList.remove('hidden');
                 dataConsentSection.classList.add('hidden');
                 databaseSection.classList.add('hidden');
@@ -845,6 +1077,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         updateMarketUI();
+        if (window.NEON_AUTH) { window.NEON_AUTH.onChange(updateMarketUI); }
     }
 
     // ============================================================
@@ -857,7 +1090,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const newCommentInput = document.getElementById('newComment');
 
     if (hubLoginWarning || commentArea) {
-        let isLoggedIn = false;
         let comments = [];
 
         function loadComments() {
@@ -911,7 +1143,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         function updateHubUI() {
-            if (!isLoggedIn) {
+            if (!neonSession()) {
                 hubLoginWarning.classList.remove('hidden');
                 commentArea.classList.add('hidden');
             } else {
@@ -923,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (postBtn) {
             postBtn.addEventListener('click', function() {
-                if (!isLoggedIn) {
+                if (!neonSession()) {
                     alert('Please log in to comment.');
                     return;
                 }
@@ -956,9 +1188,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const startDateInput = document.getElementById('startDate');
 
     if (hireAdminForm) {
-        let isLoggedIn = false;
         if (hireLoginWarning) {
-            isLoggedIn ? hireLoginWarning.classList.add('hidden') : hireLoginWarning.classList.remove('hidden');
+            neonSession() ? hireLoginWarning.classList.add('hidden') : hireLoginWarning.classList.remove('hidden');
         }
 
         if (startDateInput) {
@@ -969,7 +1200,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         hireAdminForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            if (!isLoggedIn) {
+            if (!neonSession()) {
                 hireSubmitMsg.innerHTML = '<span style="color:red;">❌ Please <a href="profile.html">log in</a> to submit a request.</span>';
                 return;
             }
@@ -1003,7 +1234,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const simulateBtn = document.getElementById('simulatePurchaseBtn');
 
     if (refLoginWarning && refContent) {
-        let isLoggedIn = false;
         let referralData = { referralCode: '', referrals: [], totalEarned: 0 };
 
         function initReferralData() {
@@ -1111,7 +1341,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         function updateRefVisibility() {
-            if (!isLoggedIn) {
+            if (!neonSession()) {
                 refLoginWarning.classList.remove('hidden');
                 refContent.classList.add('hidden');
             } else {
@@ -1173,6 +1403,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         updateRefVisibility();
+        if (window.NEON_AUTH) { window.NEON_AUTH.onChange(updateRefVisibility); }
     }
 
 }); // end DOMContentLoaded
