@@ -47,24 +47,190 @@ window.NEON_LEADS = {
         return (form && map[form.id]) || (form && form.dataset.leadType) || 'General Enquiry';
     },
 
-    /** Flatten a form into a plain object (name/id → value). */
-    collect: function (form) {
-        const data = {};
-        Array.prototype.forEach.call(form.elements, function (el) {
-            if (!el.name && !el.id) { return; }
-            const key = el.name || el.id;
-            if (el.type === 'checkbox') {
-                data[key] = el.checked;
-            } else if (el.type === 'radio') {
-                if (el.checked) { data[key] = el.value; }
-            } else if (el.type !== 'submit' && el.type !== 'button' && el.type !== 'password') {
-                if (!(key in data) || el.value) { data[key] = el.value; }
-            }
-        });
-        return data;
+    /** Lower-case, alphanumeric-only form of a field name or label. */
+    normKey: function (key) {
+        return String(key == null ? '' : key).toLowerCase().replace(/[^a-z0-9]/g, '');
     },
 
-    /** Adds the anti-spam honeypot once per form. */
+    /** Tidies a <label> / placeholder into something readable in an email. */
+    cleanLabel: function (text) {
+        return String(text == null ? '' : text)
+            .replace(/[\u2190-\u21FF\u2600-\u27BF\uFE0F]/g, ' ')  // arrows, emoji
+            .replace(/\s+/g, ' ')
+            .replace(/^[\s*:\u2022\-]+|[\s*:\u2022\-]+$/g, '')
+            .trim();
+    },
+
+    /** The visible label for a field, falling back to its placeholder. */
+    labelFor: function (el) {
+        if (el.id && el.form) {
+            const label = el.form.querySelector('label[for="' + el.id + '"]');
+            if (label) { return label.textContent; }
+        }
+        const wrapping = el.closest ? el.closest('label') : null;
+        if (wrapping && wrapping !== el) { return wrapping.textContent; }
+        if (el.tagName === 'SELECT' && el.options && el.options.length && !el.options[0].value) {
+            return el.options[0].textContent || el.options[0].text || '';   // the "choose one" prompt
+        }
+        return el.getAttribute('placeholder') || el.getAttribute('aria-label') ||
+               el.name || el.id || '';
+    },
+
+    /** The question a checkbox / radio sits under (for unnamed groups). */
+    groupKey: function (el) {
+        const box = el.closest ? el.closest('.form-group, fieldset') : null;
+        if (!box) { return ''; }
+        const legend = box.querySelector('legend');
+        const heading = box.querySelector('label, h3, h4');
+        if (heading && !heading.contains(el)) { return heading.textContent; }
+        return legend ? legend.textContent : '';
+    },
+
+    /**
+     * Flatten a form into { values, fields }.
+     * `fields` is label to answer (what a human wants to read); `values` keeps
+     * the name/id keys for anything that still looks for them. Fields without
+     * a name or id (liquor / spaza use placeholders only) are captured too.
+     */
+    collect: function (form) {
+        const self = this;
+        const values = {};
+        const fields = {};
+
+        Array.prototype.forEach.call(form.elements, function (el, index) {
+            if (!el || !el.tagName) { return; }
+            const type = String(el.type || '').toLowerCase();
+            if (type === 'submit' || type === 'button' || type === 'reset' ||
+                type === 'password' || type === 'file' || type === 'hidden') { return; }
+            if (el.name === '_hp') { return; }
+
+            const label = self.cleanLabel(self.labelFor(el)) || ('Field ' + (index + 1));
+
+            if (type === 'checkbox') {
+                if (!el.checked) { return; }
+                const answer = el.value || 'Yes';
+                const question = self.cleanLabel(el.name || self.groupKey(el)) || label;
+                if (!values[question]) { values[question] = []; }
+                if (values[question].indexOf(answer) === -1) { values[question].push(answer); }
+                return;
+            }
+
+            if (type === 'radio') {
+                if (!el.checked) { return; }
+                values[el.name || label] = el.value;
+                fields[label] = el.value;
+                return;
+            }
+
+            const value = String(el.value == null ? '' : el.value).trim();
+            if (!value) { return; }
+            values[el.name || el.id || label] = value;
+            fields[label] = value;
+        });
+
+        // Checkbox groups: one joined answer per question.
+        Object.keys(values).forEach(function (key) {
+            if (Object.prototype.toString.call(values[key]) === '[object Array]') {
+                const joined = values[key].join(', ');
+                const label = self.cleanLabel(key);
+                if (!fields[label]) { fields[label] = joined; }
+            }
+        });
+
+        return { values: values, fields: fields };
+    },
+
+    /** Keys the site uses for the same information, most specific first. */
+    aliases: {
+        name: ['name', 'fullname', 'yourname', 'contactname', 'contactperson', 'firstname',
+               'directorname', 'businessname', 'companyname', 'regcompanyname',
+               'partnercompanyname', 'signupname'],
+        email: ['email', 'emailaddress', 'businessemail', 'directoremail', 'signupemail',
+                'regemail', 'contactemail'],
+        phone: ['phone', 'phonenumber', 'tel', 'telephone', 'mobile', 'cell', 'cellphone',
+                'contactnumber', 'whatsapp', 'businessphone', 'directorphone', 'signupphone'],
+        company: ['company', 'companyname', 'businessname', 'business', 'organisation',
+                  'organization', 'tradingname', 'regcompanyname', 'partnercompanyname'],
+        message: ['message', 'notes', 'note', 'details', 'comments', 'comment', 'enquiry',
+                  'enquirydetails', 'description', 'partnerdescription', 'directoridea',
+                  'regservices', 'painpoints', 'growthgoals', 'idea', 'brief'],
+        service: ['service', 'services', 'servicetype', 'servicerequired', 'selectedservice',
+                  'bundle', 'package', 'plan', 'licencetype', 'licensetype', 'interest'],
+        industry: ['industry', 'industryfordocs', 'sector', 'regindustry', 'partnerindustry'],
+        amount: ['total', 'totalamount', 'amount', 'price', 'quote'],
+        preferredDate: ['preferreddate', 'appointmentdate', 'sessiondate', 'startdate', 'date']
+    },
+
+    /** Looser matches for labels that no alias covers. */
+    patterns: {
+        name: /(^|_)name$|fullname|contactperson/,
+        email: /email/,
+        phone: /phone|telephone|mobile|cell|whatsapp|contactnumber/,
+        company: /company|businessname|organisation|organization|trading/,
+        message: /message|notes?$|details|description|comment|enquiry|idea|goals?|painpoint|tellme|aboutyour/,
+        service: /service|bundle|package|plan|licence|license/,
+        industry: /industry|sector/,
+        amount: /total|amount|price/,
+        preferredDate: /date$|preferreddate/
+    },
+
+    /**
+     * Maps any form's fields onto the canonical lead columns the Apps Script
+     * sheet expects: name, email, phone, company, message, service, industry,
+     * amount, preferredDate.
+     */
+    normalise: function (values, fields) {
+        const self = this;
+        const flat = {};
+        const put = function (key, value) {
+            const k = self.normKey(key);
+            const text = Object.prototype.toString.call(value) === '[object Array]'
+                ? value.join(', ') : String(value == null ? '' : value).trim();
+            if (k && text && !flat[k]) { flat[k] = text; }
+        };
+        Object.keys(fields || {}).forEach(function (key) { put(key, fields[key]); });
+        Object.keys(values || {}).forEach(function (key) { put(key, values[key]); });
+
+        const used = {};
+        const take = function (keys) {
+            for (let i = 0; i < keys.length; i++) {
+                const k = self.normKey(keys[i]);
+                if (flat[k] && !used[k]) { used[k] = true; return flat[k]; }
+            }
+            return '';
+        };
+        const takePattern = function (pattern, stop) {
+            const keys = Object.keys(flat);
+            for (let i = 0; i < keys.length; i++) {
+                const k = keys[i];
+                if (used[k] || !pattern.test(k)) { continue; }
+                if (stop && stop.test(k)) { continue; }
+                used[k] = true;
+                return flat[k];
+            }
+            return '';
+        };
+        const pick = function (field) {
+            return take(self.aliases[field]) ||
+                   takePattern(self.patterns[field], field === 'name' ? /company|business|industry|file|logo/ : null);
+        };
+
+        const lead = {
+            name: pick('name'),
+            email: pick('email'),
+            phone: pick('phone'),
+            company: pick('company'),
+            message: pick('message'),
+            service: pick('service'),
+            industry: pick('industry'),
+            amount: pick('amount'),
+            preferredDate: pick('preferredDate')
+        };
+        if (!lead.name && lead.company) { lead.name = lead.company; }
+        return lead;
+    },
+
+
     addHoneypot: function (form) {
         if (form.querySelector('input[name="_hp"]')) { return; }
         const hp = document.createElement('input');
@@ -87,13 +253,17 @@ window.NEON_LEADS = {
 
     /** Sends one payload. Returns a promise that always resolves. */
     send: function (payload) {
+        const self = this;
         if (!this.isConfigured()) { this.queue(payload); return Promise.resolve({ queued: true }); }
         return fetch(this.url(), {
             method: 'POST',
             mode: 'no-cors',                      // Apps Script sends no CORS headers
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
-        }).catch(function () { return null; });
+        }).catch(function () {
+            self.queue(payload);                  // network hiccup – retry on next page load
+            return null;
+        });
     },
 
     /** Retries anything queued while the endpoint was still unconfigured. */
@@ -110,12 +280,26 @@ window.NEON_LEADS = {
     /** Collect + submit a form. */
     submit: function (form) {
         if (!form) { return Promise.resolve(); }
-        const payload = this.collect(form);
-        payload.formType = this.formName(form);
-        payload.token = this.token;
-        payload.id = 'lead-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
-        payload.page = location.pathname.split('/').pop() || 'index.html';
-        payload.timestamp = new Date().toISOString();
+        const collected = this.collect(form);
+        const lead = this.normalise(collected.values, collected.fields);
+        const payload = {
+            formType: this.formName(form),
+            name: lead.name,
+            email: lead.email,
+            phone: lead.phone,
+            company: lead.company,
+            message: lead.message,
+            service: lead.service,
+            industry: lead.industry,
+            amount: lead.amount,
+            preferredDate: lead.preferredDate,
+            fields: collected.fields,             // label -> answer, for the team email
+            token: this.token,
+            id: 'lead-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+            page: location.pathname.split('/').pop() || 'index.html',
+            timestamp: new Date().toISOString()
+        };
+        if (!payload.name && !payload.email && !payload.phone) { return Promise.resolve(); }
         return this.send(payload);
     }
 };

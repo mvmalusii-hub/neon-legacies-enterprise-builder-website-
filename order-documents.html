@@ -2415,6 +2415,32 @@
             payload.page = 'order-documents.html';
             const honeypot = document.querySelector('#orderForm input[name="_hp"]');
             if (honeypot) { payload._hp = honeypot.value; }
+            // Readable label -> answer map, used by the team email.
+            payload.fields = {
+                'Name': payload.name,
+                'Email': payload.email,
+                'Phone': payload.phone,
+                'Company': payload.company,
+                'Company type': payload.companyType,
+                'Proposed company names': payload.proposedNames.join(', '),
+                'Full document system (FDS)': payload.includeFDS ? 'Yes' : 'No',
+                'Industry roadmap': payload.includeRoadmap ? 'Yes' : 'No',
+                'Industry for documents': payload.industryForDocs,
+                'Package': payload.bundle,
+                'Personal services': payload.personalServices.join(', '),
+                'Advanced documents': payload.advancedDocs.join(', '),
+                'Order total': payload.total,
+                'Notes': payload.notes
+            };
+            // Not configured, offline or the request failed -> keep the order so
+            // the next page load can resend it (ids make the retry idempotent).
+            const queueOrder = () => {
+                try {
+                    const q = JSON.parse(localStorage.getItem('neonLeadQueue') || '[]');
+                    q.push(payload);
+                    localStorage.setItem('neonLeadQueue', JSON.stringify(q.slice(-25)));
+                } catch (storageErr) { /* private mode – nothing more we can do */ }
+            };
             try {
                 if (LEAD_ENDPOINT) {
                     await fetch(LEAD_ENDPOINT, {
@@ -2422,12 +2448,9 @@
                         mode: 'no-cors',                       // Apps Script sends no CORS headers
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify(payload)
-                    });
+                    }).catch(queueOrder);
                 } else {
-                    // Not configured yet – keep the order so it can be resent.
-                    const q = JSON.parse(localStorage.getItem('neonLeadQueue') || '[]');
-                    q.push(payload);
-                    localStorage.setItem('neonLeadQueue', JSON.stringify(q.slice(-25)));
+                    queueOrder();
                 }
                 alert('🎉 Congratulations! Your order has been received. We will send a quote and invoice within 24 hours.');
                 document.getElementById('orderForm').reset();
