@@ -161,6 +161,8 @@ function loadCode(initialSheets) {
     mail,
     cache,
     props,
+    /** Raw ContentService reply (used by the auth transport test). */
+    postRaw: params => doPost(params),
     /** Lead submission – returns the parsed JSON reply. */
     doPost: body => JSON.parse(doPost(body).body),
     /** Account call – parses the postMessage payload out of the HTML reply. */
