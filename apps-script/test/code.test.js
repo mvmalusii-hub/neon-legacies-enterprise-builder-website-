@@ -33,17 +33,17 @@ function test(name, fn) {
 
 /* ---------------------------------------------------------------- */
 
-test('health check reports v2', () => {
+test('health check reports v3', () => {
   const health = loadCode().doGet();
   eq(health.ok, true, 'ok');
-  eq(health.version, 2, 'version');
+  eq(health.version, 3, 'version');
 });
 
 test('v1 sheet is migrated in place, old rows kept', () => {
   const v1 = ['Timestamp', 'Reference', 'Form', 'Name', 'Email', 'Phone',
               'Company', 'Message', 'Page', 'Payload JSON'];
-  const svc = loadCode([v1, ['2026-10-30', 'ORD-261030-1111', 'Order', 'Old Lead',
-                             'old@example.com', '0710000000', 'Old Co', 'hi', 'x.html', '{}']]);
+  const svc = loadCode({ Leads: [v1, ['2026-10-30', 'ORD-261030-1111', 'Order', 'Old Lead',
+                             'old@example.com', '0710000000', 'Old Co', 'hi', 'x.html', '{}']] });
   const res = svc.doPost(Object.assign({}, base, {
     id: 'migrate-1', formType: 'Director Session', directorName: 'New Lead',
     directorEmail: 'new@example.com', directorIdea: 'Hello'
