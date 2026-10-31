@@ -91,7 +91,7 @@
                     </div>
                     <button type="submit" class="btn">Log In →</button>
                     <button type="button" class="btn google-btn" id="googleLoginBtn">
-                        <i class="fab fa-google"></i> Sign in with Google
+                        <i class="fab fa-google"></i> Continue with Google (Gmail)
                     </button>
                     <div class="message" id="loginMessage"></div>
                 </form>
@@ -142,6 +142,11 @@
     <!-- ============================================================ -->
     <!-- 3. EXTERNAL JAVASCRIPT (Replaces all inline JS)              -->
     <!-- ============================================================ -->
+    <script>
+        // Google Cloud Console > APIs & Services > Credentials > OAuth client ID (Web).
+        // Add https://www.neonlegacies.co.za as an authorised JavaScript origin.
+        window.NEON_GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+    </script>
     <script src="app.js"></script>
 
 </body>

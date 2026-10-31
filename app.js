@@ -267,12 +267,76 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Google login placeholder
+        // Google (Gmail) sign-in / profile creation via Google Identity Services
         const googleBtn = document.getElementById('googleLoginBtn');
         if (googleBtn) {
-            googleBtn.addEventListener('click', function() {
-                alert('Google Sign‑in will be integrated later using OAuth.');
-            });
+            const loginMsg = document.getElementById('loginMessage');
+            const say = function (html) { if (loginMsg) { loginMsg.innerHTML = html; } };
+            const clientId = window.NEON_GOOGLE_CLIENT_ID;
+            const configured = clientId && clientId.indexOf('.apps.googleusercontent.com') > 0;
+
+            window.NEON_PROFILE = {
+                key: 'neonProfile',
+                get: function () {
+                    try { return JSON.parse(localStorage.getItem(this.key) || 'null'); } catch (x) { return null; }
+                },
+                // Decode the Google ID token (JWT) payload.
+                decode: function (jwt) {
+                    const b = jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+                    return JSON.parse(decodeURIComponent(atob(b).split('').map(function (c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join('')));
+                },
+                // Create (or refresh) the profile and register it as a lead.
+                fromGoogle: function (credential) {
+                    const g = this.decode(credential);
+                    if (g.email_verified === false) { throw new Error('Gmail address not verified'); }
+                    const existing = this.get();
+                    const isNew = !existing || existing.email !== g.email;
+                    const profile = {
+                        name: g.name || g.email, email: g.email, picture: g.picture || '',
+                        provider: 'google', createdAt: isNew ? new Date().toISOString() : existing.createdAt
+                    };
+                    localStorage.setItem(this.key, JSON.stringify(profile));
+                    if (isNew) {
+                        window.NEON_LEADS.send({
+                            formType: 'Account Signup', name: profile.name, email: profile.email,
+                            message: 'Profile created with Google', provider: 'google',
+                            token: window.NEON_LEADS.token, page: 'profile.html',
+                            id: 'google-' + g.sub, timestamp: profile.createdAt
+                        });
+                    }
+                    return { profile: profile, isNew: isNew };
+                }
+            };
+
+            const onCredential = function (resp) {
+                try {
+                    const r = window.NEON_PROFILE.fromGoogle(resp.credential);
+                    say('<span style="color:green;">✅ ' + (r.isNew ? 'Profile created' : 'Welcome back') +
+                        ' for ' + r.profile.email + '.</span>');
+                } catch (err) {
+                    say('<span style="color:red;">❌ Google sign-in failed: ' + err.message + '</span>');
+                }
+            };
+
+            if (!configured) {
+                googleBtn.addEventListener('click', function () {
+                    say('<span style="color:red;">❌ Google sign-in is not configured yet (set window.NEON_GOOGLE_CLIENT_ID in profile.html).</span>');
+                });
+            } else {
+                const gs = document.createElement('script');
+                gs.src = 'https://accounts.google.com/gsi/client';
+                gs.async = true;
+                gs.onload = function () {
+                    google.accounts.id.initialize({ client_id: clientId, callback: onCredential });
+                    const holder = document.createElement('div');
+                    googleBtn.parentNode.replaceChild(holder, googleBtn);
+                    holder.id = 'googleLoginBtn';
+                    google.accounts.id.renderButton(holder, { theme: 'outline', size: 'large', text: 'continue_with' });
+                };
+                document.head.appendChild(gs);
+            }
         }
     }
 
