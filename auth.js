@@ -141,7 +141,7 @@
             var id = this.clientId();
             return typeof id === 'string' &&
                 id.indexOf('REPLACE_WITH') !== 0 &&
-                id.length > 20;
+                /^[0-9]+-[A-Za-z0-9_.-]+\.apps\.googleusercontent\.com$/.test(id);
         },
 
         /** True once the Apps Script login URL is available. */
@@ -1041,6 +1041,12 @@
             }
             if (method === 'apps-script') {
                 return 'Ready: Apps Script Google login. Origin: ' + this.origin();
+            }
+            var saved = this.readOverrides();
+            if (saved.clientId) {
+                return 'The OAuth client id is not a real Google client id – it must look ' +
+                    'like 1234567890-xxxx.apps.googleusercontent.com (create it under ' +
+                    'console.cloud.google.com/apis/credentials). Origin: ' + this.origin();
             }
             return 'Not ready: no OAuth client id and no Apps Script URL. Origin: ' +
                 this.origin();

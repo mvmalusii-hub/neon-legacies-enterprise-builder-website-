@@ -892,6 +892,18 @@ async function authScriptClientTests() {
             'a dead service is reported honestly');
     });
 
+    await test('a client id that is not Google-shaped is refused with a hint', async () => {
+        const page = makeProfilePage({ unconfigured: true });
+        page.doc.getElementById('neonAuthSetupClientId').value =
+            'YOUR_GOOGLE_CLIENT_://googleusercontent.com';
+        page.doc.getElementById('neonAuthSetupSave').click();
+        eq(page.win.NEON_AUTH.method(), 'none', 'junk id does not enable the OAuth route');
+        eq(page.googleState.initializeCalls, 0, 'GIS never asked to initialise');
+        assert(/not a real Google client id/.test(
+            String(page.doc.getElementById('neonAuthSetupStatus').textContent)),
+            'owner told exactly what is wrong');
+    });
+
     await test('end to end: Auth.gs issue → site session → Auth.gs confirmation', async () => {
         // 1. The visitor clicks "Sign in with Google"; Google has already
         //    signed them in, so Auth.gs issues a session token.

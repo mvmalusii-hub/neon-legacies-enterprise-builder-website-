@@ -163,7 +163,7 @@ and is ended by `logout.html`.
 ### Test it
 
 ```bash
-node apps-script/test/google-auth.test.js   # 49 tests, ~380 assertions
+node apps-script/test/google-auth.test.js   # 50 tests, ~390 assertions
 ```
 
 The suite runs the real `Code.gs`, `Auth.gs`, `auth.js` and `app.js` (through an
