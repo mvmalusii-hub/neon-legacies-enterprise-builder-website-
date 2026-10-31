@@ -56,6 +56,29 @@ blocking of files that should never be public.
 Everything here is in `security-headers.worker.js` (tested by
 `apps-script/test/cloudflare-worker.test.js`).
 
+## Proof that the integration is really live (three commands)
+
+```bash
+# 1. Cloudflare must own the zone
+curl -s 'https://dns.google/resolve?name=neonlegacies.co.za&type=NS' | grep -o '[a-z0-9.-]*\.ns\.cloudflare\.com'
+#    expected: two results, e.g. ana.ns.cloudflare.com / bob.ns.cloudflare.com
+
+# 2. Traffic must arrive via Cloudflare
+curl -sI https://www.neonlegacies.co.za/profile.html | grep -i '^server:'
+#    expected: server: cloudflare      (NOT server: GitHub.com)
+
+# 3. Headers + blocked paths
+./cloudflare/verify.sh
+#    expected: 13 checks passed
+```
+
+All three must agree. If (2) still says `GitHub.com`, the nameservers have not
+been switched yet, no matter what the dashboard shows.
+
+**Measured 2026-10-31 (before the migration):** zone NS = `*.anycast-ns.com`
+(Domains.co.za), `server: GitHub.com`, `verify.sh` = 5 passed / 8 failed. That
+is the "not yet integrated" baseline to compare against.
+
 ## What protects what
 
 | Threat | Layer |

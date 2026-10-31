@@ -89,6 +89,27 @@ curl -sS -X POST '<EXEC_URL>' -H 'Content-Type: text/plain' \
   --data '{"formType":"Test","name":"Test Lead","email":"you@example.com","message":"hello","token":"<TOKEN>"}'
 ```
 
+## Do we need "Google verification" / certification?
+
+**No** – and there is no such certificate to obtain for this login. What people
+usually mean by it, and the answer for each:
+
+| Thing people call "Google verification" | Needed here? |
+|---|---|
+| OAuth app verification / "unverified app" warning | **No.** `Auth.gs` requests **zero OAuth scopes** (it only reads `Session.getActiveUser()`), so a visitor never sees a consent screen and there is nothing to review. A test enforces this: *"Auth.gs asks the visitor for no permissions"*. |
+| OAuth consent screen review (if you add an OAuth client id) | **No**, as long as you only use `openid`, `email`, `profile`. Those are *non-sensitive* scopes, so the consent screen can stay **In production** without Google's review. Approval is only required for sensitive/restricted scopes (Gmail, Drive, Calendar…). |
+| Branding verification (app name + logo on the consent screen) | **Optional.** Requires verifying `neonlegacies.co.za` in Google Search Console and submitting branding. Purely cosmetic. |
+| "Verified publisher" (Workspace Marketplace) | **Not applicable** — this is not a Marketplace app. |
+| The "Google hasn't verified this app" screen you see **as the owner** when authorising `Code.gs` | That is your own script asking for Sheets/Gmail to run the lead intake. Click *Advanced ▸ Go to … (unsafe)* once; visitors never see it, because `Code.gs` runs as **you**, not as them. |
+
+The trust chain that actually matters is already in place:
+
+- Visitors authenticate on **accounts.google.com** itself — Google's own page.
+- `Auth.gs` trusts only what Google hands it (`Session.getActiveUser()`), and the
+  site only trusts a 64-character token that `Auth.gs` issued and still holds.
+- Option A (if used) verifies the ID token against
+  `oauth2.googleapis.com/tokeninfo` before creating a session.
+
 ## Google Sign-in (`action=googleLogin`)
 
 `profile.html` signs members in with their **Google account** – see `auth.js`
