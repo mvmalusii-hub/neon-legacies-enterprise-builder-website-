@@ -69,6 +69,28 @@ Neon Legacies Enterprise Builder-website/
 5. Click **Save**.
 6. Your site will be live at `https://www.neonlegacies.co.za/` within 2 minutes.
 
+### Cloudflare (CDN, security, analytics)
+
+The site is served through **Cloudflare** in front of GitHub Pages — see
+[`cloudflare/README.md`](cloudflare/README.md) for the full runbook (DNS, TLS,
+redirect rules, security headers, caching, WAF, Web Analytics, optional
+Cloudflare Pages hosting).
+
+What is already in the repository:
+
+| File | Purpose |
+| --- | --- |
+| `assets/js/cloudflare-analytics.js` | Cookieless Cloudflare Web Analytics beacon — loaded on every page. Paste your token into `CF_ANALYTICS_TOKEN` to activate. |
+| `_headers` | Security headers + cache-control rules used by Cloudflare Pages. |
+| `_redirects` | Canonical `www` host and clean-URL 301 redirects for Cloudflare Pages. |
+| `wrangler.toml` | Cloudflare Pages project config (no build step). |
+| `cloudflare/github-workflow/cloudflare-pages.yml` | Optional CI deploy to Cloudflare Pages (copy into `.github/workflows/`). |
+| `404.html` | Branded not-found page used by both GitHub Pages and Cloudflare Pages. |
+
+```bash
+npx wrangler pages dev . --port 8080   # preview with _headers/_redirects applied
+```
+
 ---
 
 ## 🛠️ How to Maintain This Site
@@ -121,8 +143,10 @@ See `.gitignore` – excludes system files (`.DS_Store`), editor settings, temp 
 
 - [ ] Replace logo placeholder with actual logo image.
 - [ ] Add actual PDFs to `assets/pdfs/`.
-- [ ] Connect contact form to a backend (optional).
-- [ ] Add Google Analytics (optional).
+- [x] Connect contact form to a backend (Google Apps Script → Sheets).
+- [x] Cloudflare integration (edge proxy, security headers, 404 page, Web Analytics).
+- [ ] Paste the Cloudflare Web Analytics token into `assets/js/cloudflare-analytics.js`.
+- [ ] Optional: enable Cloudflare Pages deploys by adding `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` secrets.
 
 ---
 

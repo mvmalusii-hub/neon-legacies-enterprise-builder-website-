@@ -1,0 +1,31 @@
+# ==========================================================
+# Cloudflare redirect rules (Cloudflare Pages / wrangler)
+# ==========================================================
+# Format: <from>  <to>  [status]
+# Docs: https://developers.cloudflare.com/pages/configuration/redirects/
+#
+# These mirror the .htaccess rules (which GitHub Pages does not
+# execute) and the Redirect Rules documented in cloudflare/README.md.
+#
+# ⚠️ IMPORTANT — do NOT add `/foo` → `/foo.html` rules here.
+# Cloudflare Pages already serves extensionless URLs natively and
+# 308-redirects `/foo.html` → `/foo`, so such a rule creates an
+# infinite redirect loop. GitHub Pages cannot serve extensionless
+# URLs at all; that behaviour is provided by a Cloudflare Redirect
+# Rule (Path A, step A4), not by this file.
+# ============================================================
+
+# --- Legacy brand domain -> canonical host (production only) ---------
+# Cloudflare Pages applies absolute-URL (domain-level) rules at the
+# edge in production; `wrangler pages dev` skips them by design.
+https://legacylaunchpad.co.za/*        https://www.neonlegacies.co.za/:splat   301
+https://www.legacylaunchpad.co.za/*    https://www.neonlegacies.co.za/:splat   301
+
+# --- Apex -> www (single canonical origin, avoids duplicate content) --
+https://neonlegacies.co.za/*           https://www.neonlegacies.co.za/:splat   301
+
+# --- Safety net: unknown paths must 404, never fall back to index -----
+# `404.html` in the repository root is served by both Cloudflare Pages
+# and GitHub Pages for unmatched paths, so no catch-all rule is needed
+# here (and a catch-all would break the 404 status code).
+

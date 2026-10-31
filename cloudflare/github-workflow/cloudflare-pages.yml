@@ -1,0 +1,64 @@
+name: Deploy to Cloudflare Pages
+
+# Optional companion workflow for Path B (cloudflare/README.md).
+#
+# INSTALL: copy this file to `.github/workflows/cloudflare-pages.yml`
+#          in the repository before relying on it:
+#            mkdir -p .github/workflows
+#            cp cloudflare/github-workflow/cloudflare-pages.yml .github/workflows/
+#
+# It stays inert until you add two repository secrets:
+#   CLOUDFLARE_API_TOKEN  – "Edit Cloudflare Workers" template token
+#   CLOUDFLARE_ACCOUNT_ID – dashboard → Overview → Account ID
+# Until then the job logs a notice and exits without touching
+# GitHub Pages, which stays the live origin.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: cloudflare-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Publish static site to Cloudflare Pages
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Cloudflare credentials
+        id: creds
+        run: |
+          if [ -z "${CLOUDFLARE_API_TOKEN}" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::CLOUDFLARE_API_TOKEN is not set - skipping Cloudflare Pages deploy (GitHub Pages remains the origin)."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Sanity-check the static bundle
+        run: |
+          test -f index.html
+          test -f _headers
+          test -f _redirects
+          test -f assets/js/cloudflare-analytics.js
+          echo "Static bundle OK"
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.creds.outputs.ready == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy . --project-name=neon-legacies --branch=${{ github.ref_name }}

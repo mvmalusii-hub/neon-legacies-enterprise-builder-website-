@@ -1,0 +1,22 @@
+# ==========================================================
+# Cloudflare Pages configuration — Neon Legacies website
+# ==========================================================
+# The site is pre-built static HTML/CSS/JS, so there is no build
+# command: the repository root IS the deploy directory.
+#
+#   Local preview : npx wrangler pages dev . --port 8080
+#   Deploy        : npx wrangler pages deploy .
+#
+# Header and redirect rules live in ./_headers and ./_redirects
+# (Cloudflare Pages reads both from the deploy directory root).
+# ==========================================================
+
+name = "neon-legacies"
+pages_build_output_dir = "."
+compatibility_date = "2025-01-01"
+
+# No build step: deploy the committed files as-is.
+# GitHub Pages keeps working unchanged as a rollback target.
+
+[env.preview]
+name = "neon-legacies-preview"

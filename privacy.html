@@ -157,7 +157,13 @@
                 <p>We do not use your personal information for marketing purposes unless you have given explicit consent. You may opt out at any time.</p>
 
                 <h2>10. Cookies and Website Tracking</h2>
-                <p>Our website (currently a static HTML site) does not use cookies or tracking scripts. If we add analytics in the future, we will update this policy and seek consent where required.</p>
+                <p>Our website is a static HTML site and does not set advertising or profiling cookies.</p>
+                <p>We use <strong>Cloudflare Web Analytics</strong> to understand how many people visit which pages so that we can improve the site. This service is <strong>cookieless</strong>: it does not write cookies, does not build a cross‑site profile, does not store your IP address in a readable form, and does not identify you personally. Because no personal information is processed for this purpose, it does not require consent under POPIA, but you can still opt out at any time:</p>
+                <ul>
+                    <li>Enable <em>Do Not Track</em> or <em>Global Privacy Control</em> in your browser — our analytics script automatically respects both signals.</li>
+                    <li>Ask us to switch analytics off for your browser and we will note the opt‑out on any device you use.</li>
+                </ul>
+                <p>Our site is delivered through the Cloudflare network, which processes technical request data (such as IP address, requested URL and user agent) as a security and content‑delivery provider for the purpose of protecting the site against attacks. If we add any cookie‑based analytics or marketing tool in the future, we will update this policy and ask for your consent first.</p>
 
                 <h2>11. Children's Privacy</h2>
                 <p>Our services are not directed at children under 18. We do not knowingly collect personal information from minors. If we become aware that we have inadvertently collected such information, we will delete it.</p>
@@ -199,5 +205,7 @@
     <!-- ============================================================ -->
     <script src="app.js"></script>
 
+    <!-- ===== CLOUDFLARE WEB ANALYTICS (cookieless) ===== -->
+    <script src="assets/js/cloudflare-analytics.js" defer></script>
 </body>
 </html>

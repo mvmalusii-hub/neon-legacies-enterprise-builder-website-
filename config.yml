@@ -49,6 +49,11 @@ exclude:
   - .gitignore
   - package.json
   - package-lock.json
+  # Cloudflare configuration — consumed by the edge, not by the browser
+  - cloudflare
+  - wrangler.toml
+  - _headers
+  - _redirects
 
 # ==========================================
 # DEFAULTS
