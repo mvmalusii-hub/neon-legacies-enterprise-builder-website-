@@ -33,6 +33,7 @@ var AUTH = {
   ALLOWED_ORIGINS: [
     'https://www.neonlegacies.co.za',
     'https://neonlegacies.co.za',
+    'https://mvmalusii-hub.github.io',   // GitHub Pages preview domain
     'http://localhost:8000',
     'http://localhost:8123'
   ],
