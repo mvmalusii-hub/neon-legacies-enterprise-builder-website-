@@ -150,3 +150,67 @@ only – there is no real account system behind it.
 - **Duplicate forms on a page**: `profile.html` holds a login form marked
   `data-no-lead="true"` (never sent) and a signup form (sent). Passwords are
   always stripped before the payload leaves the browser.
+
+## Accounts (v3)
+
+The same web app now runs a real account system — the site no longer pretends
+anyone is logged out.
+
+Sheet | Columns | Used for
+---|---|---
+`Users` | Id, Created, Name, Email, Phone, Company, Role, Status, Salt, Hash, Iterations, Last Login, Password Changed, Reset Token, Reset Expires | one row per account; `Status` must stay `active` to sign in
+`Sessions` | Token Hash, User Id, Email, Created, Expires, Device, Last Seen | one row per signed-in device (7 days)
+
+**How it works**
+
+- Passwords are stored as **salted, 600× iterated SHA-256** (`Salt` + `Hash`).
+  Apps Script has no PBKDF2/Argon2, so the iteration count is the defence;
+  bump `CONFIG.HASH_ITERATIONS` if you want it slower (it costs ~1 ms each).
+- Sign-in returns a 64-character session token. Only its SHA-256 is written to
+  `Sessions`, so a leaked sheet cannot be replayed as a login.
+- Rate limits: 10 failed logins per email per 15 min, 3 signups per email per
+  hour, 3 reset mails per email per hour.
+- Password change signs every other device out. Password reset links are single
+  use and expire after 60 minutes.
+- `requestReset` answers identically for unknown emails (no account probing).
+
+**Why an iframe:** Apps Script cannot set CORS headers, so `fetch()` can never
+read a web-app reply. Account calls are posted from a hidden form into a hidden
+iframe and the reply page does `parent.postMessage(JSON)`; `auth.js` matches it
+by `requestId`. Credentials therefore never travel in a URL.
+
+**Site wiring**
+
+File | Role
+---|---
+`auth.js` | `window.NEON_AUTH` – signup, login, logout, refresh, updateProfile, changePassword, requestReset, resetPassword, `onChange`, `requireUser`
+`profile.html` + `app.js` | sign-in / sign-up tabs, signed-in panel (details, password change, sign out), forgot-password form
+`reset.html` + `reset.js` | the page the reset email links to
+`logout.html` | ends the server session, then clears local storage
+
+Gated forms (`data-requires-auth="true"`): director session, partner application,
+growth consultation, hire-admin and market-lead registration. Their leads are
+only recorded once a real session exists, and the payload is stamped with
+`accountId` / `accountEmail`.
+
+**Owner tasks**
+
+- `migrateAccounts()` – creates the `Users`/`Sessions` tabs, reports counts.
+- `testAccounts()` – proves hashing is deterministic and rejects a wrong password.
+- Create an admin by changing that user's `Role` to `admin` in the sheet (no UI yet).
+
+**Not built yet** (deliberate, needs your decision): email verification on
+signup, Google sign-in, self-service account deletion (POPIA), and an admin
+screen for the `Users` / `Leads` sheets.
+
+## Tests
+
+```bash
+node apps-script/test/code.test.js        # lead intake backend
+node apps-script/test/accounts.test.js    # accounts backend (7 tests, 75 assertions)
+node apps-script/test/app.test.js         # lead hook + gated forms
+node apps-script/test/auth-client.test.js # auth.js ↔ Code.gs end to end
+node apps-script/test/forms.test.js       # every real <form> on the site
+node apps-script/test/wiring.test.js      # pages load the right scripts
+node apps-script/test/profile-ui.test.js  # profile page UI -> auth.js -> Code.gs
+```

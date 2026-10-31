@@ -117,14 +117,53 @@ See `.gitignore` – excludes system files (`.DS_Store`), editor settings, temp 
 
 ---
 
+## 🔐 Accounts & lead intake
+
+Every form on the site posts to one Google Apps Script web app (`apps-script/Code.gs`).
+The same deployment also runs the account system.
+
+File | Role
+---|---
+`app.js` | site-wide lead capture, page behaviour, gated-form checks
+`auth.js` | `window.NEON_AUTH` – sign up, sign in, session refresh, profile, password change/reset, sign out
+`reset.js` | logic for `reset.html` (the link in the reset email)
+`profile.html` | sign-in / sign-up, signed-in account panel, password change
+`reset.html` | choose a new password from an emailed link
+`logout.html` | ends the server session and clears this device
+`apps-script/Code.gs` | leads + accounts backend (Sheets: `Leads`, `Users`, `Sessions`)
+`apps-script/README.md` | deployment, sheet schema, security notes, tests
+
+Accounts are real: passwords are salted and iterated (SHA-256 × 600), sessions
+are server-side (`Sessions` sheet, 7 days) and only a hash of the token is
+stored. Gated forms — director session, partner application, growth
+consultation, hire admin and market-lead registration — only record a lead when
+a session exists.
+
+Run the test suites (plain Node, no installs):
+
+```bash
+node apps-script/test/code.test.js
+node apps-script/test/accounts.test.js
+node apps-script/test/app.test.js
+node apps-script/test/auth-client.test.js
+node apps-script/test/forms.test.js
+node apps-script/test/wiring.test.js
+```
+
+---
+
 ## 🧩 To Do / Roadmap
 
+- [x] Lead intake backend (Google Apps Script + Sheets).
+- [x] Real account system (sign up, sign in, sessions, password reset).
+- [ ] Email verification on signup and Google sign-in.
+- [ ] Admin screen for `Users` / `Leads` (status pipeline lives in the sheet for now).
+- [ ] Self-service account deletion (POPIA request handling).
 - [ ] Replace logo placeholder with actual logo image.
 - [ ] Add actual PDFs to `assets/pdfs/`.
-- [ ] Connect contact form to a backend (optional).
 - [ ] Add Google Analytics (optional).
 
 ---
 
-**Last updated:** May 2025  
+**Last updated:** October 2026  
 **Maintained by:** Neon Legacies Enterprise Builder(Pty) Ltd
