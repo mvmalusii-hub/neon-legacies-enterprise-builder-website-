@@ -1,5 +1,51 @@
 # Login security with Cloudflare
 
+## 0. If Cloudflare says "invalid domain"
+
+Cloudflare's **Add a site** box wants the *registrable domain only*. These are
+all rejected:
+
+| Typed | Result |
+|---|---|
+| `https://www.neonlegacies.co.za/` | invalid – no scheme, no path, no trailing slash |
+| `www.neonlegacies.co.za` | invalid – `www` is a DNS record, not a zone |
+| `neonlegacies.co.za ` (trailing space / line break from copy-paste) | invalid |
+| `Neon Legacies Enterprise Builder` | invalid |
+
+Type exactly:
+
+```
+neonlegacies.co.za
+```
+
+Two more things that produce the same error:
+
+- **Using the wrong screen.** *Workers & Pages ▸ your Worker ▸ Custom Domains*
+  needs the zone to exist first. Add the zone with **Add a site** (top-right of
+  the dashboard), then attach the Worker with **Triggers ▸ Add route**
+  (`www.neonlegacies.co.za/*`), not a custom domain.
+- **The zone is already in another Cloudflare account** (an old developer's).
+  The dashboard then refuses to add it; remove it from that account or ask
+  Cloudflare support to release it.
+
+### Verified state of this domain (checked 2026-10-31)
+
+| Record | Value |
+|---|---|
+| `neonlegacies.co.za` NS | `ns1.anycast-ns.com`, `ns2.anycast-ns.net`, `ns3.anycast-ns.com`, `ns4.anycast-ns.net` → **Domains.co.za** |
+| `neonlegacies.co.za` SOA | `dns-admin.domains.co.za` |
+| `www` CNAME | `mvmalusii-hub.github.io` → `185.199.108–111.153` (GitHub Pages) |
+| apex `A` | **none** – the bare domain does not resolve today |
+
+The nameserver change therefore happens at **Domains.co.za**:
+*Manage domain ▸ Nameservers ▸ Use custom nameservers* → paste the two
+`*.ns.cloudflare.com` names Cloudflare shows for the new zone. `.co.za` usually
+propagates within a few hours (allow up to 24).
+
+While you are there, check **DNSSEC**. If Domains.co.za has DS records enabled,
+switch DNSSEC on in Cloudflare *before* the nameservers change, otherwise the
+domain returns `SERVFAIL` after the move.
+
 The site is static (GitHub Pages) and authentication happens in
 `apps-script/Auth.gs` (Google account login) or Google Identity Services.
 GitHub Pages **cannot send response headers**, so Cloudflare is what gives the
