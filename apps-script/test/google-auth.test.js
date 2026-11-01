@@ -973,15 +973,18 @@ async function wiringTests() {
         assert(/id="accountPanel"/.test(html), 'account panel present');
         assert(/id="authMessage"/.test(html), 'auth message area present');
         assert(/id="googleLoginBtn"/.test(html), 'fallback button kept');
-        assert(/<script src="auth\.js"><\/script>\s*\n\s*<script src="app\.js"><\/script>/.test(html),
+        assert(/<script src="auth\.js(?:\?v=[0-9a-f]+)?"><\/script>\s*\n\s*<script src="app\.js"><\/script>/.test(html),
             'auth.js loads before app.js');
         assert(/<meta name="viewport"/.test(html), 'viewport meta present');
     });
 
     await test('every gated page loads auth.js and points at Google sign-in', async () => {
+        // auth.js is referenced as auth.js?v=<content hash> so a cached copy
+        // can never outlive a deploy (tools/version-assets.sh keeps it in sync).
+        const authTag = /<script src="auth\.js(?:\?v=[0-9a-f]+)?"><\/script>/;
         GATED_PAGES.forEach(function (page) {
             const html = read(page);
-            assert(html.indexOf('<script src="auth.js"></script>') !== -1,
+            assert(authTag.test(html),
                 page + ' loads auth.js');
             assert(html.indexOf('app.js') > html.indexOf('auth.js'),
                 page + ' loads auth.js before app.js');
@@ -994,7 +997,7 @@ async function wiringTests() {
 
     await test('logout.html ends the Google session', async () => {
         const html = read('logout.html');
-        assert(html.indexOf('<script src="auth.js"></script>') !== -1, 'auth.js loaded');
+        assert(/<script src="auth\.js(?:\?v=[0-9a-f]+)?"><\/script>/.test(html), 'auth.js loaded');
         assert(/NEON_AUTH\.logout\(\)/.test(html), 'session ended through auth.js');
         assert(/neonAuthSession/.test(html), 'session key swept as a fallback');
     });
