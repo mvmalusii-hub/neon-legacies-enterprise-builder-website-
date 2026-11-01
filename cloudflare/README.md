@@ -28,25 +28,32 @@ Two more things that produce the same error:
   The dashboard then refuses to add it; remove it from that account or ask
   Cloudflare support to release it.
 
-### Verified state of this domain (checked 2026-11-01 00:40Z)
+### Verified state of this domain (checked 2026-11-01 07:19Z)
 
 | Record | Value |
 |---|---|
-| `neonlegacies.co.za` NS (registry, 00:23:58Z) | `emma.ns.cloudflare.com`, `norm.ns.cloudflare.com` – **clean, exactly two** |
-| `neonlegacies.co.za` DS | **none** – `DNSSEC: unsigned`, correct at this stage |
-| `www` at Cloudflare (`emma`, asked directly) | **nothing** – NODATA for `A` and `CNAME` |
-| apex at Cloudflare (`emma`, asked directly) | **nothing** – NODATA for `A` |
-| `www` via public resolvers | **NODATA on `1.1.1.1`, `8.8.8.8`, `9.9.9.9`** → the site is unreachable for visitors without a cached record |
-| GitHub Pages | `cname: www.neonlegacies.co.za`, certificate approved, HTTPS enforced, built from `main` – the origin is healthy |
-| Cloudflare zone | authoritative (`serial=2418979269`) but **empty** |
+| `neonlegacies.co.za` NS (registry, 00:23:58Z) | `emma.ns.cloudflare.com`, `norm.ns.cloudflare.com` – clean, exactly two |
+| NS via `dns.google` + `cloudflare-dns.com` | both return the two Cloudflare nameservers – **propagated** |
+| `www` at Cloudflare | proxied A `104.21.59.250`, `172.67.186.77` (zone `serial=2419003170`) |
+| apex at Cloudflare | proxied A `104.21.59.250`, `172.67.186.77` |
+| `www.neonlegacies.co.za` | **HTTP 200, `server: cloudflare`**, `cf-cache-status: DYNAMIC` |
+| apex | `301 → https://www.neonlegacies.co.za/<same path>` (deep links keep their path) |
+| `http://` any host | `301 → https://` |
+| TLS at the edge | Let's Encrypt `CN=neonlegacies.co.za`, valid 2026-10-31 → 2027-01-29 |
+| `profile.html`, `auth.js`, `main.css`, `sitemap.xml`, `robots.txt` | all 200, no bot challenge (`cf-mitigated` absent) |
+| GitHub Pages origin | `cname: www.neonlegacies.co.za`, certificate approved, HTTPS enforced, built from `main` |
+| `neonlegacies.co.za` DS | **none** – `DNSSEC: unsigned` (last step) |
+| Security headers | **not yet** – the Worker from §3 is not deployed: `verify.sh` = 6 passed / 7 failed |
 
-The delegation is done and correct. The only thing missing is the zone's
-contents: with the registry clean this is now the difference between the site
-working and NXDOMAIN for everyone whose cache has expired.
+So the migration itself is done: registry, resolvers, zone contents and traffic
+all agree. What is left is the hardening that the Worker adds (§3), the cache
+rules it depends on (§4), WAF/bots (§5) and finally DNSSEC.
 
 History: WHOIS at 00:18:48Z still listed four nameservers (`emma`, `norm`,
 `ns3.anycast-ns.com`, `ns4.anycast-ns.net`) – the registrar had *added*
-Cloudflare instead of replacing the old pair; by 00:23:58Z that was corrected.
+Cloudflare instead of replacing the old pair; by 00:23:58Z that was corrected,
+and at 00:40Z the zone was still empty (domain dark for uncached visitors) until
+the records were added.
 
 Check it yourself at any time, without `dig`:
 
@@ -226,6 +233,13 @@ curl -sI https://www.neonlegacies.co.za/profile.html | grep -i '^server:'
 
 All five must agree. If `server:` still says `GitHub.com`, the delegation is not
 clean, no matter what the dashboard shows.
+
+**Measured 2026-11-01 07:19Z (migration complete, headers pending):** registry =
+`emma`, `norm`; both resolvers agree; zone serves proxied A records for `www`
+and the apex; `www` = 200 `server: cloudflare`; apex = 301 to `www` on the same
+path; `http://` = 301 to `https://`; TLS = Let's Encrypt `CN=neonlegacies.co.za`
+until 2027-01-29. `status.sh` = **7 passed / 1 waiting (exit 0)**;
+`verify.sh` = 6 passed / 7 failed (the Worker is not deployed yet).
 
 **Measured 2026-11-01 00:40Z (delegation clean, zone still empty):** registry =
 `emma`, `norm` only; `www` returns NODATA on `1.1.1.1`, `8.8.8.8` and `9.9.9.9`;
