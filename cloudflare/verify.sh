@@ -43,6 +43,45 @@ check_code() {
   fi
 }
 
+# A blocked path can be answered by GitHub (404, file simply absent) or by a
+# WAF rule (403). Both are fine – anything else means the file is downloadable.
+check_blocked() {
+  local label="$1" url="$2" code
+  code=$(curl -sS -o /dev/null --max-time 20 -w '%{http_code}' "$url" 2>/dev/null)
+  case "$code" in
+    403|404)
+      green "  PASS  $label (HTTP $code)"
+      PASS=$((PASS + 1)) ;;
+    *)
+      red   "  FAIL  $label (HTTP $code – downloadable)"
+      FAIL=$((FAIL + 1)) ;;
+  esac
+}
+
+# auth.js is the login logic. If the edge caches it, a fix takes hours to reach
+# users and sign-in bugs look "random". Cache rule 4.1 must bypass it.
+check_auth_js_cache() {
+  local headers cache_status cache_control
+  headers=$(curl -sSI --max-time 20 "$SITE/auth.js" 2>/dev/null | tr -d '\r')
+  cache_status=$(printf '%s\n' "$headers" | grep -i '^cf-cache-status:' | head -n 1 | awk '{print tolower($2)}')
+  cache_control=$(printf '%s\n' "$headers" | grep -i '^cache-control:' | head -n 1 | sed 's/^[Cc]ache-[Cc]ontrol: *//')
+
+  case "$cache_status" in
+    bypass|dynamic)
+      green "  PASS  auth.js is not edge-cached (cf-cache-status: $cache_status)"
+      PASS=$((PASS + 1)) ;;
+    *)
+      if printf '%s' "$cache_control" | grep -qiE 'no-store|no-cache|max-age=0'; then
+        green "  PASS  auth.js is not edge-cached (cache-control: $cache_control)"
+        PASS=$((PASS + 1))
+      else
+        red   "  FAIL  auth.js is edge-cached (cf-cache-status: ${cache_status:-none}, cache-control: ${cache_control:-none})"
+        red   "        Add cache rule 4.1: uri.path eq \"/auth.js\" -> Bypass cache"
+        FAIL=$((FAIL + 1))
+      fi ;;
+  esac
+}
+
 echo "Checking $SITE"
 echo
 echo "Cloudflare in front of the site"
@@ -60,14 +99,18 @@ check_header "COOP allows Google's popup" "cross-origin-opener-policy: *same-ori
 
 echo
 echo "Repo internals hidden"
-check_code "  /.git/config blocked" "404" "$SITE/.git/config"
-check_code "  /.env blocked" "404" "$SITE/.env"
-check_code "  test sources blocked" "404" "$SITE/apps-script/test/google-auth.test.js"
+check_blocked "  /.git/config blocked" "$SITE/.git/config"
+check_blocked "  /.env blocked" "$SITE/.env"
+check_blocked "  test sources blocked" "$SITE/apps-script/test/google-auth.test.js"
 
 echo
 echo "Login assets reachable"
 check_code "profile.html" "200" "$SITE/profile.html"
 check_code "auth.js" "200" "$SITE/auth.js"
+
+echo
+echo "Login assets are never stale"
+check_auth_js_cache
 
 echo
 echo "----------------------------------------"

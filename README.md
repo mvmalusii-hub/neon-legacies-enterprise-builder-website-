@@ -85,6 +85,19 @@ Neon Legacies Enterprise Builder-website/
 5. Click **Save**.
 6. Your site will be live at `https://www.neonlegacies.co.za/` within 2 minutes.
 
+### Custom domain, DNS and login security
+`neonlegacies.co.za` is registered at Domains.co.za and fronted by Cloudflare
+(GitHub Pages cannot send security headers, and the member areas depend on
+them). If the Cloudflare dashboard is stuck on *Cloudflare Nameservers* /
+*DNSSEC pending*, or the site suddenly serves `server: GitHub.com`, follow
+[`cloudflare/README.md`](cloudflare/README.md) – step **0b** explains that
+screen and the exact registrar change. Check the live state with:
+
+```bash
+./cloudflare/status.sh        # delegation, DNSSEC, traffic path
+./cloudflare/status.test.sh   # offline tests for that verdict
+```
+
 ---
 
 ## 🛠️ How to Maintain This Site

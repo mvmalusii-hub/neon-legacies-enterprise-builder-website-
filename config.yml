@@ -49,6 +49,16 @@ exclude:
   - .gitignore
   - package.json
   - package-lock.json
+  # Server-side and tooling sources must never be downloadable from the site.
+  # GitHub Pages publishes every file it is given, so the login backend
+  # (apps-script/*.gs), the Worker that sets the security headers, the layouts
+  # and this config file itself all became public URLs until they were listed
+  # here. `cloudflare/README.md` tells you how to prove it stayed that way.
+  - apps-script
+  - cloudflare
+  - layouts
+  - config.yml
+  - .htaccess
 
 # ==========================================
 # DEFAULTS
