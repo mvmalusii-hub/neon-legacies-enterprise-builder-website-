@@ -224,24 +224,61 @@ fi
 echo
 
 # ----------------------------------------------------------- 4. DNSSEC
-g_ds=$(doh google "$DOMAIN" DS)
-c_ds=$(doh cloudflare "$DOMAIN" DS)
+# A DS query through a recursive resolver often comes back empty even when the
+# zone is signed (the DS lives in the parent zone and resolvers answer from the
+# child), so the registry's own verdict is the primary signal. Proof that the
+# chain actually validates is the AD bit on a name that cannot be cached: a
+# random label in the zone.
+dnssec_probe_name="dnssec-probe-$RANDOM$RANDOM.$DOMAIN"
+
+ad_flag() {
+  local resolver="$1" endpoint
+  case "$resolver" in
+    google)     endpoint="https://dns.google/resolve" ;;
+    cloudflare) endpoint="https://cloudflare-dns.com/dns-query" ;;
+  esac
+  curl -sS --max-time 20 -H 'accept: application/dns-json' \
+    "$endpoint?name=$1&type=A" 2>/dev/null \
+    | node -e '
+        let body = "";
+        process.stdin.on("data", d => { body += d; });
+        process.stdin.on("end", () => {
+          let json;
+          try { json = JSON.parse(body); } catch (err) { return; }
+          console.log(json.AD === true ? "true" : "false");
+        });
+      ' \
+    || true
+}
+
+ad_cf=$(ad_flag cloudflare "$dnssec_probe_name")
+ad_google=$(ad_flag google "$dnssec_probe_name")
 
 echo "4. DNSSEC"
-echo "   DS seen by resolvers: $(printf '%s\n' "$g_ds" | join_lines)"
-echo "   registry says:        ${registry_dnssec:-<unknown>}"
+echo "   registry says:       ${registry_dnssec:-<unknown>}"
+echo "   validating resolver: cloudflare-dns AD=${ad_cf:-?}, dns.google AD=${ad_google:-?}"
+echo "                        (AD=true on a random label = the chain validates)"
 
-if [ -n "${g_ds:-}" ] || [ -n "${c_ds:-}" ]; then
-  if [ "$registry_ok" -eq 1 ] && [ "$zone_ok" -eq 1 ]; then
-    pass "DS is published and Cloudflare answers – DNSSEC is complete"
-  else
-    fail "a DS record exists but the delegation is not clean (see 1 and 3).
-         Remove the DS at Domains.co.za until the nameservers are the only thing left to fix."
-  fi
-else
-  note "no DS record yet – correct until sections 1 and 2 are green.
-         Then: Cloudflare > DNS > Settings > DNSSEC, copy the DS into Domains.co.za."
-fi
+case "${registry_dnssec:-}" in
+  signed*)
+    if [ "$registry_ok" -eq 1 ] && [ "$zone_ok" -eq 1 ] \
+       && { [ "${ad_cf:-}" = "true" ] || [ "${ad_google:-}" = "true" ]; }; then
+      pass "DNSSEC is live – registry is signed and the zone validates end to end"
+    elif [ "$registry_ok" -ne 1 ] || [ "$zone_ok" -ne 1 ]; then
+      fail "a DS record is published but sections 1 and 3 are not clean.
+         Remove the DS at Domains.co.za until the nameservers and records are correct."
+    else
+      note "registry is signed but no validating resolver returned AD yet – this is the
+         delegation/DS cache (up to an hour). If it lasts longer than that the DS and
+         DNSKEY do not match: check https://dnsviz.net/d/$DOMAIN/dnssec/"
+    fi
+    ;;
+  *)
+    fail "DNSSEC is NOT enabled – registry says '${registry_dnssec:-unknown}'
+         Cloudflare > DNS > Settings > DNSSEC > Enable, then paste the DS into
+         Domains.co.za > DNSSEC. Do this only while sections 1-3 are green."
+    ;;
+esac
 echo
 
 # ------------------------------------------------------ 5. traffic path

@@ -42,8 +42,9 @@ Two more things that produce the same error:
 | TLS at the edge | Let's Encrypt `CN=neonlegacies.co.za`, valid 2026-10-31 → 2027-01-29 |
 | `profile.html`, `auth.js`, `main.css`, `sitemap.xml`, `robots.txt` | all 200, no bot challenge (`cf-mitigated` absent) |
 | GitHub Pages origin | `cname: www.neonlegacies.co.za`, certificate approved, HTTPS enforced, built from `main` |
-| `neonlegacies.co.za` DS | **none** – `DNSSEC: unsigned` (last step) |
-| Security headers | **not yet** – the Worker from §3 is not deployed: `verify.sh` = 6 passed / 7 failed |
+| `neonlegacies.co.za` DS | **signed, validating** – registry `DNSSEC: signedDelegation`, `AD=true` from `cloudflare-dns` and `dns.google` on a random (uncacheable) label |
+| Security headers | **not yet** – no Worker/Transform rules: `verify.sh` = 6 passed / 8 failed |
+| WAF / bots / rate limit | **not yet** – `waf-test.sh` = 2 passed / 5 missing (POST reaches GitHub with 405, `/apps-script/test/*.js` is 200, no 429 in 40 requests) |
 
 So the migration itself is done: registry, resolvers, zone contents and traffic
 all agree. What is left is the hardening that the Worker adds (§3), the cache
@@ -60,6 +61,8 @@ Check it yourself at any time, without `dig`:
 ```bash
 ./cloudflare/status.sh          # live verdict: registry, resolvers, zone, DNSSEC, traffic
 ./cloudflare/status.test.sh     # 12 offline checks of that verdict logic
+./cloudflare/verify.sh          # 14 header/path checks (Worker or Transform Rules)
+./cloudflare/waf-test.sh        # cache bypass, WAF, bots, rate limit
 ```
 
 `status.sh` uses two small helpers (`whois.js`, `dnsprobe.js`) because resolver
@@ -194,19 +197,22 @@ Overview should show the zone as **Active**.
 4. Ask Domains.co.za support to confirm the delegation was submitted to ZARC;
    the registry is the last hop and the one that overrides everything.
 
-### What is left on this site (2026-11-01 07:20Z)
+### What is left on this site (2026-11-01 07:55Z)
 
-DNS is finished – `status.sh` exits 0 with *7 passed, 1 waiting*. The remaining
-work is hardening, in this order:
+DNS **and** DNSSEC are finished – `status.sh` exits 0 with *all 8 checks passed*
+(registry signed, `AD=true` from two validators). The remaining work is
+hardening, in this order:
 
-- [ ] **§3 Deploy the Worker** (`neon-security-headers`) and attach the route
-      `www.neonlegacies.co.za/*`. Until then `verify.sh` fails 8 of 14 checks,
-      the login page has no CSP, and `/apps-script/test/*.js` is downloadable.
+- [ ] **§3 / §3b Headers** – deploy the Worker or the six Transform Rules. Until
+      then `verify.sh` fails 8 of 14 checks and the login page has no CSP.
 - [ ] **§4 Cache rule for `auth.js`** – it is currently `HIT` with
       `max-age=14400`, so sign-in fixes lag up to 4 hours.
-- [ ] **§5 Bots + WAF + rate limit** on `/profile.html` and `/auth.js`.
-- [ ] **§3 DNSSEC** – copy the DS from Cloudflare into Domains.co.za (only now,
-      with the delegation clean).
+- [ ] **§5 WAF + rate limit + Bot Fight Mode** – `waf-test.sh` reports 5 missing:
+      POST reaches GitHub (405), `/apps-script/test/*.js` is downloadable (200),
+      no 429 in 40 requests, and no bot challenge.
+
+Verify as you go: `./cloudflare/verify.sh` (headers) and
+`./cloudflare/waf-test.sh` (WAF, bots, rate limit, cache).
 
 The site is static (GitHub Pages) and authentication happens in
 `apps-script/Auth.gs` (Google account login) or Google Identity Services.
@@ -408,11 +414,22 @@ next deploy re-caches it.
 
 ## 5. WAF, bots and rate limiting
 
+Exact click paths in the current dashboard (the mobile dashboard uses the same
+names, just stacked):
+
+| What | Where |
+|---|---|
+| Bot Fight Mode | **Security ▸ Bots** ▸ *Bot Fight Mode* toggle → On |
+| Custom rules | **Security ▸ WAF ▸ Custom rules** ▸ *Create rule* |
+| Rate limiting | **Security ▸ WAF ▸ Rate limiting rules** ▸ *Create rule* |
+| Cache bypass | **Caching ▸ Cache Rules** ▸ *Create rule* |
+
 **Security ▸ Bots** → *Bot Fight Mode*: **On**.
 If a real visitor ever gets challenged in a loop on the login page, add a WAF
 skip rule for `http.request.uri.path in {"/profile.html" "/auth.js"}`.
 
-**Security ▸ WAF ▸ Custom rules** (free plan allows 5):
+**Security ▸ WAF ▸ Custom rules** (free plan allows 5). For each one: *Create
+rule* → name it → paste the expression → **Action: Block** → *Deploy*.
 
 | # | Name | Expression | Action |
 |---|---|---|---|
@@ -421,7 +438,9 @@ skip rule for `http.request.uri.path in {"/profile.html" "/auth.js"}`.
 | 3 | `hide-test-sources` | `starts_with(http.request.uri.path, "/apps-script/test/")` | Block |
 
 Rule 1 is safe because nothing posts to our own domain — the forms POST to
-`script.google.com` (a different host), and the login is a GET redirect.
+`script.google.com` (a different host), and the login is a GET redirect. A
+blocked request returns **403**, so a rule that works changes
+`/apps-script/test/*.js` from 200 to 403 (GitHub's own 404 is equally fine).
 
 **Security ▸ WAF ▸ Rate limiting rules** (free plan allows 1):
 
@@ -430,6 +449,24 @@ Rule 1 is safe because nothing posts to our own domain — the forms POST to
   `http.request.uri.path eq "/profile.html" or http.request.uri.path eq "/auth.js"`
 - Rate: **30 requests per 1 minute**, counting by **IP**
 - Action: **Block**, duration **1 minute**, response code **429**
+
+### 5a. Prove each one from outside
+
+```bash
+./cloudflare/waf-test.sh              # all five protections
+./cloudflare/waf-test.sh --no-ratelimit   # skip the 40-request burst
+```
+
+| Check | What a working rule looks like |
+|---|---|
+| cache bypass | `auth.js` → `cf-cache-status: bypass` (or `dynamic`) |
+| writes blocked | `POST /` → **403** (a 405 means the request reached GitHub) |
+| test sources hidden | `/apps-script/test/*.js` → **403** or 404 |
+| bot mitigation | scripted UA → 403/429/503 or a `cf-mitigated` header |
+| rate limit | at least one **429** inside the burst |
+
+The rate-limit check fires 40 requests on purpose and runs last; your own IP may
+be blocked for a minute afterwards, which is the rule doing its job.
 
 ## 6. Do NOT switch these on
 

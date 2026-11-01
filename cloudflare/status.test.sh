@@ -54,7 +54,12 @@ case "${SCENARIO:-}:$name:$type" in
   live:neonlegacies.co.za:DS) answer "$(rr neonlegacies.co.za 43 3600 '2371 13 2 ABCD')" ;;
   *:neonlegacies.co.za:DS)    answer "" ;;
   *:emma.ns.cloudflare.com:A) answer "$(rr emma.ns.cloudflare.com 1 300 108.162.192.112)" ;;
-  *) answer "" ;;
+  *)
+    if [ "${SCENARIO:-}" = "live" ]; then
+      printf '{"Status":0,"AD":true,"Answer":[]}'
+    else
+      answer ""
+    fi ;;
 esac
 exit 0
 FAKE_CURL
@@ -133,7 +138,7 @@ echo
 expect pending 1 "the Domains.co.za change has not reached ZARC" "pending: registrar change not visible at ZARC"
 expect pending 1 "the zone has NO www record"                   "pending: empty Cloudflare zone is called out"
 expect pending 1 "is still served by GitHub.com"                "pending: traffic still reaches GitHub"
-expect pending 1 "no DS record yet"                             "pending: DNSSEC is correctly left off"
+expect pending 1 "DNSSEC is NOT enabled"                             "pending: DNSSEC is reported as missing"
 
 expect mixed 1 "PARTIAL change"                                  "mixed: partial registrar change is detected"
 expect mixed 1 "the old nameservers were added to, not replaced"  "mixed: user is told to remove them"
@@ -143,7 +148,7 @@ expect live 0 "all"                                                          "li
 expect live 0 "the registry publishes exactly the two Cloudflare nameservers" "live: registry check passes"
 expect live 0 "www exists in the zone"                                       "live: zone contents are verified"
 expect live 0 "is served by Cloudflare"                                      "live: traffic goes through Cloudflare"
-expect live 0 "DNSSEC is complete"                                           "live: DS + authority agree"
+expect live 0 "DNSSEC is live"                                                "live: DS validates end to end"
 
 echo
 if [ "$FAIL" -eq 0 ]; then
