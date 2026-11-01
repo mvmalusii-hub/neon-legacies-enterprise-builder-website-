@@ -96,6 +96,20 @@ screen and the exact registrar change. Check the live state with:
 ```bash
 ./cloudflare/status.sh        # delegation, DNSSEC, traffic path
 ./cloudflare/status.test.sh   # offline tests for that verdict
+./cloudflare/verify.sh        # security headers on the live login page
+./cloudflare/waf-test.sh      # cache bypass, WAF, bots, rate limit, leaked sources
+```
+
+### Agents (Onboard + Legis)
+The raw-API agent layer lives in [`neon_agents/`](neon_agents/README.md): a prompt
+and a JSON Schema per agent, one adapter for DeepSeek/Qwen, a validator that
+refuses bad output, and GitHub Actions that run them. It is **excluded from the
+published site** (see `_config.yml`) – `./cloudflare/waf-test.sh` proves the
+prompts and schemas stay private.
+
+```bash
+python3 -m neon_agents.cli selftest   # offline: both agents, no API key
+python3 -m unittest discover -s neon_agents/tests -p 'test_*.py'
 ```
 
 ---

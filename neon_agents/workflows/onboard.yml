@@ -1,0 +1,75 @@
+# INSTALL: copy this file to .github/workflows/onboard.yml
+# Secrets required: DEEPSEEK_API_KEY and/or QWEN_API_KEY
+# (Settings > Secrets and variables > Actions). Not needed for offline runs.
+#
+name: Run Onboard agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      input_file:
+        description: 'Path to the JSON file with client descriptions'
+        required: true
+        default: 'neon_agents/tests/samples/onboard_samples.json'
+      provider:
+        description: 'deepseek or qwen'
+        required: true
+        default: 'deepseek'
+      offline:
+        description: 'Run with the faked provider (no API key needed)'
+        type: boolean
+        required: false
+        default: false
+  push:
+    paths:
+      - 'neon_agents/agents/onboard_prompt.txt'
+      - 'neon_agents/agents/onboard_schema.json'
+
+jobs:
+  run-onboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r neon_agents/requirements.txt
+
+      # Inputs arrive as environment variables and are passed as flags, never
+      # interpolated into code, so a workflow input cannot become executable.
+      - name: Run Onboard batch
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
+          PROVIDER: ${{ github.event.inputs.provider }}
+          INPUT_FILE: ${{ github.event.inputs.input_file }}
+          OFFLINE: ${{ github.event.inputs.offline }}
+        run: |
+          set -euo pipefail
+          args="--input $INPUT_FILE --out results_onboard.json --provider $PROVIDER"
+          if [ "$OFFLINE" = "true" ]; then args="$args --offline"; fi
+          python3 -m neon_agents.cli onboard $args
+
+      - name: Every row must pass the validator
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          rows = json.load(open('results_onboard.json'))
+          bad = [(i, r['output'].get('error')) for i, r in enumerate(rows)
+                 if not r['output'].get('ok')]
+          for i, error in bad:
+              print(f'row {i}: {error}', file=sys.stderr)
+          print(f'{len(rows) - len(bad)}/{len(rows)} rows valid')
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: onboard-results
+          path: results_onboard.json
+          if-no-files-found: warn

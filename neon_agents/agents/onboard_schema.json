@@ -1,0 +1,36 @@
+{
+  "name": "onboard_routing",
+  "description": "Classify a South African business into one Neon Legacies industry and return the roadmap size plus the first three documents.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "industry": {
+        "type": "string",
+        "description": "One of the 26 Neon Legacies industries, or 'Unclassified'."
+      },
+      "roadmap_size": {
+        "type": "integer",
+        "description": "Number of documents in the roadmap for the chosen industry. 0 if Unclassified."
+      },
+      "first_three_documents": {
+        "type": "array",
+        "items": { "type": "string" },
+        "minItems": 3,
+        "maxItems": 3,
+        "description": "First three documents to obtain, in priority order."
+      },
+      "compliance_bodies": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Relevant South African compliance bodies for this industry."
+      },
+      "confidence": {
+        "type": "string",
+        "enum": ["high", "medium", "low"],
+        "description": "How confident the classification is."
+      }
+    },
+    "required": ["industry", "roadmap_size", "first_three_documents", "compliance_bodies", "confidence"],
+    "additionalProperties": false
+  }
+}

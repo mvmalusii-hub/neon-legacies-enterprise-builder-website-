@@ -25,4 +25,5 @@ exclude:
   - cloudflare
   - layouts
   - tools
+  - neon_agents
   - .htaccess
