@@ -89,6 +89,12 @@ built this layer is not permitted to write it (`gh api` returns *Resource not
 accessible by integration*). The installer is idempotent and tells you the two
 secrets to add.
 
+To let the automation commit the files itself, the `cline-cloud` App needs the
+`workflows` permission — see
+[`RUNBOOK-workflows-permission.md`](RUNBOOK-workflows-permission.md) for the
+exact click path (it is not requested today, so the repository owner has
+nothing to approve until the App owner adds it).
+
 The web-UI alternative, if you prefer: Add file → Create new file →
 `.github/workflows/agent-tests.yml` → paste the contents → commit, and repeat for
 `onboard.yml` and `legis.yml`.

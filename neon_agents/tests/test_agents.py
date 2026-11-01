@@ -174,5 +174,34 @@ class ReviewQueueTests(unittest.TestCase):
             self.assertEqual(json.load(open(review_path, encoding="utf-8")), [])
 
 
+ONBOARD_WORKFLOW = os.path.join(ROOT, "neon_agents", "workflows", "onboard.yml")
+
+
+class WorkflowActivationTests(unittest.TestCase):
+    """The Onboard workflow is activated by a push as well as by hand.
+
+    A `workflow_dispatch` supplies inputs; a `push` to the prompt/schema does
+    not, so every value the run step depends on needs a fallback. Without them
+    the step built `--input  --provider ` and argparse aborted the job with
+    "argument --input: expected one argument" before Onboard ever ran.
+    """
+
+    def setUp(self):
+        with open(ONBOARD_WORKFLOW, encoding="utf-8") as handle:
+            self.text = handle.read()
+
+    def test_push_trigger_is_present(self):
+        self.assertIn("  push:", self.text)
+
+    def test_push_run_has_input_fallbacks(self):
+        for needle in (
+            "github.event.inputs.provider || 'deepseek'",
+            "github.event.inputs.input_file || "
+            "'neon_agents/tests/samples/onboard_samples.json'",
+            "github.event.inputs.offline || 'true'",
+        ):
+            self.assertIn(needle, self.text, f"{needle} missing")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
