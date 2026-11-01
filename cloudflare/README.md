@@ -37,69 +37,69 @@ Two more things that produce the same error:
 | `neonlegacies.co.za` SOA | `ns1.anycast-ns.com dns-admin.domains.co.za` |
 | `www` CNAME | `mvmalusii-hub.github.io` → `185.199.108–111.153` (GitHub Pages), `server: GitHub.com` |
 | apex `A` | **none** – the bare domain does not resolve today |
-| Cloudflare zone | exists, assigned `emma.ns.cloudflare.com` + `norm.ns.cloudflare.com`, status *Pending Nameserver Update* |
+| Cloudflare zone | exists and answers (`emma.ns.cloudflare.com` is authoritative), status *Pending Nameserver Update* |
+| Cloudflare zone contents | **empty** – `www` and the apex return NODATA/NXDOMAIN when asked directly |
+| Registry (WHOIS, 00:18:48Z) | `emma.ns.cloudflare.com`, `norm.ns.cloudflare.com`, **plus** `ns3.anycast-ns.com`, `ns4.anycast-ns.net`, `DNSSEC: unsigned` – **a partial change** |
 
 Check it yourself at any time, without `dig`:
 
 ```bash
-./cloudflare/status.sh          # live verdict: delegation, DNSSEC, traffic path
-./cloudflare/status.test.sh     # 8 offline checks of that verdict logic
+./cloudflare/status.sh          # live verdict: registry, resolvers, zone, DNSSEC, traffic
+./cloudflare/status.test.sh     # 12 offline checks of that verdict logic
 ```
+
+`status.sh` uses two small helpers (`whois.js`, `dnsprobe.js`) because resolver
+caches lie about delegation for hours: WHOIS answers from the `.co.za` registry
+(the authoritative source) and `dnsprobe.js` asks `emma.ns.cloudflare.com`
+directly, so the zone's real contents are visible long before the switch
+settles.
 
 ## 0b. "Cloudflare Nameservers" + "DNSSEC pending" – what that screen means
 
-This is the screen after **Add a site** has succeeded: the zone exists inside
-Cloudflare, but the domain still belongs to Domains.co.za. Cloudflare is only
-*waiting*; nothing has changed on the internet yet.
+The zone exists inside Cloudflare; the dashboard is waiting for the *domain* to
+be pointed at it. Three separate jobs must happen, and doing them in the wrong
+order is what takes a site down:
+
+1. **Fill the zone** with records – harmless while the zone is pending, fatal
+   to skip.
+2. **Publish exactly two nameservers** at Domains.co.za – the real switch.
+3. **Add the DS record** – only once 1 and 2 are green.
 
 | Panel | What it really means | What to do |
 |---|---|---|
-| **Cloudflare Nameservers** `emma.ns.cloudflare.com`, `norm.ns.cloudflare.com` | The pair Cloudflare assigned to this zone. The registrar must publish **exactly these two** instead of the four `anycast-ns` ones. | Paste both at Domains.co.za (below). |
-| **DNSSEC – pending, waiting for the DS record** | Cloudflare has generated a key pair and a DS record, and wants you to hand that DS to the registry. Nothing is broken while the DS is missing. | **Wait** until the nameservers are live, then add the DS. Do *not* add it now. |
+| **Cloudflare Nameservers** `emma.ns.cloudflare.com`, `norm.ns.cloudflare.com` | The pair Cloudflare assigned to this zone. The registrar must publish **exactly these two**, replacing the four `anycast-ns` ones. | Paste both at Domains.co.za and clear the other fields (step 2). |
+| **DNSSEC – pending, waiting for the DS record** | Cloudflare generated a key pair and a DS record and wants you to hand that DS to the registry. Nothing breaks while the DS is missing. | **Wait** until the nameservers are live, then add the DS (step 3). Do *not* add it now. |
 | Red **Cancel Setup** button | Deletes the zone and throws away the assigned nameservers. | Leave it alone. |
 
-### Step 1 – point the domain at Cloudflare (Domains.co.za)
+### The trap that caught this domain: four nameservers
 
-1. Sign in at **Domains.co.za** → *Manage domain* → `neonlegacies.co.za`.
-2. Open **Nameservers** → **Use custom nameservers**.
-3. Replace all four fields with:
+`./cloudflare/status.sh` reads the registry WHOIS, which on 2026-11-01 returned:
 
-   ```
-   emma.ns.cloudflare.com
-   norm.ns.cloudflare.com
-   ```
+```
+Name Server: emma.ns.cloudflare.com
+Name Server: norm.ns.cloudflare.com
+Name Server: ns3.anycast-ns.com      <- old, must go
+Name Server: ns4.anycast-ns.net      <- old, must go
+```
 
-   No trailing dot, no `https://`, do not add `ns1.`/`ns2.` in front.
-4. **Save**, and wait for the confirmation e-mail.
+The Domains.co.za form has four nameserver fields. Filling fields 1–2 leaves
+3–4 untouched, so the registry keeps publishing **both** sets. Every lookup is
+then answered by whichever server the resolver picks:
 
-`.co.za` normally switches in 1–6 hours; allow 24, at worst 48. The old records
-keep serving during the gap, so **the website stays up** – that is why the
-dashboard can sit on "pending" for hours while `www.neonlegacies.co.za` still
-answers with `server: GitHub.com`.
+- the Cloudflare pair → zone exists but is **empty**, so `www` is NXDOMAIN;
+- the Domains.co.za pair → the old zone, which still answers.
 
-### Step 2 – leave DNSSEC alone until step 1 is live
+The site therefore works or fails purely on cache timing, which is worse than
+either state alone – and DNSSEC can never be enabled while it lasts.
 
-Order matters, and the usual advice on it is wrong:
+"Saved" at the registrar is not the same as "replaced". Section 1 of
+`status.sh` must say *"publishes exactly the two Cloudflare nameservers"*.
 
-- The DS record in the `.co.za` registry is a promise that the zone is signed.
-  If you add it **before** Cloudflare answers, every validating resolver
-  (Google, Cloudflare, most ISPs) gets unsigned answers for a signed delegation
-  and returns **SERVFAIL** – the whole domain, e-mail included, disappears.
-- Once `status.sh` reports *"both resolvers see the Cloudflare nameservers"*,
-  go back to Cloudflare ▸ **DNS ▸ Settings ▸ DNSSEC**, copy **DS Record**
-  (Key Tag, Algorithm 13, Digest Type 2, Digest) into Domains.co.za ▸
-  **DNSSEC** and save. Cloudflare flips the panel from *pending* to *active*
-  within about an hour.
+### Step 1 – fill the zone first (5 minutes, zero downtime)
 
-Adding the DS is also the only way to get the padlock-plus-padlock in the
-Cloudflare dashboard – it is hardening, not a prerequisite for the site.
-
-### Step 3 – the DNS records must already exist before the switch
-
-A new Cloudflare zone starts **empty**. If the nameservers switch before the
-records from §1 are created, `www` stops resolving and the site 404s for
-everyone. Create them while the zone is still pending (they are inert until
-Cloudflare is authoritative):
+A new Cloudflare zone starts **empty**. Create these now, while the zone is
+still pending – they are inert until Cloudflare is authoritative, and without
+them the site dies the moment the delegation is clean:
 
 | Type | Name | Content | Proxy |
 |---|---|---|---|
@@ -110,30 +110,75 @@ Cloudflare is authoritative):
 | A | `@` | `185.199.111.153` | Proxied |
 
 Cloudflare imports what it can from the old zone; verify `www` is a **proxied
-CNAME** and not a stray A record pointing at a GitHub IP.
+CNAME** and not a stray A record pointing at a GitHub IP. `status.sh` section 3
+asks `emma.ns.cloudflare.com` directly and will say *"www exists in the zone"*
+the moment this is right – no waiting for propagation.
+
+### Step 2 – publish only the two Cloudflare nameservers
+
+1. Sign in at **Domains.co.za** → *Manage domain* → `neonlegacies.co.za`.
+2. Open **Nameservers** → **Use custom nameservers**.
+3. Put the two Cloudflare names in the first two fields and **empty the rest**:
+
+   ```
+   emma.ns.cloudflare.com
+   norm.ns.cloudflare.com
+   ```
+
+   No trailing dot, no `https://`, no `ns1.`/`ns2.` prefix. Leaving anything in
+   fields 3–4 is exactly how the four-nameserver state above happened.
+4. **Save**, and complete whatever confirmation the registrar shows (some
+   Domains.co.za flows need a second "update nameservers" click and an e-mail).
+
+`.co.za` normally switches in 1–6 hours; allow 24. Resolvers that already cached
+the old delegation keep it until its TTL expires – `status.sh` prints the
+remaining seconds, and that is caching, not a failure. The website stays up the
+whole time.
+
+Check section 1 again: it must list two nameservers, both Cloudflare.
+
+### Step 3 – DNSSEC last
+
+Order matters here, and the common advice is backwards:
+
+- The DS record in the `.co.za` registry is a promise that the zone is signed.
+  If it is added **before** Cloudflare answers, every validating resolver
+  (Google, Cloudflare, most ISPs) receives unsigned answers for a signed
+  delegation and returns **SERVFAIL** – the whole domain, e-mail included,
+  disappears. On a half-switched delegation it is worse: only the queries that
+  land on Cloudflare validate, so failures look random.
+- Once `status.sh` sections 1–3 are green, open Cloudflare ▸ **DNS ▸ Settings ▸
+  DNSSEC**, copy the **DS Record** (Key Tag, Algorithm 13, Digest Type 2,
+  Digest) into Domains.co.za ▸ **DNSSEC** and save. Cloudflare flips the panel
+  from *pending* to *active* within about an hour.
+
+DNSSEC is hardening, not a prerequisite: the site is fully served without it.
 
 ### How you know it worked (no guessing)
 
 ```bash
 ./cloudflare/status.sh
-#   1. Delegation  PASS  both resolvers see the Cloudflare nameservers
-#   2. DNSSEC      NOTE/PASS depending on whether the DS has been added yet
-#   3. Traffic     PASS  www is served by Cloudflare (server: cloudflare)
+#   1. Registry delegation  PASS  publishes exactly the two Cloudflare nameservers
+#   2. Public resolvers     PASS  both serve the Cloudflare nameservers
+#   3. Cloudflare zone      PASS  authoritative, www + apex exist
+#   4. DNSSEC               PASS  DS published and Cloudflare answers
+#   5. Traffic path         PASS  www is served by Cloudflare
 ```
 
+Exit code 0 means all five agree; anything else prints the single next click.
 Then `./cloudflare/verify.sh` for the headers (13 checks) and Cloudflare ▸
 Overview should show the zone as **Active**.
 
-**If nothing changes after 48 hours**, in this order:
+**If section 1 keeps failing after 48 hours**, in this order:
 
-1. Domains.co.za shows the *custom* nameservers and the change is *saved*: many
-   registrars need a separate "Update nameservers" confirmation click.
+1. Domains.co.za shows *only* the two Cloudflare nameservers – no leftover
+   `anycast-ns` entries in fields 3–4.
 2. The zone was added as `neonlegacies.co.za`, **not** `www.neonlegacies.co.za`
    – a `www` zone never goes Active.
-3. No DS record is sitting at the registrar (see step 2) – a stale DS makes the
-   lookup fail rather than fall back.
-4. Ask Domains.co.za support to confirm the delegation was submitted to ZACR;
-   the registry is the last hop and it is the one that overrides everything.
+3. No DS record is sitting at the registrar (step 3) – a stale DS makes lookups
+   fail instead of falling back.
+4. Ask Domains.co.za support to confirm the delegation was submitted to ZARC;
+   the registry is the last hop and the one that overrides everything.
 
 The site is static (GitHub Pages) and authentication happens in
 `apps-script/Auth.gs` (Google account login) or Google Identity Services.
@@ -145,35 +190,45 @@ blocking of files that should never be public.
 Everything here is in `security-headers.worker.js` (tested by
 `apps-script/test/cloudflare-worker.test.js`).
 
-## Proof that the integration is really live (three commands)
+## Proof that the integration is really live
 
 ```bash
-# 0. One-shot verdict: delegation + DNSSEC + traffic path
+# The one command that decides it (registry + resolvers + zone + DNSSEC + site)
 ./cloudflare/status.sh
-#    expected once finished: 5 ready, 0 waiting (exit 0)
+#    expected once finished: "all 5 checks passed" (exit 0)
 
-# 1. Cloudflare must own the zone
-curl -s 'https://dns.google/resolve?name=neonlegacies.co.za&type=NS' | grep -o '[a-z0-9.-]*\.ns\.cloudflare\.com'
-#    expected: emma.ns.cloudflare.com / norm.ns.cloudflare.com
+# The registry itself, if you want the raw answer (no cache anywhere)
+node cloudflare/whois.js neonlegacies.co.za | grep -E '^(Name Server|DNSSEC)'
+#    expected: Name Server: emma.ns.cloudflare.com
+#              Name Server: norm.ns.cloudflare.com
+#              DNSSEC: signed
 
-# 2. Traffic must arrive via Cloudflare
+# What the Cloudflare zone answers right now, before propagation matters
+node cloudflare/dnsprobe.js 108.162.192.112 CNAME www.neonlegacies.co.za
+#    expected: mvmalusii-hub.github.io   (Cloudflare flattens it to A records
+#              once the CNAME is proxied – an A answer is equally good)
+
+# Traffic must arrive via Cloudflare
 curl -sI https://www.neonlegacies.co.za/profile.html | grep -i '^server:'
 #    expected: server: cloudflare      (NOT server: GitHub.com)
 
-# 3. Headers + blocked paths
+# Headers + blocked paths
 ./cloudflare/verify.sh
 #    expected: 13 checks passed
 ```
 
-All four must agree. If (2) still says `GitHub.com`, the nameservers have not
-been switched yet, no matter what the dashboard shows.
+All five must agree. If `server:` still says `GitHub.com`, the delegation is not
+clean, no matter what the dashboard shows.
 
-**Measured 2026-11-01 (zone added in Cloudflare, registrar not switched):**
-zone NS = `*.anycast-ns.com` (Domains.co.za) on both `dns.google` and
-`cloudflare-dns.com`, DS = none, `server: GitHub.com`, apex = no A record,
-`status.sh` = 2 pending / 2 waiting (exit 1). The 2026-10-31 baseline was the
-same, which proves the "pending" dashboard is not the same thing as a live
-delegation.
+**Measured 2026-11-01 00:20Z (registrar change partially applied):** registry =
+**four** nameservers (`emma`, `norm`, `ns3.anycast-ns.com`, `ns4.anycast-ns.net`),
+`DNSSEC: unsigned`; resolvers still cached the old pair (≈19 700 s left);
+`emma` answers SOA but the zone is **empty** (`www` = NXDOMAIN); `server:
+GitHub.com`; apex = no A record. `status.sh` = 4 failed / 1 passed / 3 waiting.
+
+**Measured 2026-10-31 (before the migration):** zone NS = `*.anycast-ns.com`
+(Domains.co.za), `server: GitHub.com`, `verify.sh` = 5 passed / 8 failed. That
+is the "not yet integrated" baseline to compare against.
 
 **Measured 2026-10-31 (before the migration):** zone NS = `*.anycast-ns.com`
 (Domains.co.za), `server: GitHub.com`, `verify.sh` = 5 passed / 8 failed. That

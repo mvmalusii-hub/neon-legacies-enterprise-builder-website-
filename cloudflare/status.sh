@@ -6,27 +6,33 @@
 #  still showing "Cloudflare Nameservers" + "DNSSEC pending":
 #  *does the rest of the internet already see Cloudflare?*
 #
-#  The dashboard reflects the ZONE, not the DELEGATION. A zone can
-#  sit in "Pending Nameserver Update" for a day while the registrar
-#  still publishes the old nameservers. This script reads the DNS
-#  the way a visitor's resolver does, so it cannot be fooled by a
-#  dashboard cache.
+#  It checks four independent views, because they disagree:
+#    1. the .co.za registry (authoritative, never cached)  <- the truth
+#    2. public resolvers                                   <- what visitors get
+#    3. the Cloudflare nameserver itself                   <- zone contents
+#    4. the live site                                      <- who serves it
 #
-#  No `dig` needed – it uses DNS-over-HTTPS (dns.google +
-#  cloudflare-dns.com) through curl, which every runner has.
+#  The registry check is the important one: a registrar can *add*
+#  Cloudflare and leave the old nameservers in place, which shows up
+#  as four nameservers and makes lookups randomly fail.
+#
+#  No `dig` needed – DNS-over-HTTPS via curl, WHOIS over TCP via node.
 #
 #    ./cloudflare/status.sh                      # neonlegacies.co.za
 #    ./cloudflare/status.sh example.co.za
 #
-#  Set CLOUDFLARE_NS="ns1 ns2" to override the expected nameservers
-#  (Cloudflare ▸ your zone ▸ Overview shows the pair it assigned).
+#  Overrides: CLOUDFLARE_NS="ns1 ns2" (the pair Cloudflare assigned),
+#  WHOIS_CMD / PROBE_CMD (used by status.test.sh to run offline).
 # ============================================================
 set -u
 
+HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 DOMAIN="${1:-neonlegacies.co.za}"
 WWW="www.$DOMAIN"
 CLOUDFLARE_NS="${CLOUDFLARE_NS:-emma.ns.cloudflare.com norm.ns.cloudflare.com}"
 SITE="https://$WWW"
+WHOIS_CMD="${WHOIS_CMD:-node $HERE/whois.js}"
+PROBE_CMD="${PROBE_CMD:-node $HERE/dnsprobe.js}"
 
 PASS=0
 FAIL=0
@@ -40,9 +46,9 @@ pass() { green "  PASS  $1"; PASS=$((PASS + 1)); }
 fail() { red   "  FAIL  $1"; FAIL=$((FAIL + 1)); }
 note() { amber "  NOTE  $1"; NOTE=$((NOTE + 1)); }
 
-# doh <resolver> <name> <type> -> one record value per line, no trailing dot
-# Only the ANSWER section is used, so an empty answer never "falls back" to
-# the SOA record the resolver puts in the authority section.
+# doh <resolver> <name> <type> -> one value per line, no trailing dot
+# Only the ANSWER section is read, so an empty answer never "falls back" to
+# the SOA record a resolver puts in the authority section.
 doh() {
   local resolver="$1" name="$2" type="$3" endpoint
   case "$resolver" in
@@ -67,11 +73,34 @@ doh() {
     || true
 }
 
+# remaining cache time for the delegation, from the resolver's own TTL
+doh_ttl() {
+  curl -sS --max-time 20 -H 'accept: application/dns-json' \
+    "https://dns.google/resolve?name=$1&type=NS" 2>/dev/null \
+    | node -e '
+        let body = "";
+        process.stdin.on("data", d => { body += d; });
+        process.stdin.on("end", () => {
+          let json;
+          try { json = JSON.parse(body); } catch (err) { return; }
+          const ttls = (json.Answer || []).filter(a => a.type === 2).map(a => a.TTL);
+          if (ttls.length) { console.log(Math.max.apply(null, ttls)); }
+        });
+      ' \
+    || true
+}
+
 # join the lines of stdin with ", ", or print <none> when there is nothing
 join_lines() {
   local joined
   joined=$(paste -sd, - 2>/dev/null | sed 's/,/, /g')
   if [ -n "${joined:-}" ]; then printf '%s\n' "$joined"; else printf '<none>\n'; fi
+}
+
+in_list() {
+  local needle="$1" haystack
+  haystack=" $(printf '%s' "$2" | tr '\n' ' ') "
+  case "$haystack" in *" $needle "*) return 0 ;; *) return 1 ;; esac
 }
 
 http_server() {
@@ -87,53 +116,136 @@ echo "Cloudflare status for $DOMAIN"
 echo "Expected Cloudflare nameservers: $CLOUDFLARE_NS"
 echo
 
-# ---------------------------------------------------------------- 1. NS
+# ------------------------------------------------ 1. registry (uncached)
+whois_out=$($WHOIS_CMD "$DOMAIN" 2>/dev/null)
+whois_ok=$?
+
+registry_ns=""
+registry_dnssec=""
+registry_updated=""
+if [ "$whois_ok" -eq 0 ] && [ -n "${whois_out:-}" ]; then
+  registry_ns=$(printf '%s\n' "$whois_out" \
+    | sed -n 's/^[Nn]ame [Ss]erver: *//p' \
+    | tr '[:upper:]' '[:lower:]' \
+    | sed 's/\.$//; s/[[:space:]]*$//' \
+    | sed '/^$/d' | sort -u)
+  registry_dnssec=$(printf '%s\n' "$whois_out" | sed -n 's/^[Dd][Nn][Ss][Ss][Ee][Cc]: *//p' | head -n 1)
+  registry_updated=$(printf '%s\n' "$whois_out" | sed -n 's/^[Uu]pdated [Dd]ate: *//p' | head -n 1)
+fi
+
+registry_ok=0
+echo "1. Registry delegation (.co.za, authoritative – cannot be cached)"
+if [ "$whois_ok" -ne 0 ] || [ -z "${registry_ns:-}" ]; then
+  note "could not read the registry WHOIS – the authoritative check is skipped"
+else
+  echo "   registry lists: $(printf '%s\n' "$registry_ns" | join_lines)"
+  [ -n "${registry_updated:-}" ] && echo "   last updated:   $registry_updated"
+
+  missing=""
+  extras=""
+  for ns in $CLOUDFLARE_NS; do
+    in_list "$ns" "$registry_ns" || missing="$missing $ns"
+  done
+  for ns in $registry_ns; do
+    in_list "$ns" "$CLOUDFLARE_NS" || extras="$extras $ns"
+  done
+
+  if [ -n "$missing" ]; then
+    fail "the registry does not list${missing} yet – the Domains.co.za change has not reached ZARC"
+  elif [ -n "$extras" ]; then
+    fail "PARTIAL change: the registry lists ${extras# } as well – the old nameservers were added to, not replaced.
+         Fix it at Domains.co.za: Nameservers -> leave only the two Cloudflare entries -> save.
+         While both sets are published, every lookup is answered by whichever server the resolver picks."
+  else
+    registry_ok=1
+    pass "the registry publishes exactly the two Cloudflare nameservers"
+  fi
+fi
+echo
+
+# --------------------------------------------------- 2. resolver view
 g_ns=$(doh google "$DOMAIN" NS | sort)
 c_ns=$(doh cloudflare "$DOMAIN" NS | sort)
+stale_ttl=$(doh_ttl "$DOMAIN")
 
-echo "1. Delegation (the nameservers the registrar publishes)"
+echo "2. Public resolvers (what visitors get – may be cached)"
 echo "   dns.google:      $(printf '%s\n' "$g_ns" | join_lines)"
 echo "   cloudflare-dns:  $(printf '%s\n' "$c_ns" | join_lines)"
 
-expected_missing=0
-for ns in $CLOUDFLARE_NS; do
-  printf '%s\n' "$g_ns" | grep -qx "$ns" || expected_missing=$((expected_missing + 1))
-  printf '%s\n' "$c_ns" | grep -qx "$ns" || expected_missing=$((expected_missing + 1))
-done
-ns_live=0
+resolver_cf=0
+if [ -n "$g_ns" ] && [ -n "$c_ns" ] \
+   && ! printf '%s\n%s\n' "$g_ns" "$c_ns" | grep -qv -E '\.ns\.cloudflare\.com$'; then
+  resolver_cf=1
+fi
+
 if [ -z "$g_ns" ] || [ -z "$c_ns" ]; then
-  fail "no nameservers returned – the domain is not resolving at all"
-elif [ "$expected_missing" -eq 0 ]; then
-  ns_live=1
-  pass "both resolvers see the Cloudflare nameservers – delegation is live"
+  fail "no nameservers returned – the domain is not resolving"
+elif [ "$resolver_cf" -eq 1 ]; then
+  pass "both resolvers already serve the Cloudflare nameservers"
+elif [ "$registry_ok" -eq 1 ]; then
+  note "caches still serve the old delegation${stale_ttl:+ (up to ${stale_ttl}s left)} – the registry is correct, so this clears itself"
 else
-  fail "the registrar still publishes old nameservers – change them at Domains.co.za (see README step 0b)"
+  fail "resolvers still serve the old nameservers – consistent with the registry above"
 fi
 echo
 
-# --------------------------------------------------------------- 2. DS
+# ----------------------------------------- 3. what Cloudflare itself says
+echo "3. The Cloudflare zone (asked directly, no cache)"
+cf_first=$(printf '%s\n' "$CLOUDFLARE_NS" | awk '{print $1}')
+cf_ip=$(doh google "$cf_first" A | head -n 1)
+
+zone_ok=0
+if [ -z "${cf_ip:-}" ]; then
+  note "could not resolve $cf_first – the zone check is skipped"
+else
+  echo "   asking $cf_first ($cf_ip)"
+  soa=$($PROBE_CMD "$cf_ip" SOA "$DOMAIN" 2>/dev/null)
+  www_answer=$($PROBE_CMD "$cf_ip" CNAME "$WWW" 2>/dev/null; $PROBE_CMD "$cf_ip" A "$WWW" 2>/dev/null)
+  apex_answer=$($PROBE_CMD "$cf_ip" A "$DOMAIN" 2>/dev/null)
+
+  if [ -z "${soa:-}" ]; then
+    fail "Cloudflare does not answer for the zone – the zone is not loaded or not active"
+  else
+    zone_ok=1
+    pass "Cloudflare is authoritative for the zone ($soa)"
+    if [ -z "${www_answer:-}" ]; then
+      fail "the zone has NO www record – a lookup that reaches Cloudflare returns NXDOMAIN.
+         Add it now: CNAME www -> mvmalusii-hub.github.io (proxied)."
+    else
+      pass "www exists in the zone: $(printf '%s\n' "$www_answer" | join_lines)"
+    fi
+    if [ -z "${apex_answer:-}" ]; then
+      note "no apex A records – add the four GitHub Pages A records (185.199.108-111.153) for the bare domain"
+    else
+      pass "the apex exists in the zone: $(printf '%s\n' "$apex_answer" | join_lines)"
+    fi
+  fi
+fi
+echo
+
+# ----------------------------------------------------------- 4. DNSSEC
 g_ds=$(doh google "$DOMAIN" DS)
 c_ds=$(doh cloudflare "$DOMAIN" DS)
 
-echo "2. DNSSEC (DS record in the .co.za zone)"
-echo "   dns.google:      $(printf '%s\n' "$g_ds" | join_lines)"
-echo "   cloudflare-dns:  $(printf '%s\n' "$c_ds" | join_lines)"
+echo "4. DNSSEC"
+echo "   DS seen by resolvers: $(printf '%s\n' "$g_ds" | join_lines)"
+echo "   registry says:        ${registry_dnssec:-<unknown>}"
 
-if [ -n "$g_ds" ] || [ -n "$c_ds" ]; then
-  if [ "$ns_live" -eq 1 ]; then
-    pass "DS is published and Cloudflare answers authoritatively – DNSSEC is complete"
+if [ -n "${g_ds:-}" ] || [ -n "${c_ds:-}" ]; then
+  if [ "$registry_ok" -eq 1 ] && [ "$zone_ok" -eq 1 ]; then
+    pass "DS is published and Cloudflare answers – DNSSEC is complete"
   else
-    fail "DS is published while the old nameservers still answer: signed parents + unsigned answers = SERVFAIL
-         Remove the DS at Domains.co.za right now, finish the nameserver change, then re-add it."
+    fail "a DS record exists but the delegation is not clean (see 1 and 3).
+         Remove the DS at Domains.co.za until the nameservers are the only thing left to fix."
   fi
 else
-  note "no DS record yet – correct while the nameservers are still at Domains.co.za.
-         Add the DS from Cloudflare ▸ DNS ▸ Settings ▸ DNSSEC only AFTER step 1 is live."
+  note "no DS record yet – correct until sections 1 and 2 are green.
+         Then: Cloudflare > DNS > Settings > DNSSEC, copy the DS into Domains.co.za."
 fi
 echo
 
-# --------------------------------------------------------- 3. www + apex
-echo "3. Traffic path"
+# ------------------------------------------------------ 5. traffic path
+echo "5. Traffic path"
 server_www=$(http_server "$SITE/")
 if [ "$server_www" = "cloudflare" ]; then
   pass "$WWW is served by Cloudflare (server: cloudflare)"
@@ -143,18 +255,15 @@ else
   fail "$WWW did not answer at all"
 fi
 
-apex_a=$(doh google "$DOMAIN" A)
-www_cname=$(doh google "$WWW" CNAME)
-echo "   $WWW CNAME: $(printf '%s\n' "$www_cname" | join_lines)"
-echo "   $DOMAIN A:  $(printf '%s\n' "$apex_a" | join_lines)"
-if [ -n "$apex_a" ]; then
-  pass "the apex resolves"
+apex_head=$(curl -sI --max-time 20 "https://$DOMAIN/" 2>/dev/null | head -n 1 || true)
+if [ -n "$apex_head" ]; then
+  pass "the apex answers ($apex_head)"
 else
-  note "the apex has no A records – add the four GitHub Pages A records in Cloudflare (§1) so the bare domain stops timing out"
+  note "the apex does not answer over HTTPS yet – expected until the A records exist and the switch settles"
 fi
 echo
 
-# ------------------------------------------------------------- verdict
+# ------------------------------------------------------------ verdict
 echo "----------------------------------------"
 if [ "$FAIL" -eq 0 ]; then
   if [ "$NOTE" -eq 0 ]; then
