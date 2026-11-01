@@ -28,23 +28,112 @@ Two more things that produce the same error:
   The dashboard then refuses to add it; remove it from that account or ask
   Cloudflare support to release it.
 
-### Verified state of this domain (checked 2026-10-31)
+### Verified state of this domain (checked 2026-11-01)
 
 | Record | Value |
 |---|---|
-| `neonlegacies.co.za` NS | `ns1.anycast-ns.com`, `ns2.anycast-ns.net`, `ns3.anycast-ns.com`, `ns4.anycast-ns.net` → **Domains.co.za** |
-| `neonlegacies.co.za` SOA | `dns-admin.domains.co.za` |
-| `www` CNAME | `mvmalusii-hub.github.io` → `185.199.108–111.153` (GitHub Pages) |
+| `neonlegacies.co.za` NS | `ns1.anycast-ns.com`, `ns2.anycast-ns.net`, `ns3.anycast-ns.com`, `ns4.anycast-ns.net` → **Domains.co.za** (unchanged) |
+| `neonlegacies.co.za` DS | **none** – DNSSEC is not delegated |
+| `neonlegacies.co.za` SOA | `ns1.anycast-ns.com dns-admin.domains.co.za` |
+| `www` CNAME | `mvmalusii-hub.github.io` → `185.199.108–111.153` (GitHub Pages), `server: GitHub.com` |
 | apex `A` | **none** – the bare domain does not resolve today |
+| Cloudflare zone | exists, assigned `emma.ns.cloudflare.com` + `norm.ns.cloudflare.com`, status *Pending Nameserver Update* |
 
-The nameserver change therefore happens at **Domains.co.za**:
-*Manage domain ▸ Nameservers ▸ Use custom nameservers* → paste the two
-`*.ns.cloudflare.com` names Cloudflare shows for the new zone. `.co.za` usually
-propagates within a few hours (allow up to 24).
+Check it yourself at any time, without `dig`:
 
-While you are there, check **DNSSEC**. If Domains.co.za has DS records enabled,
-switch DNSSEC on in Cloudflare *before* the nameservers change, otherwise the
-domain returns `SERVFAIL` after the move.
+```bash
+./cloudflare/status.sh          # live verdict: delegation, DNSSEC, traffic path
+./cloudflare/status.test.sh     # 8 offline checks of that verdict logic
+```
+
+## 0b. "Cloudflare Nameservers" + "DNSSEC pending" – what that screen means
+
+This is the screen after **Add a site** has succeeded: the zone exists inside
+Cloudflare, but the domain still belongs to Domains.co.za. Cloudflare is only
+*waiting*; nothing has changed on the internet yet.
+
+| Panel | What it really means | What to do |
+|---|---|---|
+| **Cloudflare Nameservers** `emma.ns.cloudflare.com`, `norm.ns.cloudflare.com` | The pair Cloudflare assigned to this zone. The registrar must publish **exactly these two** instead of the four `anycast-ns` ones. | Paste both at Domains.co.za (below). |
+| **DNSSEC – pending, waiting for the DS record** | Cloudflare has generated a key pair and a DS record, and wants you to hand that DS to the registry. Nothing is broken while the DS is missing. | **Wait** until the nameservers are live, then add the DS. Do *not* add it now. |
+| Red **Cancel Setup** button | Deletes the zone and throws away the assigned nameservers. | Leave it alone. |
+
+### Step 1 – point the domain at Cloudflare (Domains.co.za)
+
+1. Sign in at **Domains.co.za** → *Manage domain* → `neonlegacies.co.za`.
+2. Open **Nameservers** → **Use custom nameservers**.
+3. Replace all four fields with:
+
+   ```
+   emma.ns.cloudflare.com
+   norm.ns.cloudflare.com
+   ```
+
+   No trailing dot, no `https://`, do not add `ns1.`/`ns2.` in front.
+4. **Save**, and wait for the confirmation e-mail.
+
+`.co.za` normally switches in 1–6 hours; allow 24, at worst 48. The old records
+keep serving during the gap, so **the website stays up** – that is why the
+dashboard can sit on "pending" for hours while `www.neonlegacies.co.za` still
+answers with `server: GitHub.com`.
+
+### Step 2 – leave DNSSEC alone until step 1 is live
+
+Order matters, and the usual advice on it is wrong:
+
+- The DS record in the `.co.za` registry is a promise that the zone is signed.
+  If you add it **before** Cloudflare answers, every validating resolver
+  (Google, Cloudflare, most ISPs) gets unsigned answers for a signed delegation
+  and returns **SERVFAIL** – the whole domain, e-mail included, disappears.
+- Once `status.sh` reports *"both resolvers see the Cloudflare nameservers"*,
+  go back to Cloudflare ▸ **DNS ▸ Settings ▸ DNSSEC**, copy **DS Record**
+  (Key Tag, Algorithm 13, Digest Type 2, Digest) into Domains.co.za ▸
+  **DNSSEC** and save. Cloudflare flips the panel from *pending* to *active*
+  within about an hour.
+
+Adding the DS is also the only way to get the padlock-plus-padlock in the
+Cloudflare dashboard – it is hardening, not a prerequisite for the site.
+
+### Step 3 – the DNS records must already exist before the switch
+
+A new Cloudflare zone starts **empty**. If the nameservers switch before the
+records from §1 are created, `www` stops resolving and the site 404s for
+everyone. Create them while the zone is still pending (they are inert until
+Cloudflare is authoritative):
+
+| Type | Name | Content | Proxy |
+|---|---|---|---|
+| CNAME | `www` | `mvmalusii-hub.github.io` | Proxied |
+| A | `@` | `185.199.108.153` | Proxied |
+| A | `@` | `185.199.109.153` | Proxied |
+| A | `@` | `185.199.110.153` | Proxied |
+| A | `@` | `185.199.111.153` | Proxied |
+
+Cloudflare imports what it can from the old zone; verify `www` is a **proxied
+CNAME** and not a stray A record pointing at a GitHub IP.
+
+### How you know it worked (no guessing)
+
+```bash
+./cloudflare/status.sh
+#   1. Delegation  PASS  both resolvers see the Cloudflare nameservers
+#   2. DNSSEC      NOTE/PASS depending on whether the DS has been added yet
+#   3. Traffic     PASS  www is served by Cloudflare (server: cloudflare)
+```
+
+Then `./cloudflare/verify.sh` for the headers (13 checks) and Cloudflare ▸
+Overview should show the zone as **Active**.
+
+**If nothing changes after 48 hours**, in this order:
+
+1. Domains.co.za shows the *custom* nameservers and the change is *saved*: many
+   registrars need a separate "Update nameservers" confirmation click.
+2. The zone was added as `neonlegacies.co.za`, **not** `www.neonlegacies.co.za`
+   – a `www` zone never goes Active.
+3. No DS record is sitting at the registrar (see step 2) – a stale DS makes the
+   lookup fail rather than fall back.
+4. Ask Domains.co.za support to confirm the delegation was submitted to ZACR;
+   the registry is the last hop and it is the one that overrides everything.
 
 The site is static (GitHub Pages) and authentication happens in
 `apps-script/Auth.gs` (Google account login) or Google Identity Services.
@@ -59,9 +148,13 @@ Everything here is in `security-headers.worker.js` (tested by
 ## Proof that the integration is really live (three commands)
 
 ```bash
+# 0. One-shot verdict: delegation + DNSSEC + traffic path
+./cloudflare/status.sh
+#    expected once finished: 5 ready, 0 waiting (exit 0)
+
 # 1. Cloudflare must own the zone
 curl -s 'https://dns.google/resolve?name=neonlegacies.co.za&type=NS' | grep -o '[a-z0-9.-]*\.ns\.cloudflare\.com'
-#    expected: two results, e.g. ana.ns.cloudflare.com / bob.ns.cloudflare.com
+#    expected: emma.ns.cloudflare.com / norm.ns.cloudflare.com
 
 # 2. Traffic must arrive via Cloudflare
 curl -sI https://www.neonlegacies.co.za/profile.html | grep -i '^server:'
@@ -72,8 +165,15 @@ curl -sI https://www.neonlegacies.co.za/profile.html | grep -i '^server:'
 #    expected: 13 checks passed
 ```
 
-All three must agree. If (2) still says `GitHub.com`, the nameservers have not
+All four must agree. If (2) still says `GitHub.com`, the nameservers have not
 been switched yet, no matter what the dashboard shows.
+
+**Measured 2026-11-01 (zone added in Cloudflare, registrar not switched):**
+zone NS = `*.anycast-ns.com` (Domains.co.za) on both `dns.google` and
+`cloudflare-dns.com`, DS = none, `server: GitHub.com`, apex = no A record,
+`status.sh` = 2 pending / 2 waiting (exit 1). The 2026-10-31 baseline was the
+same, which proves the "pending" dashboard is not the same thing as a live
+delegation.
 
 **Measured 2026-10-31 (before the migration):** zone NS = `*.anycast-ns.com`
 (Domains.co.za), `server: GitHub.com`, `verify.sh` = 5 passed / 8 failed. That
@@ -210,5 +310,9 @@ Bot Fight Mode challenging the redirect back, or a cached `auth.js` (rule 4.1).
 - **Remove Cloudflare from the path entirely:** set the DNS records to
   *DNS only* (grey cloud). GitHub Pages then serves directly again, as it does
   today.
+- **If DNSSEC was already enabled:** delete the **DS record at Domains.co.za
+  first**, then move the nameservers back. Leaving a DS behind that points at a
+  key the new nameservers do not have keeps the domain on `SERVFAIL` long after
+  the rollback.
 - Nothing in this folder changes the site's code, so no redeploy of the site is
   needed for either rollback.
