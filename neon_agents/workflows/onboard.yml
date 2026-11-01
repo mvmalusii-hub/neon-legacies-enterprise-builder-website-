@@ -40,13 +40,21 @@ jobs:
 
       # Inputs arrive as environment variables and are passed as flags, never
       # interpolated into code, so a workflow input cannot become executable.
+      #
+      # A push to the prompt/schema carries no `github.event.inputs` at all, so
+      # every value below needs a fallback. Without them the run step built
+      # `--input  --provider ` and argparse aborted the job with
+      # "argument --input: expected one argument" before Onboard ever ran. The
+      # push path falls back to the offline faked provider, so re-activating the
+      # agent on a prompt change needs no secret; a manual dispatch still passes
+      # its own provider/input/offline and runs the live model.
       - name: Run Onboard batch
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
-          PROVIDER: ${{ github.event.inputs.provider }}
-          INPUT_FILE: ${{ github.event.inputs.input_file }}
-          OFFLINE: ${{ github.event.inputs.offline }}
+          PROVIDER: ${{ github.event.inputs.provider || 'deepseek' }}
+          INPUT_FILE: ${{ github.event.inputs.input_file || 'neon_agents/tests/samples/onboard_samples.json' }}
+          OFFLINE: ${{ github.event.inputs.offline || 'true' }}
         run: |
           set -euo pipefail
           args="--input $INPUT_FILE --out results_onboard.json --provider $PROVIDER"
