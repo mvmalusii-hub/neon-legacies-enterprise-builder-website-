@@ -1,0 +1,28 @@
+# GitHub Pages (legacy builder) reads THIS file only.
+#
+# The site also carries a `config.yml` with titles, plugins and defaults, but the
+# builder never loads it – which is why /apps-script/Auth.gs, /apps-script/Code.gs,
+# /apps-script/test/*.js, /cloudflare/security-headers.worker.js,
+# /layouts/default.html, /.htaccess, /config.yml and /tools/* were all served with
+# HTTP 200 even though their names were listed in that file's `exclude:`.
+#
+# Everything below is server-side source or tooling: none of it is part of the
+# published site, and publishing it leaks the login backend and the Worker that
+# sets the security headers. Verify after a deploy with
+# `./cloudflare/waf-test.sh` (section 3) – every path must answer 404 or 403.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - README.md
+  - LICENSE
+  - .gitignore
+  - package.json
+  - package-lock.json
+  - config.yml
+  - apps-script
+  - cloudflare
+  - layouts
+  - tools
+  - .htaccess
