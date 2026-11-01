@@ -335,6 +335,42 @@ curl -s -o /dev/null -w '%{http_code}\n' https://www.neonlegacies.co.za/.git/con
 redeploy — the policy is then reported, not enforced, so nothing is blocked
 while you read the console messages. Switch it back once the console is clean.
 
+## 3b. No-Worker alternative (doable from a phone)
+
+The Worker only sets **static** headers, and Cloudflare can set static response
+headers without any code: **Rules ▸ Transform Rules ▸ Modify Response Header**
+(free plan, 10 rules). This has the same effect for this site and needs no
+deploy. Use it if pasting a Worker into the mobile dashboard is not practical.
+
+| # | Rule | Expression | Header | Value |
+|---|---|---|---|---|
+| 1 | `csp-html` | `(http.request.uri.path eq "/" or http.request.uri.path contains ".html")` | Set static → `Content-Security-Policy` | the CSP string from `security-headers.worker.js` (one long value, no line breaks) |
+| 2 | `nosniff` | same expression | Set static → `X-Content-Type-Options` | `nosniff` |
+| 3 | `referrer` | same expression | Set static → `Referrer-Policy` | `strict-origin-when-cross-origin` |
+| 4 | `frame` | same expression | Set static → `X-Frame-Options` | `SAMEORIGIN` |
+| 5 | `coop` | same expression | Set static → `Cross-Origin-Opener-Policy` | `same-origin-allow-popups` |
+| 6 | `permissions` | same expression | Set static → `Permissions-Policy` | `geolocation=(), camera=(), microphone=(), payment=(), usb=()` |
+
+Two things a Transform Rule cannot do, and they are why the Worker still exists:
+
+- it cannot block a path (`.git/`, `.env`, `/apps-script/test/`) – that is a WAF
+  custom rule (§5, rule 2 and 3);
+- it cannot choose report-only CSP per environment (`CSP_REPORT_ONLY`).
+
+If you take this route, add §5 rule 3 (`hide-test-sources`) in the same sitting,
+otherwise `/apps-script/test/*.js` stays downloadable and `verify.sh` keeps
+failing that check.
+
+The header values are visible in one place, so they cannot drift:
+`grep -o "X-Content-Type-Options.*" cloudflare/security-headers.worker.js`.
+
+The CSP value for rule 1, ready to paste (it is the exact string the Worker
+sends; tested by `apps-script/test/cloudflare-worker.test.js`):
+
+```
+default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self' https://script.google.com; script-src 'self' 'unsafe-inline' https://accounts.google.com https://script.google.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https://lh3.googleusercontent.com https://*.googleusercontent.com; frame-src 'self' https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://oauth2.googleapis.com https://accounts.google.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests
+```
+
 ## 4. Caching rules (a stale `auth.js` breaks sign-in)
 
 Caching ▸ Cache Rules — create these in order:
