@@ -379,28 +379,58 @@ sends; tested by `apps-script/test/cloudflare-worker.test.js`):
 default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self' https://script.google.com; script-src 'self' 'unsafe-inline' https://accounts.google.com https://script.google.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https://lh3.googleusercontent.com https://*.googleusercontent.com; frame-src 'self' https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://oauth2.googleapis.com https://accounts.google.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests
 ```
 
-## 4. Caching rules (a stale `auth.js` breaks sign-in)
+## 4. Caching rules (a stale auth.js breaks sign-in)
 
-Caching ▸ Cache Rules — create these in order:
+**Where exactly to click** (mobile web included – this is the same on desktop):
+
+1. Open <https://dash.cloudflare.com>, tap the account, then the zone
+   **neonlegacies.co.za** (the page with the nameserver panels).
+2. Menu (☰ on mobile) → **Caching** → **Cache Rules**.
+   *Some accounts show this as* **Rules ▸ Cache Rules** *– same page.*
+3. **Create rule**.
+4. **Rule name:** `auth-js-bypass`.
+5. **When incoming requests match:** tap **Edit expression** (don't fight the
+   field builder on a phone) and paste exactly:
+
+   ```
+   http.request.uri.path eq "/auth.js"
+   ```
+
+6. **Then:** *Cache eligibility* → **Bypass cache**. Leave every other dropdown
+   alone.
+7. **Deploy**.
+
+That is the whole rule for this site, and it is the only cache rule you need:
 
 1. `http.request.uri.path eq "/auth.js"` → **Bypass cache**
-   (the login logic must never be a day old).
-2. `http.request.uri.path contains ".html"` → **Bypass cache**
-   (pages embed the session-gating markup).
-3. `http.request.uri.path matches "^/(main\\.css|.*\\.(png|ico|svg|woff2?))$"` →
-   **Cache eligible**, Edge TTL 1 month, Browser TTL 1 day.
 
-`auth.js` is fingerprinted only by its Git commit, so rule 1 is the important
-one: after you deploy a fix, the old copy must not survive at the edge.
+*Fallback if your plan does not show Cache Rules:* **Rules ▸ Page Rules** (free
+plan allows 3): URL `www.neonlegacies.co.za/auth.js*` → setting **Cache Level:
+Bypass** → Save. It does the same thing for this one file.
 
-**Measured 2026-11-01 07:20Z, rule 1 not yet created:**
+`http.request.uri.path` is the path **without** the query string, so the rule
+also matches `auth.js?v=6f2e76e8bf`. Conversely Cloudflare keys its cache by the
+full URL – a request for `auth.js?x=123` is a fresh `MISS` while `auth.js` is a
+`HIT` – which is why the content hash in §4a works with or without this rule.
+
+**Optional, not needed today:** HTML is already served `cf-cache-status:
+DYNAMIC` (Cloudflare does not cache it), so an extra "bypass .html" rule would
+change nothing. Caching `main.css` / images more aggressively would save a
+little origin traffic but adds a rule whose TTL you have to keep in mind after
+every design change; skip it until bandwidth says otherwise.
+
+**Measured 2026-11-01 08:15Z, rule not yet created:**
 
 ```
-auth.js   cf-cache-status: HIT   cache-control: max-age=14400   age: 41
-main.css  cf-cache-status: HIT   cache-control: max-age=14400
-app.js    cf-cache-status: MISS  cache-control: max-age=14400
-profile.html  cf-cache-status: DYNAMIC
+/auth.js              cf-cache-status: HIT   cache-control: max-age=14400  age: 462
+/auth.js?v=6f2e76e8bf cf-cache-status: HIT   cache-control: max-age=14400  age: 371
+/auth.js?x=<random>   cf-cache-status: MISS  cache-control: max-age=14400  age: 0
+profile.html          cf-cache-status: DYNAMIC
 ```
+
+The `MISS` on the randomised query is the proof that the cache key includes the
+query string – which is exactly why the `?v=<hash>` reference invalidates
+everything at once.
 
 GitHub Pages sends `max-age=14400`, so Cloudflare is free to keep `auth.js` for
 four hours. Every sign-in fix silently lags by up to 4 h and looks like "it
