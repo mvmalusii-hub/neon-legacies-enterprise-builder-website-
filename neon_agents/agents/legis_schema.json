@@ -1,0 +1,48 @@
+{
+  "name": "legis_roadmap",
+  "description": "Return the structured document roadmap for one Neon Legacies industry.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "industry": { "type": "string" },
+      "roadmap_size": { "type": "integer" },
+      "document_categories": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "enum": [
+                "Registration & Incorporation",
+                "Tax & Revenue",
+                "Labour & Employee",
+                "Empowerment & Transformation",
+                "Sector-Specific Licences",
+                "Operational & Risk",
+                "Commercial & Contractual"
+              ]
+            },
+            "document_count": { "type": "integer" },
+            "examples": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "required": ["category", "document_count", "examples"],
+          "additionalProperties": false
+        }
+      },
+      "critical_path": {
+        "type": "array",
+        "items": { "type": "string" },
+        "minItems": 5,
+        "maxItems": 5
+      },
+      "first_document": { "type": "string" },
+      "notes": { "type": ["string", "null"] }
+    },
+    "required": ["industry", "roadmap_size", "document_categories", "critical_path", "first_document", "notes"],
+    "additionalProperties": false
+  }
+}
