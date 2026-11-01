@@ -57,22 +57,41 @@ wiring without secrets.
 A violation is not just logged: the errors are quoted back to the model once as
 a correction, and only then does the call fail.
 
+## Triage: what needs a human
+
+`onboard` writes two files, because the `confidence` field is only worth having
+if something acts on it:
+
+```bash
+python3 -m neon_agents.cli onboard --input samples.json \
+  --out results_onboard.json --review-out results_onboard_review.json
+# processed 10 samples, 0 failed -> results_onboard.json
+# auto-accept 10, human review 0 -> results_onboard_review.json
+# {"total": 10, "auto": 10, "review": 0, "by_industry": {"Construction": 10}}
+```
+
+A row goes to **review** when it is low confidence, `Unclassified`, or failed –
+each with the reason attached. `Unclassified` is never auto-accepted: it means
+the industry list or the prompt needs work, not that the client has no industry.
+
 ## GitHub Actions
 
-The three workflow files live here as `workflows/*.yml` because GitHub only runs
-workflows from `.github/workflows/`, and this repository's automation token is
-not allowed to write that path. Install them once, either way:
+Install the workflows once:
 
-- **Web UI (no tooling):** Add file → Create new file → name it
-  `.github/workflows/agent-tests.yml` → paste the contents of
-  `neon_agents/workflows/agent-tests.yml` → Commit. Repeat for `onboard.yml` and
-  `legis.yml`.
-- **Command line with your own credentials:**
-  ```bash
-  mkdir -p .github/workflows
-  cp neon_agents/workflows/*.yml .github/workflows/
-  git add .github/workflows && git commit -m "Add agent workflows" && git push
-  ```
+```bash
+./neon_agents/install-workflows.sh            # copy them into .github/workflows
+./neon_agents/install-workflows.sh --commit    # copy and commit (then git push)
+```
+
+They live in `neon_agents/workflows/` rather than `.github/workflows/` because
+GitHub only runs workflows from the latter path, and the automation token that
+built this layer is not permitted to write it (`gh api` returns *Resource not
+accessible by integration*). The installer is idempotent and tells you the two
+secrets to add.
+
+The web-UI alternative, if you prefer: Add file → Create new file →
+`.github/workflows/agent-tests.yml` → paste the contents → commit, and repeat for
+`onboard.yml` and `legis.yml`.
 
 | Workflow | Trigger | Secrets needed |
 |---|---|---|

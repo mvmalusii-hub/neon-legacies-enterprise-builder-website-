@@ -16,6 +16,7 @@ from neon_agents import cli  # noqa: E402
 from neon_agents.fake import (FakeClient, FakeContentClient, good_legis,  # noqa: E402
                               good_onboard)
 from neon_agents.provider import AGENT_LIMITS, PROVIDERS, call_agent  # noqa: E402
+from neon_agents.review import classify, summarise  # noqa: E402
 
 SAMPLES = os.path.join(ROOT, "neon_agents", "tests", "samples", "onboard_samples.json")
 
@@ -125,6 +126,52 @@ class CliTests(unittest.TestCase):
             code = cli.main(["selftest"])
         self.assertEqual(code, 0, buffer.getvalue())
         self.assertIn("self-checks passed", buffer.getvalue())
+
+
+class ReviewQueueTests(unittest.TestCase):
+    def _row(self, **overrides):
+        data = good_onboard()
+        data.update(overrides)
+        return {"input": {"description": "x"}, "output": {"ok": True, "data": data}}
+
+    def test_high_confidence_row_is_auto_accepted(self):
+        auto, review = classify([self._row()])
+        self.assertEqual(len(auto), 1)
+        self.assertEqual(review, [])
+
+    def test_low_confidence_row_goes_to_review(self):
+        auto, review = classify([self._row(confidence="low")])
+        self.assertEqual(auto, [])
+        self.assertEqual(len(review), 1)
+        self.assertIn("confidence is low", review[0]["review_reasons"][0])
+
+    def test_unclassified_goes_to_review(self):
+        auto, review = classify([self._row(industry="Unclassified", roadmap_size=0)])
+        self.assertEqual(auto, [])
+        self.assertIn("no industry matched", review[0]["review_reasons"][0])
+
+    def test_failed_call_goes_to_review(self):
+        row = {"input": {}, "output": {"ok": False, "error": "boom"}}
+        auto, review = classify([row])
+        self.assertEqual(auto, [])
+        self.assertIn("did not produce valid output", review[0]["review_reasons"][0])
+
+    def test_summary_counts_industries(self):
+        rows = [self._row(), self._row(confidence="low")]
+        summary = summarise(rows)
+        self.assertEqual(summary["total"], 2)
+        self.assertEqual(summary["auto"], 1)
+        self.assertEqual(summary["review"], 1)
+        self.assertEqual(summary["by_industry"]["Construction"], 2)
+
+    def test_offline_batch_writes_a_review_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = os.path.join(tmp, "results.json")
+            review_path = os.path.join(tmp, "review.json")
+            code = cli.main(["onboard", "--input", SAMPLES, "--out", out,
+                             "--review-out", review_path, "--offline"])
+            self.assertEqual(code, 0)
+            self.assertEqual(json.load(open(review_path, encoding="utf-8")), [])
 
 
 if __name__ == "__main__":

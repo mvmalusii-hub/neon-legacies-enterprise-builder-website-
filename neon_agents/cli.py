@@ -21,6 +21,7 @@ from typing import Any, Dict, List
 from . import logging_config
 from .fake import FakeClient, good_legis, good_onboard
 from .provider import call_agent
+from .review import classify, summarise
 from .validate import validate
 
 log = logging.getLogger("neon_agents.cli")
@@ -72,7 +73,13 @@ def cmd_onboard(args: argparse.Namespace) -> int:
                              "ok": result.get("ok")}))
 
     _write_json(args.out, results)
+
+    auto, review = classify(results)
+    _write_json(args.review_out, review)
+    summary = summarise(results)
     print(f"processed {len(results)} samples, {failures} failed -> {args.out}")
+    print(f"auto-accept {len(auto)}, human review {len(review)} -> {args.review_out}")
+    print(json.dumps(summary, ensure_ascii=False))
     return 0 if failures == 0 else 1
 
 
@@ -155,6 +162,9 @@ def build_parser() -> argparse.ArgumentParser:
     onboard = sub.add_parser("onboard", help="classify a batch of client descriptions")
     onboard.add_argument("--input", required=True)
     onboard.add_argument("--out", default="results_onboard.json")
+    onboard.add_argument("--review-out", default="results_onboard_review.json",
+                         help="rows a human must look at (low confidence, "
+                              "Unclassified, or failed)")
     onboard.add_argument("--provider", default=os.getenv("PROVIDER", "deepseek"))
     onboard.add_argument("--offline", action="store_true")
     onboard.set_defaults(func=cmd_onboard)
