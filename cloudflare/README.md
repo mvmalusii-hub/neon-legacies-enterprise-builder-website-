@@ -180,7 +180,7 @@ DNSSEC is hardening, not a prerequisite: the site is fully served without it.
 ```
 
 Exit code 0 means all five agree; anything else prints the single next click.
-Then `./cloudflare/verify.sh` for the headers (13 checks) and Cloudflare ▸
+Then `./cloudflare/verify.sh` for the headers (14 checks) and Cloudflare ▸
 Overview should show the zone as **Active**.
 
 **If section 1 keeps failing after 48 hours**, in this order:
@@ -193,6 +193,20 @@ Overview should show the zone as **Active**.
    fail instead of falling back.
 4. Ask Domains.co.za support to confirm the delegation was submitted to ZARC;
    the registry is the last hop and the one that overrides everything.
+
+### What is left on this site (2026-11-01 07:20Z)
+
+DNS is finished – `status.sh` exits 0 with *7 passed, 1 waiting*. The remaining
+work is hardening, in this order:
+
+- [ ] **§3 Deploy the Worker** (`neon-security-headers`) and attach the route
+      `www.neonlegacies.co.za/*`. Until then `verify.sh` fails 8 of 14 checks,
+      the login page has no CSP, and `/apps-script/test/*.js` is downloadable.
+- [ ] **§4 Cache rule for `auth.js`** – it is currently `HIT` with
+      `max-age=14400`, so sign-in fixes lag up to 4 hours.
+- [ ] **§5 Bots + WAF + rate limit** on `/profile.html` and `/auth.js`.
+- [ ] **§3 DNSSEC** – copy the DS from Cloudflare into Domains.co.za (only now,
+      with the delegation clean).
 
 The site is static (GitHub Pages) and authentication happens in
 `apps-script/Auth.gs` (Google account login) or Google Identity Services.
@@ -218,9 +232,10 @@ node cloudflare/whois.js neonlegacies.co.za | grep -E '^(Name Server|DNSSEC)'
 #              DNSSEC: signed
 
 # What the Cloudflare zone answers right now, before propagation matters
-node cloudflare/dnsprobe.js 108.162.192.112 CNAME www.neonlegacies.co.za
-#    expected: mvmalusii-hub.github.io   (Cloudflare flattens it to A records
-#              once the CNAME is proxied – an A answer is equally good)
+node cloudflare/dnsprobe.js 108.162.192.112 A www.neonlegacies.co.za
+#    expected: the two proxied edge IPs (104.21.59.250, 172.67.186.77).
+#    A CNAME answer would mean the record is DNS-only (grey cloud) – proxying
+#    is what makes the Worker and the headers possible.
 
 # Traffic must arrive via Cloudflare
 curl -sI https://www.neonlegacies.co.za/profile.html | grep -i '^server:'
@@ -228,7 +243,7 @@ curl -sI https://www.neonlegacies.co.za/profile.html | grep -i '^server:'
 
 # Headers + blocked paths
 ./cloudflare/verify.sh
-#    expected: 13 checks passed
+#    expected: 14 checks passed
 ```
 
 All five must agree. If `server:` still says `GitHub.com`, the delegation is not
@@ -333,6 +348,27 @@ Caching ▸ Cache Rules — create these in order:
 
 `auth.js` is fingerprinted only by its Git commit, so rule 1 is the important
 one: after you deploy a fix, the old copy must not survive at the edge.
+
+**Measured 2026-11-01 07:20Z, rule 1 not yet created:**
+
+```
+auth.js   cf-cache-status: HIT   cache-control: max-age=14400   age: 41
+main.css  cf-cache-status: HIT   cache-control: max-age=14400
+app.js    cf-cache-status: MISS  cache-control: max-age=14400
+profile.html  cf-cache-status: DYNAMIC
+```
+
+GitHub Pages sends `max-age=14400`, so Cloudflare is free to keep `auth.js` for
+four hours. Every sign-in fix silently lags by up to 4 h and looks like "it
+worked yesterday". `verify.sh` now fails on exactly this:
+
+```
+FAIL  auth.js is edge-cached (cf-cache-status: hit, cache-control: max-age=14400)
+      Add cache rule 4.1: uri.path eq "/auth.js" -> Bypass cache
+```
+
+Purging once (Caching ▸ Configuration ▸ Purge Everything) is not a fix – the
+next deploy re-caches it.
 
 ## 5. WAF, bots and rate limiting
 
