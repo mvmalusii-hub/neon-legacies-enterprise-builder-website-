@@ -28,18 +28,25 @@ Two more things that produce the same error:
   The dashboard then refuses to add it; remove it from that account or ask
   Cloudflare support to release it.
 
-### Verified state of this domain (checked 2026-11-01)
+### Verified state of this domain (checked 2026-11-01 00:40Z)
 
 | Record | Value |
 |---|---|
-| `neonlegacies.co.za` NS | `ns1.anycast-ns.com`, `ns2.anycast-ns.net`, `ns3.anycast-ns.com`, `ns4.anycast-ns.net` → **Domains.co.za** (unchanged) |
-| `neonlegacies.co.za` DS | **none** – DNSSEC is not delegated |
-| `neonlegacies.co.za` SOA | `ns1.anycast-ns.com dns-admin.domains.co.za` |
-| `www` CNAME | `mvmalusii-hub.github.io` → `185.199.108–111.153` (GitHub Pages), `server: GitHub.com` |
-| apex `A` | **none** – the bare domain does not resolve today |
-| Cloudflare zone | exists and answers (`emma.ns.cloudflare.com` is authoritative), status *Pending Nameserver Update* |
-| Cloudflare zone contents | **empty** – `www` and the apex return NODATA/NXDOMAIN when asked directly |
-| Registry (WHOIS, 00:18:48Z) | `emma.ns.cloudflare.com`, `norm.ns.cloudflare.com`, **plus** `ns3.anycast-ns.com`, `ns4.anycast-ns.net`, `DNSSEC: unsigned` – **a partial change** |
+| `neonlegacies.co.za` NS (registry, 00:23:58Z) | `emma.ns.cloudflare.com`, `norm.ns.cloudflare.com` – **clean, exactly two** |
+| `neonlegacies.co.za` DS | **none** – `DNSSEC: unsigned`, correct at this stage |
+| `www` at Cloudflare (`emma`, asked directly) | **nothing** – NODATA for `A` and `CNAME` |
+| apex at Cloudflare (`emma`, asked directly) | **nothing** – NODATA for `A` |
+| `www` via public resolvers | **NODATA on `1.1.1.1`, `8.8.8.8`, `9.9.9.9`** → the site is unreachable for visitors without a cached record |
+| GitHub Pages | `cname: www.neonlegacies.co.za`, certificate approved, HTTPS enforced, built from `main` – the origin is healthy |
+| Cloudflare zone | authoritative (`serial=2418979269`) but **empty** |
+
+The delegation is done and correct. The only thing missing is the zone's
+contents: with the registry clean this is now the difference between the site
+working and NXDOMAIN for everyone whose cache has expired.
+
+History: WHOIS at 00:18:48Z still listed four nameservers (`emma`, `norm`,
+`ns3.anycast-ns.com`, `ns4.anycast-ns.net`) – the registrar had *added*
+Cloudflare instead of replacing the old pair; by 00:23:58Z that was corrected.
 
 Check it yourself at any time, without `dig`:
 
@@ -219,6 +226,12 @@ curl -sI https://www.neonlegacies.co.za/profile.html | grep -i '^server:'
 
 All five must agree. If `server:` still says `GitHub.com`, the delegation is not
 clean, no matter what the dashboard shows.
+
+**Measured 2026-11-01 00:40Z (delegation clean, zone still empty):** registry =
+`emma`, `norm` only; `www` returns NODATA on `1.1.1.1`, `8.8.8.8` and `9.9.9.9`;
+`emma` is authoritative (`serial=2418979269`) but carries no records, so the
+domain is dark for anyone without a cached record. `status.sh` = 2 failed /
+2 passed / 4 waiting.
 
 **Measured 2026-11-01 00:20Z (registrar change partially applied):** registry =
 **four** nameservers (`emma`, `norm`, `ns3.anycast-ns.com`, `ns4.anycast-ns.net`),
