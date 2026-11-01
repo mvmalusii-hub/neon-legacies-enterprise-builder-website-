@@ -73,17 +73,23 @@ esac
 echo
 
 # ------------------------------------------- 3. repo internals are hidden
-echo "3. repo internals are not downloadable (§5 WAF rules 2-3)"
+echo "3. repo internals are not downloadable (§5 WAF rules + _config.yml exclude)"
 blocked() { # blocked <path> <label>
   local path="$1" label="$2" code
-  code=$(code_of "$SITE$path")
+  # cache-buster: a stale edge copy of a now-404 file must not look like a leak
+  code=$(code_of "$SITE$path?nl_probe=$RANDOM$RANDOM")
   case "$code" in
     403|404) pass "$label (HTTP $code)" ;;
-    *)       fail "$label is public (HTTP $code) – add the WAF rule from §5" ;;
+    *)       fail "$label is public (HTTP $code) – add it to _config.yml exclude or the WAF rule from §5" ;;
   esac
 }
-blocked "/apps-script/test/google-auth.test.js" "test sources"
+blocked "/apps-script/Auth.gs" "login backend source"
+blocked "/apps-script/Code.gs" "leads backend source"
+blocked "/apps-script/test/google-auth.test.js" "auth tests"
 blocked "/apps-script/test/cloudflare-worker.test.js" "worker tests"
+blocked "/cloudflare/security-headers.worker.js" "Worker source"
+blocked "/config.yml" "Jekyll config"
+blocked "/.htaccess" ".htaccess"
 blocked "/.env" ".env"
 blocked "/.git/config" ".git/config"
 echo

@@ -197,22 +197,24 @@ Overview should show the zone as **Active**.
 4. Ask Domains.co.za support to confirm the delegation was submitted to ZARC;
    the registry is the last hop and the one that overrides everything.
 
-### What is left on this site (2026-11-01 07:55Z)
+### What is left on this site (2026-11-01 08:05Z)
 
-DNS **and** DNSSEC are finished – `status.sh` exits 0 with *all 8 checks passed*
-(registry signed, `AD=true` from two validators). The remaining work is
-hardening, in this order:
+Done: DNS, DNSSEC, and the published-source leak (fixed in the repo, not with a
+WAF rule – see §9). `status.sh` exits 0 with *all 8 checks passed*.
+
+Still to do in the Cloudflare dashboard, in this order:
 
 - [ ] **§3 / §3b Headers** – deploy the Worker or the six Transform Rules. Until
       then `verify.sh` fails 8 of 14 checks and the login page has no CSP.
-- [ ] **§4 Cache rule for `auth.js`** – it is currently `HIT` with
-      `max-age=14400`, so sign-in fixes lag up to 4 hours.
-- [ ] **§5 WAF + rate limit + Bot Fight Mode** – `waf-test.sh` reports 5 missing:
-      POST reaches GitHub (405), `/apps-script/test/*.js` is downloadable (200),
-      no 429 in 40 requests, and no bot challenge.
+- [ ] **§4 Cache rule for `auth.js`** – still `HIT` with `max-age=14400` at the
+      edge. §4a already defeats the browser half in the repo, so this is now
+      only about the edge copy.
+- [ ] **§5 WAF rules + rate limit + Bot Fight Mode** – `waf-test.sh` reports what
+      is missing: POST reaches GitHub (405), no 429 in 40 requests, no bot
+      challenge.
 
 Verify as you go: `./cloudflare/verify.sh` (headers) and
-`./cloudflare/waf-test.sh` (WAF, bots, rate limit, cache).
+`./cloudflare/waf-test.sh` (cache, WAF, bots, rate limit, leaked sources).
 
 The site is static (GitHub Pages) and authentication happens in
 `apps-script/Auth.gs` (Google account login) or Google Identity Services.
@@ -363,9 +365,9 @@ Two things a Transform Rule cannot do, and they are why the Worker still exists:
   custom rule (§5, rule 2 and 3);
 - it cannot choose report-only CSP per environment (`CSP_REPORT_ONLY`).
 
-If you take this route, add §5 rule 3 (`hide-test-sources`) in the same sitting,
-otherwise `/apps-script/test/*.js` stays downloadable and `verify.sh` keeps
-failing that check.
+If you take this route, add §5 rule 2 (`hide-internals`) in the same sitting,
+otherwise a file that is not in `_config.yml` stays downloadable and `verify.sh`
+keeps failing that check.
 
 The header values are visible in one place, so they cannot drift:
 `grep -o "X-Content-Type-Options.*" cloudflare/security-headers.worker.js`.
@@ -412,6 +414,28 @@ FAIL  auth.js is edge-cached (cf-cache-status: hit, cache-control: max-age=14400
 Purging once (Caching ▸ Configuration ▸ Purge Everything) is not a fix – the
 next deploy re-caches it.
 
+### 4a. The browser half of the same problem (already fixed in the repo)
+
+The cache rule only stops **Cloudflare** from holding a stale copy. GitHub Pages
+sends `cache-control: max-age=14400`, so a visitor's own browser keeps `auth.js`
+for four hours as well. That is why every gated page now loads it as a content
+hash:
+
+```html
+<script src="auth.js?v=6f2e76e8bf"></script>
+```
+
+Change `auth.js`, run the tool, and the URL changes – no cache anywhere can
+serve the old copy, rule or no rule:
+
+```bash
+./tools/version-assets.sh           # rewrite the 10 gated pages
+./tools/version-assets.sh --check   # fail if a page is behind (run before pushing)
+```
+
+Add `--check` to whatever you do before deploying; it exits 1 and names the
+pages that still point at an old hash.
+
 ## 5. WAF, bots and rate limiting
 
 Exact click paths in the current dashboard (the mobile dashboard uses the same
@@ -428,19 +452,24 @@ names, just stacked):
 If a real visitor ever gets challenged in a loop on the login page, add a WAF
 skip rule for `http.request.uri.path in {"/profile.html" "/auth.js"}`.
 
-**Security ▸ WAF ▸ Custom rules** (free plan allows 5). For each one: *Create
-rule* → name it → paste the expression → **Action: Block** → *Deploy*.
+**Security ▸ WAF ▸ Custom rules** (free plan allows 5; two are enough). For each
+one: *Create rule* → name it → paste the expression → **Action: Block** →
+*Deploy*.
 
 | # | Name | Expression | Action |
 |---|---|---|---|
 | 1 | `static-no-writes` | `http.request.method in {"POST" "PUT" "PATCH" "DELETE"}` | Block |
-| 2 | `hide-repo-paths` | `http.request.uri.path contains ".git/" or http.request.uri.path contains ".env"` | Block |
-| 3 | `hide-test-sources` | `starts_with(http.request.uri.path, "/apps-script/test/")` | Block |
+| 2 | `hide-internals` | `http.request.uri.path contains ".git/" or http.request.uri.path contains ".env" or starts_with(http.request.uri.path, "/apps-script/") or starts_with(http.request.uri.path, "/cloudflare/") or http.request.uri.path eq "/config.yml" or http.request.uri.path eq "/.htaccess"` | Block |
 
 Rule 1 is safe because nothing posts to our own domain — the forms POST to
 `script.google.com` (a different host), and the login is a GET redirect. A
-blocked request returns **403**, so a rule that works changes
-`/apps-script/test/*.js` from 200 to 403 (GitHub's own 404 is equally fine).
+blocked request returns **403**, so a rule that works changes a leaked path from
+200 to 403 (GitHub's own 404 is equally fine).
+
+Rule 2 is **defence in depth**: `_config.yml` already stops those paths from
+being published at all (they answer 404). Keep the rule anyway — it is what
+covers a file someone adds later and forgets to exclude, and it costs none of
+the free plan's quota that this site needs.
 
 **Security ▸ WAF ▸ Rate limiting rules** (free plan allows 1):
 
@@ -507,3 +536,40 @@ Bot Fight Mode challenging the redirect back, or a cached `auth.js` (rule 4.1).
   the rollback.
 - Nothing in this folder changes the site's code, so no redeploy of the site is
   needed for either rollback.
+
+## 9. Perimeter summary
+
+Every control, where it lives, why that layer, and how it is proven. "Repo"
+means it is already in place and cannot drift; "dashboard" means it is still to
+be created.
+
+| Control | Layer | State | Proof |
+|---|---|---|---|
+| Login backend and Worker source not published | **Repo** – `_config.yml` `exclude:` | ✅ in place | `waf-test.sh` §3 → every path 404 |
+| `auth.js` cannot serve stale code | **Repo** – content hash `?v=` + `tools/version-assets.sh --check` | ✅ in place | `version-assets.sh --check` exits 0 |
+| Stale edge copy of `auth.js` | **Dashboard** – Caching ▸ Cache Rules | ⏳ to create | `waf-test.sh` §1 → `cf-cache-status: bypass` |
+| Writes refused at the edge | **Dashboard** – WAF custom rule 1 | ⏳ to create | `waf-test.sh` §2 → POST = 403 |
+| Internals blocked even if published again | **Dashboard** – WAF custom rule 2 | ⏳ to create | `waf-test.sh` §3 (403 instead of 404 is also a pass) |
+| Automated clients challenged | **Dashboard** – Security ▸ Bots | ⏳ to create | `waf-test.sh` §4 → challenge or 403/429/503 |
+| Login page rate limited | **Dashboard** – WAF rate limiting (1 rule) | ⏳ to create | `waf-test.sh` §5 → a 429 inside 40 requests |
+| CSP, nosniff, Referrer-Policy, COOP, Permissions-Policy | **Dashboard** – Worker (§3) or Transform Rules (§3b) | ⏳ to create | `verify.sh` → 14/14 |
+| DNSSEC | **Dashboard + registrar** | ✅ in place | `status.sh` §4 → registry signed, `AD=true` |
+| Cloudflare authoritative for the zone | **Registrar** | ✅ in place | `status.sh` §1–3 |
+
+Two rules of thumb that keep this cheap:
+
+- **Fix it at the source first.** A file that is not published cannot be leaked,
+  and needs no rule, no quota and no maintenance. That is why the source leak is
+  a repo fix, not a WAF rule.
+- **Spend dashboard quota on behaviour, not on file lists.** The free plan gives
+  5 custom rules and 1 rate-limit rule; behaviour rules (`no writes`, one
+  combined `hide-internals`) leave room for the login-specific protections.
+
+### The freed redirect
+
+`.htaccess` used to redirect `legacylaunchpad.co.za` → `www.neonlegacies.co.za`.
+GitHub Pages never executes Apache config, so it did nothing except publish
+itself. If that domain still matters, do it in **Rules ▸ Redirect Rules**:
+
+- If: `http.host eq "legacylaunchpad.co.za" or http.host eq "www.legacylaunchpad.co.za"`
+- Then: dynamic redirect **301** to `concat("https://www.neonlegacies.co.za", http.request.uri.path)`
