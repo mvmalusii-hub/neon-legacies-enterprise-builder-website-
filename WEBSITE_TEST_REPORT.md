@@ -172,3 +172,38 @@ python3 -m unittest discover -s neon_agents/tests  # 40 tests
 bash tools/version-assets.sh --check               # cache-busting is current
 ```
 
+---
+
+## 6. Visual assets added
+
+The site had no photography and the header used a plain text “NL” tile. Added:
+
+| Asset | Where it is used |
+|---|---|
+| `assets/images/logo-mark.svg` | header of all 61 pages — gold monogram replacing the text tile |
+| `assets/images/photos/hero-office.jpg` | homepage hero background + pricing banner |
+| `visual-strategy.jpg` · `visual-documents.jpg` · `visual-partnership.jpg` | homepage photo band |
+| `visual-compliance.jpg` | `business-support.html` banner |
+| `visual-architecture.jpg` | `3d-floor-plans.html` banner |
+| `signage-storefront.jpg` | `liquor-licence.html` banner |
+| `spaza-shop.jpg` | `spaza-compliance.html` banner |
+| `about-team.jpg` | `about.html` |
+
+Photographs are Unsplash (free commercial use, attribution not required) —
+recorded in `assets/images/CREDITS.md` — and are resized + re-encoded
+(quality 72, metadata stripped); the whole photo set is ≈1 MB.
+
+Also fixed while rendering the pages in headless Chromium:
+
+- `.btn-primary { width: 100% }` turned the homepage CTAs into full-width bars →
+  scoped with `.hero-actions .btn { width: auto }`.
+- `.btn-outline` was navy-on-navy inside the dark heroes (effectively
+  invisible) → light treatment scoped to the dark hero classes.
+- Removed the stray `<link rel="icon" … sizes="16x16">` line from `index.html`
+  and deleted the junk `assets/images/favicon-*.png` placeholder file.
+- Typo “Iduustries” → “Industries” in the homepage hero badge.
+
+Verified with headless Chromium: desktop renders of 7 pages, plus an overflow
+probe at 485 / 753 / 1425 px — `scrollWidth === clientWidth` at every width
+(no horizontal scroll).
+

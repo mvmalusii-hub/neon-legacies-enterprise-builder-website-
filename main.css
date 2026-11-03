@@ -2487,3 +2487,171 @@ h3 {
 }
 
 
+/* ============================================================ */
+/*  12. VISUALS – brand mark, photography, banners              */
+/* ============================================================ */
+
+/* Brand mark in the header (replaces the old text "NL" tile). */
+.logo-mark {
+    width: 44px;
+    height: 44px;
+    display: block;
+    flex: 0 0 auto;
+    border-radius: 11px;
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.35));
+}
+
+/* Homepage hero: corporate photography under a navy wash. */
+.hero-premium {
+    background-image:
+        linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.64) 52%, rgba(15, 23, 42, 0.90) 100%),
+        url('assets/images/photos/hero-office.jpg');
+    background-size: cover;
+    background-position: center 42%;
+    background-repeat: no-repeat;
+}
+
+/* Photo band – three cards that give the page a corporate feel. */
+.visual-band {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 22px;
+    margin: 34px 0 10px;
+}
+.visual-card {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 250px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16);
+}
+.visual-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    transition: transform 0.6s ease;
+}
+.visual-card:hover img {
+    transform: scale(1.06);
+}
+.visual-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0) 30%, rgba(15, 23, 42, 0.55) 62%, rgba(15, 23, 42, 0.92) 100%);
+}
+.visual-card-body {
+    position: relative;
+    z-index: 2;
+    padding: 22px;
+    color: #fff;
+}
+.visual-card-body h3 {
+    font-size: 1.08rem;
+    margin-bottom: 6px;
+}
+.visual-card-body p {
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: #cbd5e1;
+}
+
+/* Full-width photo banner used on service pages. */
+.photo-banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 230px;
+    margin-bottom: 30px;
+    border-radius: 22px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.18);
+}
+.photo-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.66) 55%, rgba(15, 23, 42, 0.18) 100%);
+}
+.photo-banner-content {
+    position: relative;
+    z-index: 2;
+    padding: 28px 32px;
+    color: #fff;
+    max-width: 620px;
+}
+.photo-banner-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+.photo-banner-content p {
+    font-size: 0.95rem;
+    color: #cbd5e1;
+}
+.photo-banner .banner-tag {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(251, 191, 36, 0.16);
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    color: #fbbf24;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+@media (max-width: 480px) {
+    .visual-card {
+        min-height: 210px;
+    }
+    .photo-banner-content {
+        padding: 20px;
+    }
+    .photo-banner-content h2 {
+        font-size: 1.2rem;
+    }
+}
+
+
+/* ============================================================ */
+/*  13. HERO BUTTONS                                            */
+/* ============================================================ */
+/* `.btn-primary` is width:100% for the industry pages, which turned
+   the homepage CTAs into full-width bars. Let the hero buttons size
+   to their label instead. */
+.hero-actions .btn {
+    width: auto;
+}
+
+/* The dark heroes set `color: white`, but `.btn-outline` is navy-on-navy
+   and effectively invisible there. Give it a light treatment. */
+.hero-premium .btn-outline,
+.hero-industry .btn-outline,
+.hero-business .btn-outline,
+.hero-personal .btn-outline,
+.hero-marketing .btn-outline,
+.global-badge .btn-outline {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.10);
+}
+.hero-premium .btn-outline:hover,
+.hero-industry .btn-outline:hover,
+.hero-business .btn-outline:hover,
+.hero-personal .btn-outline:hover,
+.hero-marketing .btn-outline:hover,
+.global-badge .btn-outline:hover {
+    background: #ffffff;
+    color: #0f172a;
+    border-color: #ffffff;
+}
+
