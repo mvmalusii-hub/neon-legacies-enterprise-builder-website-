@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Transport & Logistics Document Roadmap – 84 Documents | Neon Legacies Enterprise Builder</title>
    <meta name="description" content="Complete document roadmap for transport and logistics – 84 documents including fleet management, driver contracts, and compliance records.">
+    <link rel="canonical" href="https://www.neonlegacies.co.za/industry-transport.html">
 
     <!-- External Styles -->
     <link rel="stylesheet" href="main.css">
@@ -18,7 +21,7 @@
         <div class="logo-area">
             <div class="logo-icon">NL</div>
             <div class="logo-text">
-                <h1>Neon Legacies Enterprise Builder</h1>
+                <div class="logo-name">Neon Legacies Enterprise Builder</div>
                 <p>Building what lasts.</p>
             </div>
         </div>
@@ -401,7 +404,7 @@ Transport & Logistics (Pty) Ltd/
             <!-- ===== BUTTONS ===== -->
             <div class="industry-buttons">
                 <a href="industries.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Industries</a>
-                <a href="#" id="orderSelectedBtn" class="btn btn-primary"><i class="fas fa-clipboard-list"></i> Order Selected Documents →</a>
+                <a href="#" id="orderSelectedBtnBottom" class="btn btn-primary"><i class="fas fa-clipboard-list"></i> Order Selected Documents →</a>
             </div>
 
             <!-- ===== FOOTER / CONTACT ===== -->
@@ -424,8 +427,7 @@ Transport & Logistics (Pty) Ltd/
     <!-- ============================================================ -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const orderBtn = document.getElementById('orderSelectedBtn');
-            if (orderBtn) {
+            document.querySelectorAll('#orderSelectedBtn, #orderSelectedBtnBottom').forEach(function(orderBtn) {
                 orderBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     const selected = [];
@@ -442,7 +444,7 @@ Transport & Logistics (Pty) Ltd/
                     const param = encodeURIComponent(JSON.stringify(selected));
                     window.location.href = 'order-documents.html?industry=Transport%20%26%20Logistics&preselected=' + param;
                 });
-            }
+            });
         });
     </script>
 

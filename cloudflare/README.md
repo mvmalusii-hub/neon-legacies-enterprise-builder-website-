@@ -65,6 +65,20 @@ Check it yourself at any time, without `dig`:
 ./cloudflare/waf-test.sh        # cache bypass, WAF, bots, rate limit
 ```
 
+### Deploying the header Worker (one command)
+
+`security-headers.worker.js` + `wrangler.toml` are ready to ship. With a
+`Workers Scripts: Edit` API token for this zone:
+
+```bash
+CLOUDFLARE_API_TOKEN=... ./cloudflare/deploy.sh   # wrangler deploy + route
+./cloudflare/verify.sh                            # the 7 header checks must pass
+```
+
+`deploy.sh` wraps `npx wrangler deploy` and binds
+`www.neonlegacies.co.za/*`, so the CSP/HSTS/nosniff headers land on every page
+instead of being set by hand in the dashboard.
+
 `status.sh` uses two small helpers (`whois.js`, `dnsprobe.js`) because resolver
 caches lie about delegation for hours: WHOIS answers from the `.co.za` registry
 (the authoritative source) and `dnsprobe.js` asks `emma.ns.cloudflare.com`

@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cash for Scrap Document Roadmap – 77 Documents | Neon Legacies Enterprise Builder</title>
     <meta name="description" content="Complete document roadmap for scrap metal recycling – 77 documents including permits, supplier agreements, and compliance records.">
+    <link rel="canonical" href="https://www.neonlegacies.co.za/industry-cash-for-scrap.html">
 
     <!-- External Styles -->
     <link rel="stylesheet" href="main.css">
@@ -18,7 +21,7 @@
         <div class="logo-area">
             <div class="logo-icon">NL</div>
             <div class="logo-text">
-                <h1>Neon Legacies Enterprise Builder</h1>
+                <div class="logo-name">Neon Legacies Enterprise Builder</div>
                 <p>Building what lasts.</p>
             </div>
         </div>
@@ -385,7 +388,7 @@ Cash for Scrap (Pty) Ltd/
             <!-- ===== BUTTONS ===== -->
             <div class="industry-buttons">
                 <a href="industries.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Industries</a>
-                <a href="#" id="orderSelectedBtn" class="btn btn-primary"><i class="fas fa-clipboard-list"></i> Order Selected Documents →</a>
+                <a href="#" id="orderSelectedBtnBottom" class="btn btn-primary"><i class="fas fa-clipboard-list"></i> Order Selected Documents →</a>
             </div>
 
             <!-- ===== FOOTER / CONTACT ===== -->
@@ -408,8 +411,7 @@ Cash for Scrap (Pty) Ltd/
     <!-- ============================================================ -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const orderBtn = document.getElementById('orderSelectedBtn');
-            if (orderBtn) {
+            document.querySelectorAll('#orderSelectedBtn, #orderSelectedBtnBottom').forEach(function(orderBtn) {
                 orderBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     const selected = [];
@@ -426,7 +428,7 @@ Cash for Scrap (Pty) Ltd/
                     const param = encodeURIComponent(JSON.stringify(selected));
                     window.location.href = 'order-documents.html?industry=Cash%20for%20Scrap&preselected=' + param;
                 });
-            }
+            });
         });
     </script>
 

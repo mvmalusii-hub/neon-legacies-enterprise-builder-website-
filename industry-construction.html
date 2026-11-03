@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Construction Document Roadmap – 84 Documents | Neon Legacies Enterprise Builder</title>
     <meta name="description" content="Complete document roadmap for construction companies – 84 documents including CIDB registration, MOI, site diary, risk assessments, and more.">
+    <link rel="canonical" href="https://www.neonlegacies.co.za/industry-construction.html">
 
     <!-- External Styles -->
     <link rel="stylesheet" href="main.css">
@@ -18,7 +21,7 @@
         <div class="logo-area">
             <div class="logo-icon">NL</div>
             <div class="logo-text">
-                <h1>Neon Legacies Enterprise Builder</h1>
+                <div class="logo-name">Neon Legacies Enterprise Builder</div>
                 <p>Building what lasts.</p>
             </div>
         </div>
@@ -378,7 +381,7 @@ Construction Company (Pty) Ltd/
             <!-- ===== BUTTONS ===== -->
             <div class="industry-buttons">
                 <a href="industries.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Industries</a>
-                <a href="#" id="orderSelectedBtn" class="btn btn-primary"><i class="fas fa-clipboard-list"></i> Order Selected Documents →</a>
+                <a href="#" id="orderSelectedBtnBottom" class="btn btn-primary"><i class="fas fa-clipboard-list"></i> Order Selected Documents →</a>
             </div>
 
             <!-- ===== FOOTER / CONTACT ===== -->
@@ -401,8 +404,7 @@ Construction Company (Pty) Ltd/
     <!-- ============================================================ -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const orderBtn = document.getElementById('orderSelectedBtn');
-            if (orderBtn) {
+            document.querySelectorAll('#orderSelectedBtn, #orderSelectedBtnBottom').forEach(function(orderBtn) {
                 orderBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     const selected = [];
@@ -419,7 +421,7 @@ Construction Company (Pty) Ltd/
                     const param = encodeURIComponent(JSON.stringify(selected));
                     window.location.href = 'order-documents.html?industry=Construction&preselected=' + param;
                 });
-            }
+            });
         });
     </script>
 

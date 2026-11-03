@@ -50,8 +50,9 @@ body {
     font-weight: bold;
     color: #0f172a;
 }
-.logo-text h1 {
+.logo-text .logo-name {
     font-size: 1.4rem;
+    font-weight: 700;
     letter-spacing: -0.5px;
 }
 .logo-text p {
@@ -606,6 +607,18 @@ body {
 .hero-partner h2,
 .hero-growth h2,
 .global-badge h2 {
+    margin: 10px 0;
+}
+/* The hero heading is the page's single <h1> now; keep the h2 look. */
+.hero-premium h1,
+.hero-admin h1,
+.hero-referral h1,
+.hero-market h1,
+.hero-hub h1,
+.hero-partner h1,
+.hero-growth h1,
+.global-badge h1 {
+    font-size: 1.5rem;
     margin: 10px 0;
 }
 /* specific hero overrides */
