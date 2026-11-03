@@ -13,7 +13,11 @@ const dom = require('./dom-stub');
 const backend = require('./appsscript-stub');
 
 const CLIENT_ID = '1234567890-abcdefghijklmnop.apps.googleusercontent.com';
-const SHARED_TOKEN = 'REPLACE_WITH_A_LONG_RANDOM_STRING';   // matches Code.gs CONFIG
+// Read the token Code.gs actually checks instead of keeping a second copy in
+// the test. The two drifted apart once (Code.gs/app.js were given the live
+// token while this line still held the placeholder), which made every backend
+// test fail as "unauthorised". Deriving it here means that can never happen.
+const SHARED_TOKEN = backend.loadCode().sandbox.CONFIG.SHARED_TOKEN;
 
 /* ------------------------------------------------------------------ */
 /* tiny test framework                                                 */

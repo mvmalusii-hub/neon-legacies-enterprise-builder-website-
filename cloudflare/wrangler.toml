@@ -1,0 +1,22 @@
+# ============================================================
+#  Neon Legacies – security-headers Worker (wrangler config)
+#  ------------------------------------------------------------
+#  GitHub Pages cannot send response headers, so this Worker is
+#  what adds CSP / HSTS / nosniff / Referrer-Policy / COOP to
+#  every page (the Google sign-in depends on them).
+#
+#  Deploy:  CLOUDFLARE_API_TOKEN=... ./cloudflare/deploy.sh
+#  Verify:  ./cloudflare/verify.sh   (all 7 header checks must pass)
+#  Docs:    cloudflare/README.md §3
+# ============================================================
+name = "neon-legacies-security-headers"
+main = "security-headers.worker.js"
+compatibility_date = "2024-11-01"
+
+# Wrap every request on the site so the headers reach every page.
+routes = [
+  { pattern = "www.neonlegacies.co.za/*", zone_name = "neonlegacies.co.za" }
+]
+
+# The GitHub Pages origin serves the assets; the Worker only adds headers.
+workers_dev = false

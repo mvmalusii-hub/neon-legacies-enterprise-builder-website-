@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signed Out | Neon Legacies Enterprise Builder</title>
     <meta name="description" content="You have been signed out of the Neon Legacies Enterprise Builder Business Hub.">
+    <link rel="canonical" href="https://www.neonlegacies.co.za/logout.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Neon Legacies Enterprise Builder">
+    <meta property="og:title" content="Signed Out | Neon Legacies Enterprise Builder">
+    <meta property="og:description" content="You have been signed out of the Neon Legacies Enterprise Builder Business Hub.">
+    <meta property="og:url" content="https://www.neonlegacies.co.za/logout.html">
+    <meta property="og:image" content="https://www.neonlegacies.co.za/assets/images/og-image.png">
+    <meta property="og:image:alt" content="Neon Legacies Enterprise Builder">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Signed Out | Neon Legacies Enterprise Builder">
+    <meta name="twitter:description" content="You have been signed out of the Neon Legacies Enterprise Builder Business Hub.">
+    <meta name="twitter:image" content="https://www.neonlegacies.co.za/assets/images/og-image.png">
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#0f172a">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -15,14 +27,14 @@
         .top-header { background: #0f172a; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
         .logo-area { display: flex; align-items: center; gap: 12px; text-decoration: none; color: white; }
         .logo-icon { background: #fbbf24; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: #0f172a; }
-        .logo-text h1 { font-size: 1.4rem; letter-spacing: -0.5px; }
+        .logo-text .logo-name { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
         .logo-text p { font-size: 0.7rem; color: #94a3b8; }
         .top-nav a { color: white; text-decoration: none; margin-left: 22px; }
         .top-nav a:hover { color: #fbbf24; }
         main { max-width: 640px; margin: 60px auto; padding: 0 20px; }
         .card { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 10px 30px rgba(15,23,42,0.08); text-align: center; }
         .card i { font-size: 2.4rem; color: #fbbf24; margin-bottom: 18px; }
-        .card h2 { font-size: 1.6rem; color: #0f172a; margin-bottom: 10px; }
+        .card h1 { font-size: 1.6rem; color: #0f172a; margin-bottom: 10px; }
         .card p { color: #475569; margin-bottom: 24px; }
         .btn { display: inline-block; background: #0f172a; color: white; padding: 12px 26px; border-radius: 999px; text-decoration: none; font-weight: 600; }
         .btn:hover { background: #fbbf24; color: #0f172a; }
@@ -32,9 +44,9 @@
 <body>
     <header class="top-header">
         <a class="logo-area" href="index.html">
-            <div class="logo-icon">NL</div>
+            <img class="logo-mark" src="assets/images/logo-mark.svg" alt="Neon Legacies Enterprise Builder logo" width="44" height="44">
             <div class="logo-text">
-                <h1>Neon Legacies Enterprise Builder</h1>
+                <div class="logo-name">Neon Legacies Enterprise Builder</div>
                 <p>Building what lasts.</p>
             </div>
         </a>
@@ -49,7 +61,7 @@
     <main>
         <div class="card">
             <i class="fas fa-sign-out-alt"></i>
-            <h2>You have been signed out</h2>
+            <h1>You have been signed out</h1>
             <p>Your session details have been cleared from this device. You can sign in again from the Business Hub at any time.</p>
             <p class="fine" id="signedOutAs"></p>
             <a class="btn" href="index.html">Back to Home</a>
