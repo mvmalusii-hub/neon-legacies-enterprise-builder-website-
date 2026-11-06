@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Our Partners | Legacy Launchpad</title>
+    <meta name="description" content="Become a Legacy Launchpad partner. Lawyers, accountants, tax practitioners, and business consultants can apply to join our network.">
+
+    <!-- External Styles -->
+    <link rel="stylesheet" href="main.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- 1. TOP HEADER (Shared)                                       -->
+    <!-- ============================================================ -->
+    <header class="top-header">
+        <div class="logo-area">
+            <div class="logo-icon">LP</div>
+            <div class="logo-text">
+                <h1>Legacy Launchpad</h1>
+                <p>Building what lasts.</p>
+            </div>
+        </div>
+
+        <nav class="top-nav" id="topNav">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="industries.html">Industries</a>
+            <a href="policies.html">Policies</a>
+            <a href="#contact">Contact</a>
+        </nav>
+
+        <button class="menu-toggle" id="menuToggleTop" aria-label="Toggle navigation">☰</button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar">☰</button>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- 2. MAIN APP CONTAINER                                        -->
+    <!-- ============================================================ -->
+    <div class="app-container">
+
+        <!-- SIDEBAR (Shared) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Enterprise Menu</h3>
+                <p>Advanced features</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="profile.html"><i class="fas fa-user-plus"></i> 01 Profile / Create Profile</a></li>
+                <li><a href="partners.html"><i class="fas fa-handshake"></i> 02 Our Partners</a></li>
+                <li><a href="#"><i class="fas fa-globe"></i> 03 International Partners</a></li>
+                <li><a href="#"><i class="fas fa-chart-line"></i> 04 Strategic Growth</a></li>
+                <li><a href="#"><i class="fas fa-building"></i> 05 Business Partners</a></li>
+                <li><a href="#"><i class="fas fa-chart-simple"></i> 06 Real Time Market Leads</a></li>
+                <li><a href="#"><i class="fas fa-users"></i> 07 Business Hub</a></li>
+                <li><a href="#"><i class="fas fa-user-tie"></i> 08 Hire Our Admin</a></li>
+                <li><a href="#"><i class="fas fa-gift"></i> 09 Referral Program</a></li>
+                <li><a href="#"><i class="fas fa-sign-out-alt"></i> 10 Profile Log Out</a></li>
+            </ul>
+        </aside>
+
+        <!-- MAIN CONTENT (Page-specific) -->
+        <main class="main-content">
+
+            <h2 class="section-title">🤝 Our Partners</h2>
+
+            <div class="partner-container">
+                <p class="partner-intro">
+                    Legacy Launchpad collaborates with trusted legal, accounting, audit, and tax professionals to offer you a complete business support ecosystem. Partner with us to share workload while your clients benefit from all‑round expertise.
+                </p>
+                <p class="partner-instruction">
+                    Select your profession below and complete the form. Once approved, you'll be listed on our website and gain access to client referrals.
+                </p>
+
+                <!-- Login warning (hidden by default, shown via JS if not logged in) -->
+                <div id="loginWarning" class="login-warning hidden">
+                    ⚠️ You are not logged in. <a href="profile.html">Please log in or create a profile</a> before submitting a partnership application.
+                </div>
+
+                <!-- Partner Type Dropdown -->
+                <div class="form-group">
+                    <label for="partnerType">I am applying as a:</label>
+                    <select id="partnerType">
+                        <option value="legal">Legal Partner (Lawyer / Firm)</option>
+                        <option value="accounting">Accounting Partner</option>
+                        <option value="audit">Audit Partner</option>
+                        <option value="tax">Tax Representative Partner</option>
+                        <option value="business">Business Partnership Venture</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic Form Container -->
+                <div id="dynamicForm">
+                    <!-- Filled by JavaScript -->
+                </div>
+
+                <button id="submitPartnerBtn" class="btn">Submit Partnership Application →</button>
+                <div id="submitMessage" class="message"></div>
+            </div>
+
+            <!-- Footer / Contact (Shared) -->
+            <div class="footer-contact" id="contact">
+                <p><strong>Msimelelo Victor Malusi</strong> – Founder</p>
+                <p>
+                    <i class="fas fa-phone"></i> 072 152 3293 &nbsp;|&nbsp;
+                    <i class="fab fa-whatsapp"></i> 063 301 7269 &nbsp;|&nbsp;
+                    <i class="fas fa-envelope"></i> mv.malusi@legacylaunchpad.co.za
+                </p>
+                <p>© 2025 Legacy Launchpad (Pty) Ltd – Building what lasts.</p>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 3. EXTERNAL JAVASCRIPT                                       -->
+    <!-- ============================================================ -->
+    <script src="app.js"></script>
+
+</body>
+</html>
