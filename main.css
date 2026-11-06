@@ -2555,6 +2555,7 @@ h3 {
 .visual-card-body h3 {
     font-size: 1.08rem;
     margin-bottom: 6px;
+    color: #000000;
 }
 .visual-card-body p {
     font-size: 0.86rem;
