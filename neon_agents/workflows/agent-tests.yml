@@ -1,0 +1,48 @@
+name: Agent tests (offline)
+
+# INSTALL: copy this file to .github/workflows/agent-tests.yml (GitHub only runs
+# workflows from that path). It needs no secrets, so it is the first one to add.
+#
+# Runs on every change to the agent layer. Needs no API key and no network:
+# the provider is faked, so a broken schema, prompt wiring or validator fails
+# here instead of after a paid call.
+on:
+  push:
+    paths:
+      - 'neon_agents/**'
+      - '.github/workflows/agent-tests.yml'
+  pull_request:
+    paths:
+      - 'neon_agents/**'
+      - '.github/workflows/agent-tests.yml'
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests (stdlib only, no install step)
+        run: python3 -m unittest discover -s neon_agents/tests -p 'test_*.py' -v
+
+      - name: Self-test (both agents, faked provider)
+        run: python3 -m neon_agents.cli selftest
+
+      - name: Offline batch over the 10 sample descriptions
+        run: |
+          python3 -m neon_agents.cli onboard \
+            --input neon_agents/tests/samples/onboard_samples.json \
+            --out /tmp/results_onboard.json \
+            --offline
+          python3 - <<'PY'
+          import json
+          rows = json.load(open('/tmp/results_onboard.json'))
+          assert len(rows) == 10, len(rows)
+          assert all(r['output']['ok'] for r in rows), 'a sample failed'
+          print('10/10 samples valid')
+          PY

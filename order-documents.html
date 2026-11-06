@@ -1,9 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Order Document Roadmaps & Compliance Systems | Legacy Launchpad</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Document Roadmaps & Compliance Systems | Neon Legacies Enterprise Builder</title>
     <meta name="description" content="Order ready-to-use document roadmaps and compliance systems for your industry. Fixed pricing, fast delivery, South African compliance.">
-    <title>Order & Quote | Legacy Launchpad</title>
+    <link rel="canonical" href="https://www.neonlegacies.co.za/order-documents.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Neon Legacies Enterprise Builder">
+    <meta property="og:title" content="Order Document Roadmaps & Compliance Systems | Neon Legacies Enterprise Builder">
+    <meta property="og:description" content="Order ready-to-use document roadmaps and compliance systems for your industry. Fixed pricing, fast delivery, South African compliance.">
+    <meta property="og:url" content="https://www.neonlegacies.co.za/order-documents.html">
+    <meta property="og:image" content="https://www.neonlegacies.co.za/assets/images/og-image.png">
+    <meta property="og:image:alt" content="Neon Legacies Enterprise Builder">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Order Document Roadmaps & Compliance Systems | Neon Legacies Enterprise Builder">
+    <meta name="twitter:description" content="Order ready-to-use document roadmaps and compliance systems for your industry. Fixed pricing, fast delivery, South African compliance.">
+    <meta name="twitter:image" content="https://www.neonlegacies.co.za/assets/images/og-image.png">
 
     <!-- External Styles -->
     <link rel="stylesheet" href="main.css">
@@ -17,9 +30,9 @@
     <!-- ============================================================ -->
     <header class="top-header">
         <div class="logo-area">
-            <div class="logo-icon">LP</div>
+            <img class="logo-mark" src="assets/images/logo-mark.svg" alt="Neon Legacies Enterprise Builder logo" width="44" height="44">
             <div class="logo-text">
-                <h1>Legacy Launchpad</h1>
+                <div class="logo-name">Neon Legacies Enterprise Builder</div>
                 <p>Building what lasts.</p>
             </div>
         </div>
@@ -69,7 +82,7 @@
                 <li><a href="referral.html"><i class="fas fa-gift"></i> 09 Referral Program</a></li>
                 <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i> 10 Profile Log Out</a></li>
                 <!-- EPK Studio link (opens in new tab) -->
-                <li><a href="https://www.legacylaunchpad.co.za/artist-profile-service.html" target="_blank"><i class="fas fa-star"></i> 11 EPK Studio</a></li>
+                <li><a href="https://www.neonlegacies.co.za/artist-profile-service.html" target="_blank"><i class="fas fa-star"></i> 11 EPK Studio</a></li>
             </ul>
         </aside>
 
@@ -85,6 +98,7 @@
             <!-- ===== FORM ===== -->
             <div class="order-form-card">
                 <form id="orderForm">
+                            <input type="text" name="_hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">
 
                     <!-- Client Info -->
                     <div class="form-row-2">
@@ -255,10 +269,10 @@
                 <p><strong>Msimelelo Victor Malusi</strong> – Founder</p>
                 <p>
                     <i class="fas fa-phone"></i> 072 152 3293 &nbsp;|&nbsp;
-                    <i class="fab fa-whatsapp"></i> 063 301 7269 &nbsp;|&nbsp;
-                    <i class="fas fa-envelope"></i> mv.malusi@legacylaunchpad.co.za
+                    <i class="fab fa-whatsapp"></i> 067 794 9236 &nbsp;|&nbsp;
+                    <i class="fas fa-envelope"></i> mv.malusi@neonlegacies.co.za
                 </p>
-                <p>© 2025 Legacy Launchpad (Pty) Ltd – Building what lasts.</p>
+                <p>© 2025 Neon Legacies Enterprise Builder (Pty) Ltd – Building what lasts.</p>
             </div>
 
         </main>
@@ -2400,14 +2414,35 @@
                 notes: document.getElementById('notes').value,
                 timestamp: new Date().toISOString()
             };
+            // ---- Lead intake (Google Apps Script) ----------------------
+            // Paste the deployed /exec URL + the shared token from
+            // apps-script/Code.gs. Until then the order is queued locally.
+            // Accepts the bare deployment ID or the full .../exec URL.
+            const LEAD_ID = 'AKfycbzM082roGPD0iDJy8XgmSdFATcPS8Ma5b2Y7XtAAEiO';
+            const LEAD_ENDPOINT = LEAD_ID.indexOf('https://script.google.com/') === 0
+                ? LEAD_ID
+                : (LEAD_ID ? 'https://script.google.com/macros/s/' + LEAD_ID + '/exec' : '');
+            const LEAD_TOKEN = '32bb90901d4b2c3323c1bb87cb08940f341040813634abc0';
+            payload.formType = 'Order';
+            payload.token = LEAD_TOKEN;
+            payload.id = 'order-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+            payload.page = 'order-documents.html';
+            const honeypot = document.querySelector('#orderForm input[name="_hp"]');
+            if (honeypot) { payload._hp = honeypot.value; }
             try {
-                // Replace with your actual Google Apps Script URL
-                await fetch('YOUR_APPS_SCRIPT_WEB_APP_URL', {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                if (LEAD_ENDPOINT) {
+                    await fetch(LEAD_ENDPOINT, {
+                        method: 'POST',
+                        mode: 'no-cors',                       // Apps Script sends no CORS headers
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    // Not configured yet – keep the order so it can be resent.
+                    const q = JSON.parse(localStorage.getItem('neonLeadQueue') || '[]');
+                    q.push(payload);
+                    localStorage.setItem('neonLeadQueue', JSON.stringify(q.slice(-25)));
+                }
                 alert('🎉 Congratulations! Your order has been received. We will send a quote and invoice within 24 hours.');
                 document.getElementById('orderForm').reset();
                 advContainer.innerHTML = '';

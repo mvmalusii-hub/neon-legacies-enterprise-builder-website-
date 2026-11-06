@@ -1,0 +1,60 @@
+# INSTALL: copy this file to .github/workflows/legis.yml
+# Secrets required: DEEPSEEK_API_KEY and/or QWEN_API_KEY
+#
+name: Run Legis agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      industry:
+        description: 'Industry (must match the table, e.g. Construction)'
+        required: true
+        default: 'Construction'
+      context:
+        description: 'Business context (optional, free text)'
+        required: false
+        default: ''
+      provider:
+        description: 'deepseek or qwen'
+        required: true
+        default: 'deepseek'
+
+jobs:
+  run-legis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r neon_agents/requirements.txt
+
+      - name: Run Legis
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
+          INDUSTRY: ${{ github.event.inputs.industry }}
+          CONTEXT: ${{ github.event.inputs.context }}
+          PROVIDER: ${{ github.event.inputs.provider }}
+        run: |
+          set -euo pipefail
+          python3 -m neon_agents.cli legis \
+            --industry "$INDUSTRY" \
+            --context "$CONTEXT" \
+            --provider "$PROVIDER" \
+            --out result_legis.json
+
+      - name: Show the roadmap
+        if: always()
+        run: python3 -c "import json;print(json.dumps(json.load(open('result_legis.json')),indent=2,ensure_ascii=False))"
+
+      - name: Upload result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legis-result
+          path: result_legis.json
+          if-no-files-found: warn

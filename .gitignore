@@ -1,0 +1,14 @@
+# Secrets and local state – never commit these.
+.env
+.env.*
+!.env.example
+
+# Agent run output (artifacts are uploaded by the workflows instead)
+results_onboard.json
+result_legis.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/

@@ -1,8 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Strategic Growth | Legacy Launchpad</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Growth | Neon Legacies Enterprise Builder</title>
     <meta name="description" content="Strategic growth consultations and business development services. Book a session with our team to scale your business.">
+    <link rel="canonical" href="https://www.neonlegacies.co.za/strategic-growth.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Neon Legacies Enterprise Builder">
+    <meta property="og:title" content="Strategic Growth | Neon Legacies Enterprise Builder">
+    <meta property="og:description" content="Strategic growth consultations and business development services. Book a session with our team to scale your business.">
+    <meta property="og:url" content="https://www.neonlegacies.co.za/strategic-growth.html">
+    <meta property="og:image" content="https://www.neonlegacies.co.za/assets/images/og-image.png">
+    <meta property="og:image:alt" content="Neon Legacies Enterprise Builder">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Strategic Growth | Neon Legacies Enterprise Builder">
+    <meta name="twitter:description" content="Strategic growth consultations and business development services. Book a session with our team to scale your business.">
+    <meta name="twitter:image" content="https://www.neonlegacies.co.za/assets/images/og-image.png">
 
     <!-- External Styles -->
     <link rel="stylesheet" href="main.css">
@@ -16,9 +30,9 @@
     <!-- ============================================================ -->
     <header class="top-header">
         <div class="logo-area">
-            <div class="logo-icon">LP</div>
+            <img class="logo-mark" src="assets/images/logo-mark.svg" alt="Neon Legacies Enterprise Builder logo" width="44" height="44">
             <div class="logo-text">
-                <h1>Legacy Launchpad</h1>
+                <div class="logo-name">Neon Legacies Enterprise Builder</div>
                 <p>Building what lasts.</p>
             </div>
         </div>
@@ -51,12 +65,12 @@
                 <li><a href="partners.html"><i class="fas fa-handshake"></i> 02 Our Partners</a></li>
                 <li><a href="international.html"><i class="fas fa-globe"></i> 03 International Partners</a></li>
                 <li><a href="strategic-growth.html"><i class="fas fa-chart-line"></i> 04 Strategic Growth</a></li>
-                <li><a href="#"><i class="fas fa-building"></i> 05 Business Partners</a></li>
-                <li><a href="#"><i class="fas fa-chart-simple"></i> 06 Real Time Market Leads</a></li>
-                <li><a href="#"><i class="fas fa-users"></i> 07 Business Hub</a></li>
-                <li><a href="#"><i class="fas fa-user-tie"></i> 08 Hire Our Admin</a></li>
-                <li><a href="#"><i class="fas fa-gift"></i> 09 Referral Program</a></li>
-                <li><a href="#"><i class="fas fa-sign-out-alt"></i> 10 Profile Log Out</a></li>
+                <li><a href="business-partners.html"><i class="fas fa-building"></i> 05 Business Partners</a></li>
+                <li><a href="market-leads.html"><i class="fas fa-chart-simple"></i> 06 Real Time Market Leads</a></li>
+                <li><a href="business-hub.html"><i class="fas fa-users"></i> 07 Business Hub</a></li>
+                <li><a href="hire-admin.html"><i class="fas fa-user-tie"></i> 08 Hire Our Admin</a></li>
+                <li><a href="referral.html"><i class="fas fa-gift"></i> 09 Referral Program</a></li>
+                <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i> 10 Profile Log Out</a></li>
             </ul>
         </aside>
 
@@ -66,9 +80,9 @@
             <!-- Hero Section -->
             <div class="hero-growth">
                 <i class="fas fa-seedling"></i>
-                <h2>Strategic Business Growth</h2>
+                <h1>Strategic Business Growth</h1>
                 <p>Live sessions, diversification, mass production, process management & market preparedness.</p>
-                <p>With our team of experienced professionals, Legacy Launchpad is your most sound all‑rounded business partner.</p>
+                <p>With our team of experienced professionals, Neon Legacies Enterprise Builder is your most sound all‑rounded business partner.</p>
             </div>
 
             <h2 class="section-title">📈 Business Strategic Growth Consultation</h2>
@@ -80,7 +94,7 @@
 
                 <!-- Login warning (hidden by default) -->
                 <div id="loginWarning" class="login-warning hidden">
-                    ⚠️ You are not logged in. <a href="profile.html">Please log in or create a profile</a> to book a consultation.
+                    ⚠️ You are not logged in. <a href="profile.html">Sign in with Google</a> to book a consultation.
                 </div>
 
                 <form id="growthForm">
@@ -177,10 +191,10 @@
                 <p><strong>Msimelelo Victor Malusi</strong> – Founder</p>
                 <p>
                     <i class="fas fa-phone"></i> 072 152 3293 &nbsp;|&nbsp;
-                    <i class="fab fa-whatsapp"></i> 063 301 7269 &nbsp;|&nbsp;
-                    <i class="fas fa-envelope"></i> mv.malusi@legacylaunchpad.co.za
+                    <i class="fab fa-whatsapp"></i> 067 794 9236 &nbsp;|&nbsp;
+                    <i class="fas fa-envelope"></i> mv.malusi@neonlegacies.co.za
                 </p>
-                <p>© 2025 Legacy Launchpad (Pty) Ltd – Building what lasts.</p>
+                <p>© 2025 Neon Legacies Enterprise Builder (Pty) Ltd – Building what lasts.</p>
             </div>
 
         </main>
@@ -189,6 +203,8 @@
     <!-- ============================================================ -->
     <!-- 3. EXTERNAL JAVASCRIPT                                       -->
     <!-- ============================================================ -->
+    <!-- auth.js first: it owns the Google session app.js gates on -->
+    <script src="auth.js?v=6f2e76e8bf"></script>
     <script src="app.js"></script>
 
 </body>

@@ -1,8 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Referral Program – Earn Money | Legacy Launchpad</title>
-    <meta name="description" content="Join the Legacy Launchpad referral program. Earn 10% commission for every successful referral. Share your unique link and start earning.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Program – Earn Money | Neon Legacies Enterprise Builder</title>
+    <meta name="description" content="Join the Neon Legacies Enterprise Builder referral program. Earn 10% commission for every successful referral. Share your unique link and start earning.">
+    <link rel="canonical" href="https://www.neonlegacies.co.za/referral.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Neon Legacies Enterprise Builder">
+    <meta property="og:title" content="Referral Program – Earn Money | Neon Legacies Enterprise Builder">
+    <meta property="og:description" content="Join the Neon Legacies Enterprise Builder referral program. Earn 10% commission for every successful referral. Share your unique link and start earning.">
+    <meta property="og:url" content="https://www.neonlegacies.co.za/referral.html">
+    <meta property="og:image" content="https://www.neonlegacies.co.za/assets/images/og-image.png">
+    <meta property="og:image:alt" content="Neon Legacies Enterprise Builder">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Referral Program – Earn Money | Neon Legacies Enterprise Builder">
+    <meta name="twitter:description" content="Join the Neon Legacies Enterprise Builder referral program. Earn 10% commission for every successful referral. Share your unique link and start earning.">
+    <meta name="twitter:image" content="https://www.neonlegacies.co.za/assets/images/og-image.png">
 
     <!-- External Styles -->
     <link rel="stylesheet" href="main.css">
@@ -16,9 +30,9 @@
     <!-- ============================================================ -->
     <header class="top-header">
         <div class="logo-area">
-            <div class="logo-icon">LP</div>
+            <img class="logo-mark" src="assets/images/logo-mark.svg" alt="Neon Legacies Enterprise Builder logo" width="44" height="44">
             <div class="logo-text">
-                <h1>Legacy Launchpad</h1>
+                <div class="logo-name">Neon Legacies Enterprise Builder</div>
                 <p>Building what lasts.</p>
             </div>
         </div>
@@ -56,7 +70,7 @@
                 <li><a href="business-hub.html"><i class="fas fa-users"></i> 07 Business Hub</a></li>
                 <li><a href="hire-admin.html"><i class="fas fa-user-tie"></i> 08 Hire Our Admin</a></li>
                 <li><a href="referral.html"><i class="fas fa-gift"></i> 09 Referral Program</a></li>
-                <li><a href="#"><i class="fas fa-sign-out-alt"></i> 10 Profile Log Out</a></li>
+                <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i> 10 Profile Log Out</a></li>
             </ul>
         </aside>
 
@@ -66,13 +80,13 @@
             <!-- Hero -->
             <div class="hero-referral">
                 <i class="fas fa-gift"></i>
-                <h2>Referral Program – Earn While You Grow</h2>
-                <p>Share Legacy Launchpad with your network. When someone you refer makes a purchase of R1,000 or more, you earn <strong>10% of their spend</strong> (minimum R100 per qualified referral).</p>
+                <h1>Referral Program – Earn While You Grow</h1>
+                <p>Share Neon Legacies Enterprise Builder with your network. When someone you refer makes a purchase of R1,000 or more, you earn <strong>10% of their spend</strong> (minimum R100 per qualified referral).</p>
             </div>
 
             <!-- Login check -->
             <div id="loginWarning" class="login-warning hidden">
-                ⚠️ You are not logged in. <a href="profile.html">Please log in or create a profile</a> to access your referral link and earnings.
+                ⚠️ You are not logged in. <a href="profile.html">Sign in with Google</a> to access your referral link and earnings.
             </div>
 
             <!-- Referral Content (visible when logged in) -->
@@ -97,7 +111,7 @@
                 <div class="form-card">
                     <h3>🔗 Your Unique Referral Link</h3>
                     <div class="referral-link-box">
-                        <code id="referralLink">https://legacylaunchpad.co.za/?ref=YOUR_CODE</code>
+                        <code id="referralLink">https://neonlegacies.co.za/?ref=YOUR_CODE</code>
                         <button id="copyLinkBtn" class="btn btn-sm">Copy</button>
                     </div>
                     <button id="refreshLinkBtn" class="btn btn-sm btn-outline">Generate New Link</button>
@@ -128,10 +142,10 @@
                 <p><strong>Msimelelo Victor Malusi</strong> – Founder</p>
                 <p>
                     <i class="fas fa-phone"></i> 072 152 3293 &nbsp;|&nbsp;
-                    <i class="fab fa-whatsapp"></i> 063 301 7269 &nbsp;|&nbsp;
-                    <i class="fas fa-envelope"></i> mv.malusi@legacylaunchpad.co.za
+                    <i class="fab fa-whatsapp"></i> 067 794 9236 &nbsp;|&nbsp;
+                    <i class="fas fa-envelope"></i> mv.malusi@neonlegacies.co.za
                 </p>
-                <p>© 2025 Legacy Launchpad (Pty) Ltd – Building what lasts.</p>
+                <p>© 2025 Neon Legacies Enterprise Builder (Pty) Ltd – Building what lasts.</p>
             </div>
 
         </main>
@@ -140,6 +154,8 @@
     <!-- ============================================================ -->
     <!-- 3. EXTERNAL JAVASCRIPT                                       -->
     <!-- ============================================================ -->
+    <!-- auth.js first: it owns the Google session app.js gates on -->
+    <script src="auth.js?v=6f2e76e8bf"></script>
     <script src="app.js"></script>
 
 </body>
